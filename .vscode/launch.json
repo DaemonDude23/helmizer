@@ -1,0 +1,58 @@
+{
+    "configurations": [
+        {
+            "args": [
+                "-n",
+                "sealed-secrets",
+                "--resource-paths",
+                "sealed-secrets/templates/",
+                "--kustomization-directory",
+                "."
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/examples/resources",
+            "name": "Example - resources",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
+                "-n",
+                "sealed-secrets",
+                "--resource-paths",
+                "sealed-secrets/templates/",
+                "--patches-strategic-merge-paths",
+                "patches/",
+                "--kustomization-directory",
+                ".",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/examples/patchStrategicMerge",
+            "name": "Example - patchStrategicMerge",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
+                "-n",
+                "sealed-secrets",
+                "--resource-paths",
+                "sealed-secrets/templates/",
+                "--common-labels",
+                "app.kubernetes.io/helmizer=true",
+                "app.kubernetes.io/yes=false",
+                "--kustomization-directory",
+                "."
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/examples/commonLabels",
+            "name": "Example - commonLabels",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        }
+    ],
+    "version": "0.2.0"
+}

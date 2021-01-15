@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+commonLabels:
+  app.kubernetes.io/helmizer: 'true'
+  app.kubernetes.io/yes: 'false'
+kind: Kustomization
+namespace: sealed-secrets
+resources:
+- sealed-secrets/templates/deployment.yaml
+- sealed-secrets/templates/role-binding.yaml
+- sealed-secrets/templates/service.yaml
+- sealed-secrets/templates/cluster-role-binding.yaml
+- sealed-secrets/templates/cluster-role.yaml
+- sealed-secrets/templates/service-account.yaml
+- sealed-secrets/templates/sealedsecret-crd.yaml
+- sealed-secrets/templates/role.yaml

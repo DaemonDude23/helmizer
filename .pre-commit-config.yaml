@@ -1,0 +1,19 @@
+repos:
+  - hooks:
+      - id: check-merge-conflict
+      - args:
+          - '--markdown-linebreak-ext=md'
+        id: trailing-whitespace
+      - id: detect-aws-credentials
+      - id: detect-private-key
+      - id: check-case-conflict
+      - id: check-symlinks
+      - args:
+          - '--allow-multiple-documents'
+        id: check-yaml
+      - id: pretty-format-json
+      - args:
+          - '--maxkb=1024'
+        id: check-added-large-files
+    repo: 'git://github.com/pre-commit/pre-commit-hooks'
+    rev: v3.3.0
