@@ -7,7 +7,7 @@
     - [Examples](#examples)
     - [Install a local virtual environment for dependencies](#install-a-local-virtual-environment-for-dependencies)
       - [Docker](#docker)
-        - [Build (Optional)](#build-optional)
+        - [Build Locally (Optional)](#build-locally-optional)
         - [Run](#run)
   - [References](#references)
   - [TODO](#todo)
@@ -95,7 +95,7 @@ virtualenv --clear ./venv/
 
 #### Docker
 
-##### Build (Optional)
+##### Build Locally (Optional)
 
 ```bash
 docker build -t helmizer:latest .
@@ -108,7 +108,7 @@ docker run --name helmizer \
   --rm \
   -v "$PWD"/examples:/usr/src/app/examples \
   -w /usr/src/app \
-  helmizer:latest ./helmizer.py \
+  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.1.0 ./helmizer.py \
     -n sealed-secrets \
     --resource-paths ./examples/resources/sealed-secrets/templates/ \
     --kustomization-directory ./examples/resources/
