@@ -1,19 +1,28 @@
 repos:
   - hooks:
+      - id: check-case-conflict
       - id: check-merge-conflict
-      - args:
-          - '--markdown-linebreak-ext=md'
-        id: trailing-whitespace
+      - id: destroyed-symlinks
       - id: detect-aws-credentials
       - id: detect-private-key
-      - id: check-case-conflict
-      - id: check-symlinks
-      - args:
-          - '--allow-multiple-documents'
-        id: check-yaml
-      - id: pretty-format-json
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: fix-encoding-pragma
+      - id: mixed-line-ending
       - args:
           - '--maxkb=1024'
         id: check-added-large-files
+      - args:
+          - '--markdown-linebreak-ext=md'
+        id: trailing-whitespace
+      - id: check-symlinks
+      - args:
+          - '--allow-multiple-documents'
+        files: ^flux\/.+\.tf
+        id: check-yaml
+      - args:
+          - '--maxkb=1024'
+        id: check-added-large-files
+      - id: requirements-txt-fixer
     repo: 'git://github.com/pre-commit/pre-commit-hooks'
-    rev: v3.3.0
+    rev: v3.4.0

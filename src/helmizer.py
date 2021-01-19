@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 """
 Helmizer - Generates `kustomization.yaml` for your locally-rendered YAML manifests, such as Helm templates
 """
 import argparse
 import logging
-from os import pardir, path, walk
+from os import path, walk
 from sys import stdout
 
 import yaml
@@ -34,7 +34,7 @@ class Kustomization():
         self.common_labels = self.get_common_labels()
 
     def print_kustomization(self):
-        print(f"{yaml.dump(self.yaml, sort_keys=True)}")
+        print(yaml.dump(self.yaml, sort_keys=True))
 
     def write_kustomization(self):
         if self.arguments.dry_run == False:
@@ -43,9 +43,10 @@ class Kustomization():
             kustomization_directory = str(
                 f"{self.arguments.kustomization_directory[0]}/{self.arguments.kustomization_file_name}")
             with open(kustomization_directory, 'w') as file:
-                documents = yaml.dump(self.yaml, file, sort_keys=True)
-                logging.info(
+                logging.debug(
                     f"Successfully wrote to file: {kustomization_directory}")
+        else:
+            return
 
     def render_template(self):
         self.print_kustomization()
@@ -65,7 +66,7 @@ class Kustomization():
             if len(self.arguments.common_labels) > 0:
                 logging.debug(f"commonLabels: {self.arguments.common_labels}")
                 dict_common_labels = dict()
-                for count, label in enumerate(self.arguments.common_labels[0]):
+                for label in self.arguments.common_labels[0]:
                     list_label = label.split("=")
                     dict_common_labels[list_label[0]] = list_label[1]
                 self.yaml["commonLabels"] = dict_common_labels
@@ -82,7 +83,7 @@ class Kustomization():
                 for target_path in paths[0]:
                     # path
                     if path.isdir(target_path):
-                        for (dirpath, dirnames, filenames) in walk(target_path):
+                        for (dirpath, _, filenames) in walk(target_path):
                             for file in filenames:
                                 absolute_path = str(f"{dirpath}/{file}")
                                 if arguments.resource_absolute_paths:
@@ -121,21 +122,24 @@ def init_arg_parser():
                                          formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
         optionals = parser.add_argument_group()
-        optionals.add_argument("--namespace", "-n", dest='namespace', action='store', type=str, help='')
+        optionals.add_argument("--common-labels", dest='common_labels', action='append', nargs='*',
+                               help='Common Labels where `=` is the assignment operator e.g key=value')
+        optionals.add_argument("--debug", dest='debug', action='store_true', help='Enable debug logging', default=False)
+        optionals.add_argument("--dry-run", dest='dry_run', action='store_true', help='Do not write to a file system.', default=True)
         optionals.add_argument("--kustomization-file-name", dest='kustomization_file_name', action='store',
                                type=str, help='options: `kustomization.yaml`, kustomization.yml, `Kustomization`',
                                default='kustomization.yaml')
-        optionals.add_argument("--debug", dest='debug', action='store_true', help='', default=False)
-        optionals.add_argument("--dry-run", dest='dry_run', action='store_true', help='', default=False)
-        optionals.add_argument("--patches-strategic-merge-paths", dest='patches_strategic_merge_paths', action='append', nargs='*', help='')
-        optionals.add_argument("--resource-paths", dest='resource_paths', action='append', nargs='*', help='')
-        optionals.add_argument("--resource-absolute-paths", dest='resource_absolute_paths', action='append', nargs='*', help='')
-        optionals.add_argument("--common-labels", dest='common_labels', action='append', nargs='*', help='')
-
-        required = parser.add_argument_group()
-        required.add_argument("--kustomization-directory", dest='kustomization_directory',
-                              action='store', type=str, nargs=1, help='', required=True)
-
+        optionals.add_argument("--namespace", "-n", dest='namespace', action='store', type=str, help='Specify namespace in kustomization')
+        optionals.add_argument("--patches-strategic-merge-paths", dest='patches_strategic_merge_paths', action='append', nargs='*',
+                               help='Path(s) to patch directories or files patchStrategicMerge')
+        optionals.add_argument("--resource-paths", dest='resource_paths', action='append', nargs='*',
+                               help='Path(s) to resource directories or files')
+        optionals.add_argument("--resource-absolute-paths", dest='resource_absolute_paths', action='append', nargs='*',
+                               help='TODO')
+        optionals.add_argument("--kustomization-directory", dest='kustomization_directory',
+                              action='store', type=str, nargs=1, help='Path to directory to contain the kustomization file',
+                              required=True)
+        optionals.add_argument('--version', action='version', version='v0.2.0')
         arguments = parser.parse_args()
 
         if arguments.debug:
@@ -153,7 +157,6 @@ def init_arg_parser():
 
 def main():
     arguments = init_arg_parser()
-    # kustomize
     kustomization = Kustomization(arguments)
     kustomization.render_template()
 
