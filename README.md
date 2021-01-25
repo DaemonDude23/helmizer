@@ -10,8 +10,8 @@
       - [Local Python](#local-python)
       - [Docker](#docker)
   - [Kustomize Options](#kustomize-options)
-    - [Supported:](#supported)
-    - [Unsupported (Currently):](#unsupported-currently)
+    - [Supported](#supported)
+    - [Unsupported (Currently)](#unsupported-currently)
   - [References](#references)
   - [TODO](#todo)
 
@@ -63,7 +63,7 @@ optional arguments:
 - [resources](examples/resources/)
 
 _With vscode you can utilize the included [launch.json](.vscode/launch.json) to test these more quickly, or reference for your configuration._
-The `sealed-secrets` **Helm** chart is used as an example
+The `sealed-secrets` **Helm** chart is used for examples for it's small scope.
 
 ### Installation
 
@@ -154,14 +154,14 @@ docker run --name helmizer \
 
 ## Kustomize Options
 
-### Supported:
+### Supported
 
 - [namespace](https://kubectl.docs.kubernetes.io/references/kustomize/namespace/)
 - [resources](https://kubectl.docs.kubernetes.io/references/kustomize/resource/)
 - [patchStrategicMerge](https://kubectl.docs.kubernetes.io/references/kustomize/patchesstrategicmerge/)
 - [commonLabels](https://kubectl.docs.kubernetes.io/references/kustomize/commonlabels/)
 
-### Unsupported (Currently):
+### Unsupported (Currently)
 
 - [bases](https://kubectl.docs.kubernetes.io/references/kustomize/bases/)
 - [commonAnnotations](https://kubectl.docs.kubernetes.io/references/kustomize/commonannotations/)
@@ -178,8 +178,6 @@ docker run --name helmizer \
 - [secretGenerator](https://kubectl.docs.kubernetes.io/references/kustomize/secretgenerator/)
 - [vars](https://kubectl.docs.kubernetes.io/references/kustomize/vars/)
 
-
-
 ## References
 
 - [Kustomize Docs](https://kubectl.docs.kubernetes.io/references/kustomize/)
@@ -195,3 +193,4 @@ docker run --name helmizer \
 - Redirect examples to not add an _extra_ newline.
 - Snap package?
 - Homebrew?
+- Link to docs for how to auth to pull from GitHub's container registry.
