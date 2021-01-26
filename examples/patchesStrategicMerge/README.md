@@ -1,4 +1,4 @@
-# Simple Resources
+# patchesStrategicMerge
 
 ## Generating the Helm Template
 
@@ -32,7 +32,7 @@ python3 ./src/helmizer.py \
 docker run --name helmizer \
   --rm \
   -v "$PWD":/tmp/helmizer -w /tmp/helmizer \
-  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.2.0 /usr/src/app/helmizer.py \
+  docker.pkg.github.com/chicken231/helmizer/helmizer:latest /usr/src/app/helmizer.py \
     -n sealed-secrets \
     --resource-paths ./examples/patchStrategicMerge/sealed-secrets/templates/ \
     --patches-strategic-merge-paths ./examples/patchStrategicMerge/extra/ \

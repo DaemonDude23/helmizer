@@ -28,8 +28,8 @@ I began transitioning my helm charts to local templates via [helm template](http
 ## Usage
 
 ```bash
-usage: helmizer [-h] [--common-labels [COMMON_LABELS ...]] [--debug] [--dry-run] [--kustomization-file-name KUSTOMIZATION_FILE_NAME] [--namespace NAMESPACE]
-                [--patches-strategic-merge-paths [PATCHES_STRATEGIC_MERGE_PATHS ...]] [--resource-paths [RESOURCE_PATHS ...]]
+usage: helmizer [-h] [--commonAnnotations [COMMON_ANNOTATIONS ...]] [--commonLabels [COMMON_LABELS ...]] [--debug] [--dry-run] [--kustomization-file-name KUSTOMIZATION_FILE_NAME]
+                [--namespace NAMESPACE] [--patchesStrategicMerge [PATCHES_STRATEGIC_MERGE ...]] [--resources [RESOURCES ...]]
                 [--resource-absolute-paths [RESOURCE_ABSOLUTE_PATHS ...]] --kustomization-directory KUSTOMIZATION_DIRECTORY [--version]
 
 Helmizer
@@ -37,17 +37,19 @@ Helmizer
 optional arguments:
   -h, --help            show this help message and exit
 
-  --common-labels [COMMON_LABELS ...]
-                        Common Labels where `=` is the assignment operator e.g key=value (default: None)
+  --commonAnnotations [COMMON_ANNOTATIONS ...]
+                        Common Annotations where '=' is the assignment operator e.g linkerd.io/inject=enabled (default: None)
+  --commonLabels [COMMON_LABELS ...]
+                        Common Labels where '=' is the assignment operator e.g labelname=labelvalue (default: None)
   --debug               Enable debug logging (default: False)
   --dry-run             Do not write to a file system. (default: True)
   --kustomization-file-name KUSTOMIZATION_FILE_NAME
-                        options: `kustomization.yaml`, kustomization.yml, `Kustomization` (default: kustomization.yaml)
+                        options: 'kustomization.yaml', 'kustomization.yml', 'Kustomization' (default: kustomization.yaml)
   --namespace NAMESPACE, -n NAMESPACE
                         Specify namespace in kustomization (default: None)
-  --patches-strategic-merge-paths [PATCHES_STRATEGIC_MERGE_PATHS ...]
-                        Path(s) to patch directories or files patchStrategicMerge (default: None)
-  --resource-paths [RESOURCE_PATHS ...]
+  --patchesStrategicMerge [PATCHES_STRATEGIC_MERGE ...]
+                        Path(s) to patch directories or files patchesStrategicMerge (default: None)
+  --resources [RESOURCES ...]
                         Path(s) to resource directories or files (default: None)
   --resource-absolute-paths [RESOURCE_ABSOLUTE_PATHS ...]
                         TODO (default: None)
@@ -58,8 +60,9 @@ optional arguments:
 
 ### Examples
 
+- [commonAnnotations](examples/commonAnnotations/)
 - [commonLabels](examples/commonLabels/)
-- [patchStrategicMerge](examples/patchStrategicMerge/)
+- [patchStrategicMerge](examples/patchesStrategicMerge/)
 - [resources](examples/resources/)
 
 _With vscode you can utilize the included [launch.json](.vscode/launch.json) to test these more quickly, or reference for your configuration._
@@ -146,7 +149,7 @@ docker run --name helmizer \
   --rm \
   -v "$PWD"/examples:/tmp/helmizer \
   -w /tmp/helmizer \
-  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.2.0 /usr/src/app/helmizer.py \
+  docker.pkg.github.com/chicken231/helmizer/helmizer:latest /usr/src/app/helmizer.py \
     -n sealed-secrets \
     --resource-paths ./resources/sealed-secrets/templates/ \
     --kustomization-directory ./resources/ > ./examples/resources/kustomization.yaml
@@ -156,15 +159,15 @@ docker run --name helmizer \
 
 ### Supported
 
-- [namespace](https://kubectl.docs.kubernetes.io/references/kustomize/namespace/)
-- [resources](https://kubectl.docs.kubernetes.io/references/kustomize/resource/)
-- [patchStrategicMerge](https://kubectl.docs.kubernetes.io/references/kustomize/patchesstrategicmerge/)
+- [commonAnnotations](https://kubectl.docs.kubernetes.io/references/kustomize/commonannotations/)
 - [commonLabels](https://kubectl.docs.kubernetes.io/references/kustomize/commonlabels/)
+- [namespace](https://kubectl.docs.kubernetes.io/references/kustomize/namespace/)
+- [patchStrategicMerge](https://kubectl.docs.kubernetes.io/references/kustomize/patchesstrategicmerge/)
+- [resources](https://kubectl.docs.kubernetes.io/references/kustomize/resource/)
 
 ### Unsupported (Currently)
 
 - [bases](https://kubectl.docs.kubernetes.io/references/kustomize/bases/)
-- [commonAnnotations](https://kubectl.docs.kubernetes.io/references/kustomize/commonannotations/)
 - [components](https://kubectl.docs.kubernetes.io/references/kustomize/components/)
 - [configMapGenerator](https://kubectl.docs.kubernetes.io/references/kustomize/configmapgenerator/)
 - [crds](https://kubectl.docs.kubernetes.io/references/kustomize/crds/)

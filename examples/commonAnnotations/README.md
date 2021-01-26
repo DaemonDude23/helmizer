@@ -1,6 +1,6 @@
-# commonLabels
+# commonAnnotations
 
-- [commonLabels](#commonlabels)
+- [commonAnnotations](#commonannotations)
   - [Generating the Helm Template](#generating-the-helm-template)
   - [Generate Kustomization](#generate-kustomization)
     - [Raw Python](#raw-python)
@@ -30,9 +30,9 @@ _These assumes you're in the root directory of this repository_
 ```bash
 python3 ./src/helmizer.py \
   -n sealed-secrets \
-  --resources ./examples/commonLabels/sealed-secrets/templates/ \
-  --commonLabels "app.kubernetes.io/helmizer=true" "app.kubernetes.io/yes=false" \
-  --kustomization-directory ./examples/commonLabels/
+  --resources ./examples/commonAnnotations/sealed-secrets/templates/ \
+  --commonAnnotations ./examples/commonAnnotations/sealed-secrets/templates/ \
+  --kustomization-directory ./examples/commonAnnotations/
 ```
 
 ### Docker
@@ -43,9 +43,9 @@ docker run --name helmizer \
   -v "$PWD":/tmp/helmizer -w /tmp/helmizer \
   docker.pkg.github.com/chicken231/helmizer/helmizer:latest /usr/src/app/helmizer.py \
     -n sealed-secrets \
-    --resources ./examples/commonLabels/sealed-secrets/templates/ \
-    --commonLabels "app.kubernetes.io/helmizer=true" "app.kubernetes.io/yes=false" \
-    --kustomization-directory ./examples/commonLabels/ > ./examples/commonLabels/kustomization.yaml
+    --resources ./examples/commonAnnotations/sealed-secrets/templates/ \
+    --commonAnnotations "app.kubernetes.io/annotation=yeah" "linkerd.io/inject=enabled" \
+    --kustomization-directory ./examples/commonAnnotations/ > ./examples/commonAnnotations/kustomization.yaml
 ```
 
 ## Validate

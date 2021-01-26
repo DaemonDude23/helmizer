@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+commonAnnotations:
+  app.kubernetes.io/annotation: yeah
+  linkerd.io/inject: enabled
+kind: Kustomization
+namespace: sealed-secrets
+resources:
+- sealed-secrets/templates/deployment.yaml
+- sealed-secrets/templates/role-binding.yaml
+- sealed-secrets/templates/service.yaml
+- sealed-secrets/templates/cluster-role-binding.yaml
+- sealed-secrets/templates/cluster-role.yaml
+- sealed-secrets/templates/service-account.yaml
+- sealed-secrets/templates/sealedsecret-crd.yaml
+- sealed-secrets/templates/role.yaml
+

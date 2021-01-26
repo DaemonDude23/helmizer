@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: cert-manager
+resources:
+- cert-manager/templates/deployment.yaml
+- cert-manager/templates/webhook-service.yaml
+- cert-manager/templates/webhook-validating-webhook.yaml
+- cert-manager/templates/cainjector-rbac.yaml
+- cert-manager/templates/service.yaml
+- cert-manager/templates/cainjector-deployment.yaml
+- cert-manager/templates/serviceaccount.yaml
+- cert-manager/templates/webhook-mutating-webhook.yaml
+- cert-manager/templates/webhook-serviceaccount.yaml
+- cert-manager/templates/rbac.yaml
+- cert-manager/templates/webhook-deployment.yaml
+- cert-manager/templates/cainjector-serviceaccount.yaml
+- cert-manager/templates/webhook-rbac.yaml
+- https://github.com/jetstack/cert-manager/releases/download/v1.1.0/cert-manager.yaml
+

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Helmizer - Generates `kustomization.yaml` for your locally-rendered YAML manifests, such as Helm templates
+Helmizer - Generates `kustomization.yaml` for your locally-rendered YAML manifests, such as from Helm templates
 """
 import argparse
 import logging
@@ -9,6 +9,7 @@ from os import path, walk
 from sys import stdout
 
 import yaml
+from validators import url as validate_url
 
 
 class Kustomization():
@@ -25,11 +26,13 @@ class Kustomization():
         # optional
         self.namespace = self.get_namespace()
         # patchesStrategicMerge
-        self.patches_strategic_merge_paths = self.get_files(
-            arguments, arguments.patches_strategic_merge_paths, "patchesStrategicMerge")
+        self.patches_strategic_merge = self.get_files(
+            arguments, arguments.patches_strategic_merge, "patchesStrategicMerge")
         # resources
         self.resources = self.get_files(
-            arguments, arguments.resource_paths, "resources")
+            arguments, arguments.resources, "resources")
+        # commonAnnotations
+        self.common_annotations = self.get_common_annotations()
         # commonLabels
         self.common_labels = self.get_common_labels()
 
@@ -61,6 +64,19 @@ class Kustomization():
         except TypeError as e:
             pass
 
+    def get_common_annotations(self):
+        try:
+            if len(self.arguments.common_annotations) > 0:
+                logging.debug(f"commonAnnotations: {self.arguments.common_annotations}")
+                dict_common_annotations = dict()
+                for annotation in self.arguments.common_annotations[0]:
+                    list_annotation = annotation.split("=")
+                    dict_common_annotations[list_annotation[0]] = list_annotation[1]
+                self.yaml["commonAnnotations"] = dict_common_annotations
+                return dict_common_annotations
+        except TypeError as e:
+            pass
+
     def get_common_labels(self):
         try:
             if len(self.arguments.common_labels) > 0:
@@ -81,19 +97,16 @@ class Kustomization():
             if len(paths[0]) > 0:
                 list_final_target_paths = list()
                 for target_path in paths[0]:
-                    # path
+                    # parent directory
                     if path.isdir(target_path):
                         for (dirpath, _, filenames) in walk(target_path):
                             for file in filenames:
                                 absolute_path = str(f"{dirpath}/{file}")
                                 if arguments.resource_absolute_paths:
-                                    list_final_target_paths.append(
-                                        absolute_path)
+                                    list_final_target_paths.append(absolute_path)
                                 else:
-                                    str_relative_path = path.relpath(
-                                        absolute_path, arguments.kustomization_directory[0])
-                                    list_final_target_paths.append(
-                                        str_relative_path)
+                                    str_relative_path = path.relpath(absolute_path, arguments.kustomization_directory[0])
+                                    list_final_target_paths.append(str_relative_path)
                     # file
                     elif path.isfile(target_path):
                         absolute_path = path.abspath(target_path)
@@ -103,9 +116,10 @@ class Kustomization():
                         else:
                             str_relative_path = path.relpath(
                                 absolute_path, arguments.kustomization_directory[0])
-                            list_final_target_paths.append(
-                                str_relative_path)
-                    # TODO url
+                            list_final_target_paths.append(str_relative_path)
+                    # url
+                    elif validate_url(target_path):
+                        list_final_target_paths.append(target_path)
 
                 # wrap up
                 self.yaml[yaml_key] = list()
@@ -122,17 +136,19 @@ def init_arg_parser():
                                          formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
         optionals = parser.add_argument_group()
-        optionals.add_argument("--common-labels", dest='common_labels', action='append', nargs='*',
-                               help='Common Labels where `=` is the assignment operator e.g key=value')
+        optionals.add_argument("--commonAnnotations", dest='common_annotations', action='append', nargs='*',
+                               help='Common Annotations where \'=\' is the assignment operator e.g linkerd.io/inject=enabled')
+        optionals.add_argument("--commonLabels", dest='common_labels', action='append', nargs='*',
+                               help='Common Labels where \'=\' is the assignment operator e.g labelname=labelvalue')
         optionals.add_argument("--debug", dest='debug', action='store_true', help='Enable debug logging', default=False)
         optionals.add_argument("--dry-run", dest='dry_run', action='store_true', help='Do not write to a file system.', default=True)
         optionals.add_argument("--kustomization-file-name", dest='kustomization_file_name', action='store',
-                               type=str, help='options: `kustomization.yaml`, kustomization.yml, `Kustomization`',
+                               type=str, help='options: \'kustomization.yaml\', \'kustomization.yml\', \'Kustomization\'',
                                default='kustomization.yaml')
         optionals.add_argument("--namespace", "-n", dest='namespace', action='store', type=str, help='Specify namespace in kustomization')
-        optionals.add_argument("--patches-strategic-merge-paths", dest='patches_strategic_merge_paths', action='append', nargs='*',
-                               help='Path(s) to patch directories or files patchStrategicMerge')
-        optionals.add_argument("--resource-paths", dest='resource_paths', action='append', nargs='*',
+        optionals.add_argument("--patchesStrategicMerge", dest='patches_strategic_merge', action='append', nargs='*',
+                               help='Path(s) to patch directories or files patchesStrategicMerge')
+        optionals.add_argument("--resources", dest='resources', action='append', nargs='*',
                                help='Path(s) to resource directories or files')
         optionals.add_argument("--resource-absolute-paths", dest='resource_absolute_paths', action='append', nargs='*',
                                help='TODO')
