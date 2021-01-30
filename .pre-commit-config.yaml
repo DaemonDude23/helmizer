@@ -1,13 +1,18 @@
 repos:
   - hooks:
       - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
       - id: check-merge-conflict
       - id: destroyed-symlinks
       - id: detect-aws-credentials
       - id: detect-private-key
+      - id: double-quote-string-fixer
       - id: end-of-file-fixer
       - id: fix-byte-order-marker
       - id: fix-encoding-pragma
+        args:
+          - --remove
       - id: mixed-line-ending
       - args:
           - '--maxkb=1024'
@@ -24,5 +29,6 @@ repos:
           - '--maxkb=1024'
         id: check-added-large-files
       - id: requirements-txt-fixer
+      - id: check-ast
     repo: 'git://github.com/pre-commit/pre-commit-hooks'
     rev: v3.4.0

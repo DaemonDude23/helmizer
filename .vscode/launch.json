@@ -2,6 +2,7 @@
     "configurations": [
         {
             "args": [
+                "--sort-keys",
                 "-n",
                 "sealed-secrets",
                 "--resources",
@@ -18,17 +19,18 @@
         },
         {
             "args": [
+                "--sort-keys",
                 "-n",
                 "sealed-secrets",
                 "--resources",
                 "sealed-secrets/templates/",
                 "--patchesStrategicMerge",
-                "patches/",
+                "extra/",
                 "--kustomization-directory",
                 ".",
             ],
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/examples/patchStrategicMerge",
+            "cwd": "${workspaceFolder}/examples/patchesStrategicMerge",
             "name": "Example - patchStrategicMerge",
             "program": "${workspaceFolder}/src/helmizer.py",
             "request": "launch",
@@ -36,13 +38,14 @@
         },
         {
             "args": [
+                "--sort-keys",
                 "-n",
                 "sealed-secrets",
                 "--resources",
                 "sealed-secrets/templates/",
                 "--commonAnnotations",
                 "linkerd.io/inject=enabled",
-                "annotation/iam=true",
+                "app.kubernetes.io/annotation=yeah",
                 "--kustomization-directory",
                 "."
             ],
@@ -55,6 +58,7 @@
         },
         {
             "args": [
+                "--sort-keys",
                 "-n",
                 "sealed-secrets",
                 "--resources",
@@ -74,6 +78,7 @@
         },
         {
             "args": [
+                "--sort-keys",
                 "-n",
                 "cert-manager",
                 "--resources",

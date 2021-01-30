@@ -60,7 +60,7 @@ python3 ./src/helmizer.py \
 docker run --name helmizer \
   --rm \
   -v "$PWD":/tmp/helmizer -w /tmp/helmizer \
-  docker.pkg.github.com/chicken231/helmizer/helmizer:latest /usr/src/app/helmizer.py \
+  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.4.0 /usr/src/app/helmizer.py \
     -n sealed-secrets \
     --resources ./examples/resources/sealed-secrets/templates/ \
     --kustomization-directory ./examples/resources/ > ./examples/resources/kustomization.yaml
@@ -72,7 +72,7 @@ With a URL instead of a path to file:
 docker run --name helmizer \
   --rm \
   -v "$PWD":/tmp/helmizer -w /tmp/helmizer \
-  docker.pkg.github.com/chicken231/helmizer/helmizer:latest /usr/src/app/helmizer.py \
+  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.4.0 /usr/src/app/helmizer.py \
     -n cert-manager \
     --resources \
       ./examples/resources/cert-manager/templates/ \

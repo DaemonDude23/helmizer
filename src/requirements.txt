@@ -1,2 +1,2 @@
-PyYaml==5.3.1       # https://pypi.org/project/PyYAML/
+PyYaml==5.4.1       # https://pypi.org/project/PyYAML/
 validators==0.18.2  # https://pypi.org/project/validators/

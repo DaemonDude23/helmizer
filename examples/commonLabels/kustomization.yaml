@@ -13,4 +13,3 @@ resources:
 - sealed-secrets/templates/sealedsecret-crd.yaml
 - sealed-secrets/templates/service-account.yaml
 - sealed-secrets/templates/service.yaml
-

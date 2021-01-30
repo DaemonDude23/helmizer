@@ -19,30 +19,35 @@
 
 ## About
 
-Helmizer takes various CLI inputs and constructs a kustomization file from those inputs.
+**Helmizer** takes various CLI inputs and constructs a [kustomization file](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/) from those inputs.
 
-For example, instead of manually entering the paths to `resources` in a kustomization file, this tool will walk any number of directories containing resources and populate the kustomization with these resources. Or only pull in individual files, it's your choice.
+For example, instead of manually entering the paths to [`resources`](https://kubectl.docs.kubernetes.io/references/kustomize/resource/) in a kustomization file, this tool will walk any number of directories containing resources and populate the kustomization with these resources. Or only pull in individual files, it's your choice.
 
-I began transitioning my helm charts to local templates via [helm template](https://helm.sh/docs/helm/helm_template/), which were then applied to the cluster separately via [Kustomize](https://kustomize.io/). I didn't enjoy having to manually manage the relative paths to files in the **kustomization**. I wanted a repeatable way for me to generate **Kubernetes** manifests from a helm chart, and tack on any patches or adjustments later. Thus, **helmizer**. **But `Helm` is in no way required to make this tool useful.**
+I began transitioning my `helm` charts to local templates via [helm template](https://helm.sh/docs/helm/helm_template/), which were then applied to the cluster separately via [Kustomize](https://kustomize.io/). I didn't enjoy having to manually manage the relative paths to files in the **kustomization**. I wanted a repeatable way for me to generate **Kubernetes** manifests from a helm chart, and tack on any patches or adjustments later. Thus, **helmizer**. **But [`Helm`](https://helm.sh/) is in no way required to make this tool useful.**
 
 ## Usage
 
-```bash
-usage: helmizer [-h] [--commonAnnotations [COMMON_ANNOTATIONS ...]] [--commonLabels [COMMON_LABELS ...]] [--debug] [--dry-run] [--kustomization-file-name KUSTOMIZATION_FILE_NAME]
-                [--namespace NAMESPACE] [--patchesStrategicMerge [PATCHES_STRATEGIC_MERGE ...]] [--resources [RESOURCES ...]]
-                [--resource-absolute-paths [RESOURCE_ABSOLUTE_PATHS ...]] --kustomization-directory KUSTOMIZATION_DIRECTORY [--version]
+```
+usage: helmizer [-h] [--apiVersion API_VERSION] [--commonAnnotations [COMMON_ANNOTATIONS ...]] [--commonLabels [COMMON_LABELS ...]] [--debug] [--dry-run]
+                --kustomization-directory KUSTOMIZATION_DIRECTORY [--kustomization-file-name KUSTOMIZATION_FILE_NAME] [--namespace NAMESPACE]
+                [--patchesStrategicMerge [PATCHES_STRATEGIC_MERGE ...]] [--resources [RESOURCES ...]] [--resource-absolute-paths [RESOURCE_ABSOLUTE_PATHS ...]] [--sort-keys]
+                [--version]
 
 Helmizer
 
 optional arguments:
   -h, --help            show this help message and exit
 
+  --apiVersion API_VERSION
+                        Specify the Kustomization 'apiVersion' (default: kustomize.config.k8s.io/v1beta1)
   --commonAnnotations [COMMON_ANNOTATIONS ...]
                         Common Annotations where '=' is the assignment operator e.g linkerd.io/inject=enabled (default: None)
   --commonLabels [COMMON_LABELS ...]
                         Common Labels where '=' is the assignment operator e.g labelname=labelvalue (default: None)
   --debug               Enable debug logging (default: False)
-  --dry-run             Do not write to a file system. (default: True)
+  --dry-run             Do not write to a file system. (default: False)
+  --kustomization-directory KUSTOMIZATION_DIRECTORY
+                        Path to directory to contain the kustomization file (default: None)
   --kustomization-file-name KUSTOMIZATION_FILE_NAME
                         options: 'kustomization.yaml', 'kustomization.yml', 'Kustomization' (default: kustomization.yaml)
   --namespace NAMESPACE, -n NAMESPACE
@@ -53,8 +58,7 @@ optional arguments:
                         Path(s) to resource directories or files (default: None)
   --resource-absolute-paths [RESOURCE_ABSOLUTE_PATHS ...]
                         TODO (default: None)
-  --kustomization-directory KUSTOMIZATION_DIRECTORY
-                        Path to directory to contain the kustomization file (default: None)
+  --sort-keys           Sort keys in arrays/lists (default: False)
   --version             show program's version number and exit
 ```
 
@@ -65,8 +69,8 @@ optional arguments:
 - [patchStrategicMerge](examples/patchesStrategicMerge/)
 - [resources](examples/resources/)
 
-_With vscode you can utilize the included [launch.json](.vscode/launch.json) to test these more quickly, or reference for your configuration._
-The `sealed-secrets` **Helm** chart is used for examples for it's small scope.
+_With [vscode](https://code.visualstudio.com/) you can utilize the included [launch.json](.vscode/launch.json) to test these more quickly, or reference for your configuration._
+The `sealed-secrets` **Helm** chart is used for examples for its small scope.
 
 ### Installation
 
@@ -91,7 +95,7 @@ pip3 install virtualenv==20.0.33
 ```bash
 virtualenv --python=python3.9 ./venv/
 ```
-4. 'Activate' this virtual environment for pip3:
+4. _Activate_ this virtual environment for pip3:
 ```bash
 source ./venv/bin/activate
 ```
@@ -108,12 +112,12 @@ virtualenv --clear ./venv/
 #### Build Locally (Optional)
 
 ```bash
-docker build -t helmizer:latest .
+docker build -t helmizer:v0.3.0 .
 ```
 
 ### Run
 
-**For greater detail on running from examples (they assumes you've ran `helm template`, see the [resource example](examples/resources/README.md))**
+**For greater detail on running from examples (they assumes you've ran [helm template](https://helm.sh/docs/helm/helm_template/), see the [resource example](examples/resources/README.md))**
 
 #### Local Python
 
@@ -147,9 +151,8 @@ In this example (*Nix OS), we're redirecting program output to the (e.g. `kustom
 ```bash
 docker run --name helmizer \
   --rm \
-  -v "$PWD"/examples:/tmp/helmizer \
-  -w /tmp/helmizer \
-  docker.pkg.github.com/chicken231/helmizer/helmizer:latest /usr/src/app/helmizer.py \
+  -v "$PWD"/examples:/tmp/helmizer -w /tmp/helmizer \
+  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.3.0 /usr/src/app/helmizer.py \
     -n sealed-secrets \
     --resource-paths ./resources/sealed-secrets/templates/ \
     --kustomization-directory ./resources/ > ./examples/resources/kustomization.yaml
@@ -167,7 +170,7 @@ docker run --name helmizer \
 
 ### Unsupported (Currently)
 
-- [bases](https://kubectl.docs.kubernetes.io/references/kustomize/bases/)
+- [~~bases~~](https://kubectl.docs.kubernetes.io/references/kustomize/bases/)
 - [components](https://kubectl.docs.kubernetes.io/references/kustomize/components/)
 - [configMapGenerator](https://kubectl.docs.kubernetes.io/references/kustomize/configmapgenerator/)
 - [crds](https://kubectl.docs.kubernetes.io/references/kustomize/crds/)
@@ -188,12 +191,6 @@ docker run --name helmizer \
 ## TODO
 
 - Support:
-  - Non-filesystem manifests.
-  - Add 'quiet' flag to guarantee no extra output.
   - Support additional Kustomizations.
   - Config file as a possible alternative to command line args?
-  - Optional sorting of keys.
 - Redirect examples to not add an _extra_ newline.
-- Snap package?
-- Homebrew?
-- Link to docs for how to auth to pull from GitHub's container registry.
