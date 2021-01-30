@@ -112,7 +112,7 @@ virtualenv --clear ./venv/
 #### Build Locally (Optional)
 
 ```bash
-docker build -t helmizer:v0.3.0 .
+docker build -t helmizer:v0.4.1 .
 ```
 
 ### Run
@@ -152,7 +152,7 @@ In this example (*Nix OS), we're redirecting program output to the (e.g. `kustom
 docker run --name helmizer \
   --rm \
   -v "$PWD"/examples:/tmp/helmizer -w /tmp/helmizer \
-  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.3.0 /usr/src/app/helmizer.py \
+  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.4.1 /usr/src/app/helmizer.py \
     -n sealed-secrets \
     --resource-paths ./resources/sealed-secrets/templates/ \
     --kustomization-directory ./resources/ > ./examples/resources/kustomization.yaml

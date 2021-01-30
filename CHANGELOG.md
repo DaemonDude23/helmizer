@@ -1,9 +1,14 @@
 # Changelog
 
 - [Changelog](#changelog)
+  - [v0.4.1](#v041)
   - [v0.4.0](#v040)
 
 ---
+
+## [v0.4.1](https://github.com/chicken231/helmizer/releases/tag/v0.4.1)
+
+- Fixed default key order when `--sort-keys=false`.
 
 ## [v0.4.0](https://github.com/chicken231/helmizer/releases/tag/v0.4.0)
 

@@ -21,16 +21,14 @@ class Kustomization():
             arguments (dict): CLI arguments
         """
 
-        # scaffolding
         self.arguments = arguments
-        self.schema_defaults = {
-            # 'apiVersion': 'kustomize.config.k8s.io/v1beta1',
-            'kind': 'Kustomization',
-        }
-        self.yaml = dict(self.schema_defaults)
+        self.yaml = dict()
 
-        # namespace
+        # apiVersion
         self.api_version = self.get_api_version()
+
+        # kind
+        self.yaml["kind"] = "Kustomization"
 
         # namespace
         self.namespace = self.get_namespace()
@@ -42,8 +40,7 @@ class Kustomization():
         self.common_labels = self.get_common_labels()
 
         # patchesStrategicMerge
-        self.patches_strategic_merge = self.get_files(
-            arguments, arguments.patches_strategic_merge, "patchesStrategicMerge")
+        self.patches_strategic_merge = self.get_files(arguments, arguments.patches_strategic_merge, "patchesStrategicMerge")
 
         # resources
         self.resources = self.get_files(arguments, arguments.resources, "resources")
@@ -207,7 +204,7 @@ def init_arg_parser():
                                help='TODO')
         optionals.add_argument("--sort-keys", dest='sort_keys', action='store_true', help='Sort keys in arrays/lists',
                                default=False)
-        optionals.add_argument('--version', action='version', version='v0.4.0')
+        optionals.add_argument('--version', action='version', version='v0.4.1')
         arguments = parser.parse_args()
 
         if arguments.debug:
