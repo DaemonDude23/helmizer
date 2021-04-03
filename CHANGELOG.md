@@ -1,11 +1,16 @@
 # Changelog
 
 - [Changelog](#changelog)
+  - [v0.5.1](#v051)
   - [v0.5.0](#v050)
   - [v0.4.1](#v041)
   - [v0.4.0](#v040)
 
 ---
+
+## [v0.5.1](https://github.com/chicken231/helmizer/releases/tag/v0.5.1)
+
+- Fixed README
 
 ## [v0.5.0](https://github.com/chicken231/helmizer/releases/tag/v0.5.0)
 
