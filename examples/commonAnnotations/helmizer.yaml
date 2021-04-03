@@ -1,0 +1,31 @@
+helmizer:
+  commandSequence:
+  - command: "helm"
+    args:
+      - "-n"
+      - "sealed-secrets"
+      - "template"
+      - "sealed-secrets"
+      - --output-dir
+      - '.'
+      - --include-crds
+      - --skip-tests
+      - --version
+      - '1.12.2'
+      - stable/sealed-secrets
+  dry-run: false
+  kustomization-directory: .
+  kustomization-file-name: kustomization.yaml
+  resource-absolute-paths: []
+  sort-keys: false
+  version: '0.1.0'
+kustomize:
+  namespace: sealed-secrets
+  resources:
+    - sealed-secrets/templates/
+  patchesStrategicMerge:
+    - extra/
+  commonAnnotations:
+    app.kubernetes.io/annotation: yeah
+    linkerd.io/inject: enabled
+  commonLabels: {}

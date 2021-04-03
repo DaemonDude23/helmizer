@@ -1,0 +1,33 @@
+app-id: org.chicken231.Helmizer
+runtime: org.freedesktop.Platform
+runtime-version: '20.08'
+sdk: org.freedesktop.Sdk
+command: helmizer
+modules:
+  - name: helmizer
+    buildsystem: simple
+    build-options:
+      build-args:
+        - --share=network
+    build-commands:
+      - pip3 install --prefix=/app --upgrade pip
+      - pip3 install --prefix=/app -r requirements.txt
+      - mkdir -p /app/bin
+      - cp -r /run/build/helmizer/helmizer.py /run/build/helmizer/requirements.txt /app/
+      - ln -s /app/helmizer.py /app/bin/helmizer
+      # TODO add filesystem paths to $PATH
+    sources:
+      - type: dir
+        path: src
+finish-args:
+  # https://docs.flatpak.org/en/latest/sandbox-permissions-reference.html?highlight=--filesystem#filesystem-permissions
+  - --filesystem=host
+  - --filesystem=/home/linuxbrew/.linuxbrew/bin:ro
+  - --filesystem=/home/linuxbrew/.linuxbrew/sbin:ro
+  - --filesystem=/usr/local/sbin:ro
+  - --filesystem=/usr/local/bin:ro
+  - --filesystem=/usr/sbin:ro
+  - --filesystem=/usr/bin
+  - --filesystem=/sbin:ro
+  - --filesystem=/bin:ro
+  - --filesystem=/snap/bin:ro

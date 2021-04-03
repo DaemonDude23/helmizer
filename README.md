@@ -3,8 +3,11 @@
 - [Helmizer](#helmizer)
   - [About](#about)
   - [Usage](#usage)
+  - [Configuration](#configuration)
     - [Examples](#examples)
     - [Installation](#installation)
+    - [Putting it in your `$PATH`](#putting-it-in-your-path)
+      - [Linux](#linux)
       - [Build Locally (Optional)](#build-locally-optional)
     - [Run](#run)
       - [Local Python](#local-python)
@@ -13,13 +16,12 @@
     - [Supported](#supported)
     - [Unsupported (Currently)](#unsupported-currently)
   - [References](#references)
-  - [TODO](#todo)
 
 ---
 
 ## About
 
-**Helmizer** takes various CLI inputs and constructs a [kustomization file](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/) from those inputs.
+**Helmizer** takes various inputs from a YAML config file (`helmizer.yaml` by default) and constructs a [kustomization file](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/) from those inputs.
 
 For example, instead of manually entering the paths to [`resources`](https://kubectl.docs.kubernetes.io/references/kustomize/resource/) in a kustomization file, this tool will walk any number of directories containing resources and populate the kustomization with these resources. Or only pull in individual files, it's your choice.
 
@@ -27,39 +29,58 @@ I began transitioning my `helm` charts to local templates via [helm template](ht
 
 ## Usage
 
+The recommended way of using **Helmizer** is via a [YAML config file](./examples/resources/helmizer.yaml). But it can be run entirely from the CLI at parity with config. Don't combine them at the same time, though (e.g. `resources` defined in `helmizer.yaml` and CLI at the same time).
+
 ```
-usage: helmizer [-h] [--apiVersion API_VERSION] [--commonAnnotations [COMMON_ANNOTATIONS ...]] [--commonLabels [COMMON_LABELS ...]] [--debug] [--dry-run]
-                --kustomization-directory KUSTOMIZATION_DIRECTORY [--kustomization-file-name KUSTOMIZATION_FILE_NAME] [--namespace NAMESPACE]
-                [--patchesStrategicMerge [PATCHES_STRATEGIC_MERGE ...]] [--resources [RESOURCES ...]] [--resource-absolute-paths [RESOURCE_ABSOLUTE_PATHS ...]] [--sort-keys]
-                [--version]
+usage: helmizer [-h] [--debug] [--dry-run] [--helmizer-config-path HELMIZER_CONFIG_PATH] [--quiet] [--version]
 
 Helmizer
 
 optional arguments:
   -h, --help            show this help message and exit
 
-  --apiVersion API_VERSION
-                        Specify the Kustomization 'apiVersion' (default: kustomize.config.k8s.io/v1beta1)
-  --commonAnnotations [COMMON_ANNOTATIONS ...]
-                        Common Annotations where '=' is the assignment operator e.g linkerd.io/inject=enabled (default: None)
-  --commonLabels [COMMON_LABELS ...]
-                        Common Labels where '=' is the assignment operator e.g labelname=labelvalue (default: None)
   --debug               Enable debug logging (default: False)
   --dry-run             Do not write to a file system. (default: False)
-  --kustomization-directory KUSTOMIZATION_DIRECTORY
-                        Path to directory to contain the kustomization file (default: None)
-  --kustomization-file-name KUSTOMIZATION_FILE_NAME
-                        options: 'kustomization.yaml', 'kustomization.yml', 'Kustomization' (default: kustomization.yaml)
-  --namespace NAMESPACE, -n NAMESPACE
-                        Specify namespace in kustomization (default: None)
-  --patchesStrategicMerge [PATCHES_STRATEGIC_MERGE ...]
-                        Path(s) to patch directories or files patchesStrategicMerge (default: None)
-  --resources [RESOURCES ...]
-                        Path(s) to resource directories or files (default: None)
-  --resource-absolute-paths [RESOURCE_ABSOLUTE_PATHS ...]
-                        TODO (default: None)
-  --sort-keys           Sort keys in arrays/lists (default: False)
+  --helmizer-config-path HELMIZER_CONFIG_PATH
+                        Override helmizer file path. Default = '$KUSTOMIZATION_PATH/helmizer.yaml' (default: /home/drew/Nextcloud/TECH/git/private/helmizer)
+  --quiet, -q           Quiet output (TODO subcommand output) (default: False)
   --version             show program's version number and exit
+```
+
+## Configuration
+
+Example `helmizer.yaml` config file. The `helm` command is invoked 
+
+```yml
+helmizer:
+  commandSequence:
+  - command: "helm"
+    args:
+      - "-n"
+      - "sealed-secrets"
+      - "template"
+      - "sealed-secrets"
+      - --output-dir
+      - '.'
+      - --include-crds
+      - --skip-tests
+      - --version
+      - '1.12.2'
+      - stable/sealed-secrets
+  dry-run: false
+  kustomization-directory: .
+  kustomization-file-name: kustomization.yaml
+  resource-absolute-paths: []
+  sort-keys: true
+  version: '0.1.0'
+kustomize:
+  namespace: sealed-secrets
+  resources:
+    - sealed-secrets/templates/
+  patchesStrategicMerge:
+    - extra/
+  commonAnnotations: {}
+  commonLabels: {}
 ```
 
 ### Examples
@@ -86,10 +107,11 @@ cd helmizer
 1. Update pip:
 ```bash
 python3 -m pip install --upgrade pip
+./venv/bin/python -m pip install --upgrade pip
 ```
 2. Install `virtualenv` for your user:
 ```bash
-pip3 install virtualenv==20.0.33
+./venv/bin/pip3 install virtualenv==20.4.2
 ```
 3. Setup relative virtual environment:
 ```bash
@@ -101,7 +123,7 @@ source ./venv/bin/activate
 ```
 5. Install requirements into virtual environment.
 ```bash
-pip3 install --use-feature=2020-resolver -r ./src/requirements.txt
+pip3 install -r ./src/requirements.txt
 ```
 
 If you need to reset the virtual environment for whatever reason:
@@ -109,10 +131,22 @@ If you need to reset the virtual environment for whatever reason:
 virtualenv --clear ./venv/
 ```
 
+### Putting it in your `$PATH`
+
+#### Linux
+
+```bash
+sudo ln -s /absolute/path/to/src/helmizer.py /usr/local/bin/helmizer
+```
+
+```bash
+pip3 install -r ./src/requirements.txt
+```
+
 #### Build Locally (Optional)
 
 ```bash
-docker build -t helmizer:v0.4.1 .
+docker build -t helmizer:v0.5.0 .
 ```
 
 ### Run
@@ -152,7 +186,7 @@ In this example (*Nix OS), we're redirecting program output to the (e.g. `kustom
 docker run --name helmizer \
   --rm \
   -v "$PWD"/examples:/tmp/helmizer -w /tmp/helmizer \
-  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.4.1 /usr/src/app/helmizer.py \
+  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.5.0 /usr/src/app/helmizer.py \
     -n sealed-secrets \
     --resource-paths ./resources/sealed-secrets/templates/ \
     --kustomization-directory ./resources/ > ./examples/resources/kustomization.yaml
@@ -187,10 +221,3 @@ docker run --name helmizer \
 ## References
 
 - [Kustomize Docs](https://kubectl.docs.kubernetes.io/references/kustomize/)
-
-## TODO
-
-- Support:
-  - Support additional Kustomizations.
-  - Config file as a possible alternative to command line args?
-- Redirect examples to not add an _extra_ newline.

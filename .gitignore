@@ -1,1 +1,7 @@
 venv/
+.flatpak-builder/
+build/flatpak/**
+build/pyinstaller/**
+dist/linux/**
+dist/windows/**
+**/__pycache__/

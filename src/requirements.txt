@@ -1,2 +1,3 @@
+confuse==1.4.0      # https://pypi.org/project/confuse/
 PyYaml==5.4.1       # https://pypi.org/project/PyYAML/
 validators==0.18.2  # https://pypi.org/project/validators/

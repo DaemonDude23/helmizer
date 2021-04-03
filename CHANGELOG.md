@@ -1,10 +1,17 @@
 # Changelog
 
 - [Changelog](#changelog)
+  - [v0.5.0](#v050)
   - [v0.4.1](#v041)
   - [v0.4.0](#v040)
 
 ---
+
+## [v0.5.0](https://github.com/chicken231/helmizer/releases/tag/v0.5.0)
+
+- **Breaking**: Replaced CLI args for things like `resources` with YAML config file.
+- Fixed `patchesStrategicMerge` example.
+- Huge refactor. Much wow.
 
 ## [v0.4.1](https://github.com/chicken231/helmizer/releases/tag/v0.4.1)
 

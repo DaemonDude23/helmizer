@@ -23,7 +23,6 @@ repos:
       - id: check-symlinks
       - args:
           - '--allow-multiple-documents'
-        files: ^flux\/.+\.tf
         id: check-yaml
       - args:
           - '--maxkb=1024'

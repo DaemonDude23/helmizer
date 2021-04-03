@@ -2,13 +2,7 @@
     "configurations": [
         {
             "args": [
-                "--sort-keys",
-                "-n",
-                "sealed-secrets",
-                "--resources",
-                "sealed-secrets/templates/",
-                "--kustomization-directory",
-                "."
+                "--debug",
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/examples/resources",
@@ -19,35 +13,18 @@
         },
         {
             "args": [
-                "--sort-keys",
-                "-n",
-                "sealed-secrets",
-                "--resources",
-                "sealed-secrets/templates/",
-                "--patchesStrategicMerge",
-                "extra/",
-                "--kustomization-directory",
-                ".",
+                "--debug"
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/examples/patchesStrategicMerge",
-            "name": "Example - patchStrategicMerge",
+            "name": "Example - patchesStrategicMerge",
             "program": "${workspaceFolder}/src/helmizer.py",
             "request": "launch",
             "type": "python"
         },
         {
             "args": [
-                "--sort-keys",
-                "-n",
-                "sealed-secrets",
-                "--resources",
-                "sealed-secrets/templates/",
-                "--commonAnnotations",
-                "linkerd.io/inject=enabled",
-                "app.kubernetes.io/annotation=yeah",
-                "--kustomization-directory",
-                "."
+                "--debug"
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/examples/commonAnnotations",
@@ -58,40 +35,11 @@
         },
         {
             "args": [
-                "--sort-keys",
-                "-n",
-                "sealed-secrets",
-                "--resources",
-                "sealed-secrets/templates/",
-                "--commonLabels",
-                "app.kubernetes.io/helmizer=true",
-                "app.kubernetes.io/yes=false",
-                "--kustomization-directory",
-                "."
+                "--debug"
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/examples/commonLabels",
             "name": "Example - commonLabels",
-            "program": "${workspaceFolder}/src/helmizer.py",
-            "request": "launch",
-            "type": "python"
-        },
-        {
-            "args": [
-                "--sort-keys",
-                "-n",
-                "cert-manager",
-                "--resources",
-                "https://github.com/jetstack/cert-manager/releases/download/v1.1.0/cert-manager.yaml",
-                "cert-manager/templates/",
-                "--kustomization-file-name",
-                "kustomization.yml",
-                "--kustomization-directory",
-                "."
-            ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/examples/resources",
-            "name": "Example - resources (URL)",
             "program": "${workspaceFolder}/src/helmizer.py",
             "request": "launch",
             "type": "python"
