@@ -211,7 +211,7 @@ def init_arg_parser():
                                default=getcwd())
         optionals.add_argument('--quiet', '-q', dest='quiet', action='store_true', help='Quiet output from subcommands',
                                default=False)
-        optionals.add_argument('--version', action='version', version='v0.5.0')
+        optionals.add_argument('--version', action='version', version='v0.5.1')
         arguments = parser.parse_args()
 
         if arguments.quiet:

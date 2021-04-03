@@ -42,14 +42,14 @@ optional arguments:
   --debug               Enable debug logging (default: False)
   --dry-run             Do not write to a file system. (default: False)
   --helmizer-config-path HELMIZER_CONFIG_PATH
-                        Override helmizer file path. Default = '$KUSTOMIZATION_PATH/helmizer.yaml' (default: /home/drew/Nextcloud/TECH/git/private/helmizer)
+                        Override helmizer file path. Default = '$KUSTOMIZATION_PATH/helmizer.yaml' (default: Present Working Directory)
   --quiet, -q           Quiet output (TODO subcommand output) (default: False)
   --version             show program's version number and exit
 ```
 
 ## Configuration
 
-Example `helmizer.yaml` config file. The `helm` command is invoked 
+Example `helmizer.yaml` config file. The `helm` command is invoked before the content for `kustomization.yaml` is generated. Any number of commands can be added here.
 
 ```yml
 helmizer:
@@ -146,7 +146,7 @@ pip3 install -r ./src/requirements.txt
 #### Build Locally (Optional)
 
 ```bash
-docker build -t helmizer:v0.5.0 .
+docker build -t helmizer:v0.5.1 .
 ```
 
 ### Run
@@ -186,7 +186,7 @@ In this example (*Nix OS), we're redirecting program output to the (e.g. `kustom
 docker run --name helmizer \
   --rm \
   -v "$PWD"/examples:/tmp/helmizer -w /tmp/helmizer \
-  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.5.0 /usr/src/app/helmizer.py \
+  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.5.1 /usr/src/app/helmizer.py \
     -n sealed-secrets \
     --resource-paths ./resources/sealed-secrets/templates/ \
     --kustomization-directory ./resources/ > ./examples/resources/kustomization.yaml
