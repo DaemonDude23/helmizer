@@ -16,7 +16,7 @@ helmizer:
   dry-run: false
   kustomization-directory: .
   kustomization-file-name: kustomization.yaml
-  resource-absolute-paths: []
+  resource-absolute-paths: false
   sort-keys: true
   version: '0.1.0'
 kustomize:
@@ -25,5 +25,3 @@ kustomize:
     - sealed-secrets/templates/
   patchesStrategicMerge:
     - extra/
-  commonAnnotations: {}
-  commonLabels: {}

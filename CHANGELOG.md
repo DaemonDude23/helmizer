@@ -1,12 +1,17 @@
 # Changelog
 
 - [Changelog](#changelog)
+  - [v0.5.2](#v052)
   - [v0.5.1](#v051)
   - [v0.5.0](#v050)
   - [v0.4.1](#v041)
   - [v0.4.0](#v040)
 
 ---
+
+## [v0.5.2](https://github.com/chicken231/helmizer/releases/tag/v0.5.1)
+
+- Fix relative/absolute path issues when executing the script from a directory outside of what contains the `kustomization` or `helmizer.yaml`.
 
 ## [v0.5.1](https://github.com/chicken231/helmizer/releases/tag/v0.5.1)
 

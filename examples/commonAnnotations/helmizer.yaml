@@ -16,7 +16,7 @@ helmizer:
   dry-run: false
   kustomization-directory: .
   kustomization-file-name: kustomization.yaml
-  resource-absolute-paths: []
+  resource-absolute-paths: false
   sort-keys: false
   version: '0.1.0'
 kustomize:

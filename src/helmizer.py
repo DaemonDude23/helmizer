@@ -46,12 +46,12 @@ class Kustomization():
             self.yaml['commonLabels'] = dict_get_common_labels
 
         # patchesStrategicMerge
-        list_patches_strategic_merge = self.get_files('patchesStrategicMerge')
+        list_patches_strategic_merge = self.get_files(arguments, 'patchesStrategicMerge')
         if list_patches_strategic_merge:
             self.yaml['patchesStrategicMerge'] = list_patches_strategic_merge
 
         # resources
-        list_resources = self.get_files('resources')
+        list_resources = self.get_files(arguments, 'resources')
         if list_resources:
             self.yaml['resources'] = list_resources
 
@@ -64,6 +64,7 @@ class Kustomization():
         except KeyError:
             pass
 
+
     def print_kustomization(self):
         try:
             print(yaml.dump(self.yaml, sort_keys=False))
@@ -73,13 +74,18 @@ class Kustomization():
 
     def write_kustomization(self):
         # identify kustomization file's parent directory
-        str_kustomization_directory = str()
-        try:
-            str_kustomization_directory = self.helmizer_config['helmizer']['kustomization-directory'].get(str)
-        except KeyError:
-            str_kustomization_directory = '.'
+        str_kustomization_dir = str()
+
+        if self.arguments.kustomization_dir:
+            str_kustomization_dir = self.arguments.kustomization_dir
+        else:
+            try:
+                str_kustomization_dir = self.helmizer_config['helmizer']['kustomization-directory'].get(str)
+            except KeyError:
+                str_kustomization_dir = getcwd()
 
         # identify kustomization file name
+        # TODO allow kustomization of file name
         str_kustomization_file_name = str()
         try:
             str_kustomization_file_name = self.helmizer_config['helmizer']['kustomization-file-name'].get(str)
@@ -88,7 +94,7 @@ class Kustomization():
 
         # write to file
         try:
-            kustomization_file_path = path.normpath(f'{str_kustomization_directory}/{str_kustomization_file_name}')
+            kustomization_file_path = path.normpath(f'{str_kustomization_dir}/{str_kustomization_file_name}')
             with open(kustomization_file_path, 'w') as file:
                 file.write(yaml.dump(self.yaml))
                 logging.debug(f'Successfully wrote to file: {kustomization_file_path}')
@@ -102,6 +108,7 @@ class Kustomization():
         self.sort_keys()
         self.print_kustomization()
         self.write_kustomization()
+
 
     def get_api_version(self):
         str_api_version = str()
@@ -137,6 +144,7 @@ class Kustomization():
         finally:
             return dict_common_annotations
 
+
     def get_common_labels(self):
         dict_common_labels = dict()
         try:
@@ -148,55 +156,85 @@ class Kustomization():
         finally:
             return dict_common_labels
 
-    def get_files(self, key):
-        try:
-            paths = self.helmizer_config['kustomize'][key].get(list)
 
-            if len(paths) > 0:
-                list_final_target_paths = list()
-                for target_path in paths:
+    def get_files(self, arguments, key):
+        list_target_paths = list()
+        list_final_target_paths = list()
+        str_kustomization_path = str()
+
+        try:
+            # test if the key to configure is even defined in input helmizer config
+            list_kustomization_children = self.helmizer_config['kustomize'][key].get(list)
+
+            if arguments.kustomization_dir:
+                str_kustomization_path = path.abspath(arguments.kustomization_dir)
+            else:
+                str_kustomization_path = path.abspath(self.helmizer_config['helmizer']['kustomization-directory'].get(str))
+
+            if len(list_kustomization_children) > 0:
+                for target_path in list_kustomization_children:
+                    str_child_path = path.abspath(path.join(str_kustomization_path, target_path))
 
                     # walk directory
-                    if path.isdir(target_path):
-                        for (dirpath, _, filenames) in walk(target_path):
-                            for file in filenames:
-                                absolute_path = path.normpath(f'{dirpath}/{file}')
-                                # TODO fix this
-                                if len(self.helmizer_config['helmizer']['resource-absolute-paths'].get(list)) > 0:
-                                    if len(self.helmizer_config['helmizer']['resource-absolute-paths'].get(list)) > 0:
-                                        list_final_target_paths.append(absolute_path)
-                                else:
-                                    if self.helmizer_config['helmizer']['kustomization-directory']:
-                                        str_relative_path = path.relpath(absolute_path, self.helmizer_config['helmizer']['kustomization-directory'].get(str))
-                                    list_final_target_paths.append(str_relative_path)
+                    if path.isdir(str_child_path):
+                        for (dirpath, _, filenames) in walk(str_child_path):
+                            for filename in filenames:
+                                list_target_paths.append(path.join(dirpath, filename))
 
                     # file
-                    elif path.isfile(target_path):
-                        absolute_path = path.abspath(target_path)
-                        if self.helmizer_config['helmizer']['resource-absolute-paths'].get(bool):
-                            list_final_target_paths.append(absolute_path)
-                        else:
-                            str_relative_path = path.relpath(absolute_path, getcwd())
-                            list_final_target_paths.append(str_relative_path)
+                    elif path.isfile(str_child_path):
+                        list_target_paths.append(str_child_path)
 
                     # url
-                    elif validate_url(target_path):
-                        list_final_target_paths.append(target_path)
+                    elif validate_url(str_child_path):
+                        list_target_paths.append(str_child_path)
+
+                # convert absolute paths into paths relative to the kustomization directory
+                for final_target_path in list_target_paths:
+                    list_final_target_paths.append(path.relpath(final_target_path, str_kustomization_path))
 
                 return list_final_target_paths
+
         except NotFoundError:
+            logging.debug(f'key not found: {key}')
             pass
         except TypeError:
             pass
 
 
-def run_subprocess(arguments, command_string):
-    logging.debug(f"creating subprocess: \'{command_string}\'")
-    # TODO make it respect this arg
-    if arguments.quiet:
-        subprocess.run(f'{command_string}', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, text=False)
-    else:
-        subprocess.run(f'{command_string}', shell=True, check=True, text=True)
+    def run_subprocess(self, arguments):
+        subprocess_working_directory = str()
+        if arguments.kustomization_dir:
+            subprocess_working_directory = path.abspath(path.normpath(arguments.kustomization_dir))
+        else:
+            subprocess_working_directory = path.abspath(path.normpath(self.helmizer_config['helmizer']['kustomization-directory'].get(str)))
+        logging.debug(f'Subprocess working directory: {subprocess_working_directory}')
+
+
+        list_command_string = list()
+        for config_command in self.helmizer_config['helmizer']['commandSequence']:
+            try:
+
+                # construct command(s)
+                if config_command['command']:
+                    command = config_command['command'].get(str)
+                    if config_command['args']:
+                        args = ' '.join(config_command['args'].get(list))  # combine list elements into space-delimited
+                        list_command_string.append(f'{command} {args}')
+                    else:
+                        list_command_string.append(f'{command}')
+
+                # execute
+                for command in list_command_string:
+                    logging.debug(f"creating subprocess: \'{command}\'")
+                    if arguments.quiet:
+                        subprocess.run(f'{command}', shell=True, check=True, stdout=subprocess.DEVNULL,
+                                    stderr=subprocess.DEVNULL, text=True, cwd=subprocess_working_directory)
+                    else:
+                        subprocess.run(f'{command}', shell=True, check=True, text=True, cwd=subprocess_working_directory)
+
+            except NotFoundError as e:
+                pass
 
 
 def init_arg_parser():
@@ -206,12 +244,13 @@ def init_arg_parser():
         optionals = parser.add_argument_group()
         optionals.add_argument('--debug', dest='debug', action='store_true', help='Enable debug logging', default=False)
         optionals.add_argument('--dry-run', dest='dry_run', action='store_true', help='Do not write to a file system.', default=False)
-        optionals.add_argument('--helmizer-config-path', dest='helmizer_config_path', action='store', type=str,
-                               help='Override helmizer file path. Default = \'$KUSTOMIZATION_PATH/helmizer.yaml\'',
-                               default=getcwd())
-        optionals.add_argument('--quiet', '-q', dest='quiet', action='store_true', help='Quiet output from subcommands',
+        optionals.add_argument('--helmizer-directory', dest='helmizer_directory', action='store', type=str,
+                               help='Override helmizer file path')
+        optionals.add_argument('--kustomization-directory', dest='kustomization_dir', action='store', type=str,
+                               help='Set path containing kustomization')
+        optionals.add_argument('--quiet', '-q', dest='quiet', action='store_true', help='Quiet output from subprocesses',
                                default=False)
-        optionals.add_argument('--version', action='version', version='v0.5.1')
+        optionals.add_argument('--version', action='version', version='v0.5.2')
         arguments = parser.parse_args()
 
         if arguments.quiet:
@@ -236,17 +275,24 @@ def validate_helmizer_config_version(helmizer_config_version):
 
 
 def init_helmizer_config(arguments):
+    str_helmizer_config_path = str()
+    if arguments.helmizer_directory:
+        str_helmizer_config_path = arguments.helmizer_directory
+    else:
+        str_helmizer_config_path = getcwd()
+
     config = confuse.Configuration('helmizer', __name__)
     try:
         try:
-            logging.debug(f'Trying helmizer config path from config: {arguments.helmizer_config_path}/helmizer.yaml')
-            config.set_file(f'{arguments.helmizer_config_path}/helmizer.yaml')
-            logging.debug(f'parsed config: {config}')
+            # assume file name is helmizer.yaml
+            logging.debug(f'Trying helmizer config path from config: {str_helmizer_config_path}/helmizer.yaml')
+            config.set_file(f'{str_helmizer_config_path}/helmizer.yaml')
         except KeyError:
-            if arguments.helmizer_config_path:
-                logging.debug(f'Trying helmizer config path from argument: {arguments.helmizer_config_path}')
-                config.set_file(path.normpath(arguments.helmizer_config_path))
-                logging.debug(f'parsed config: {config}')
+            if str_helmizer_config_path:
+                logging.debug(f'Trying helmizer config path from argument: {str_helmizer_config_path}')
+                config.set_file(path.normpath(str_helmizer_config_path))
+        finally:
+            logging.debug(f'parsed config: {config}')
     except confuse.exceptions.ConfigReadError:
         # no config file found. Give up
         return dict()
@@ -256,19 +302,6 @@ def init_helmizer_config(arguments):
     except KeyError:
         logging.debug('Unable to validate version')
 
-    # TODO give it its own function
-    for config_command in config['helmizer']['commandSequence']:
-        try:
-            if config_command['command']:
-                command = config_command['command'].get(str)
-                if config_command['args']:
-                    args = ' '.join(config_command['args'].get(list))  # combine list elements into space-delimited
-                    run_subprocess(arguments, f'{command} {args}')
-                else:
-                    run_subprocess(command)
-        except NotFoundError as e:
-            pass
-
     return config
 
 
@@ -276,6 +309,7 @@ def main():
     arguments = init_arg_parser()
     helmizer_config = init_helmizer_config(arguments)
     kustomization = Kustomization(helmizer_config, arguments)
+    kustomization.run_subprocess(arguments)
     kustomization.render_template()
 
 
