@@ -74,15 +74,15 @@ class Kustomization():
 
     def write_kustomization(self):
         # identify kustomization file's parent directory
-        str_kustomization_dir = str()
+        str_kustomization_directory = str()
 
-        if self.arguments.kustomization_dir:
-            str_kustomization_dir = self.arguments.kustomization_dir
+        if self.arguments.kustomization_directory:
+            str_kustomization_directory = self.arguments.kustomization_directory
         else:
             try:
-                str_kustomization_dir = self.helmizer_config['helmizer']['kustomization-directory'].get(str)
+                str_kustomization_directory = self.helmizer_config['helmizer']['kustomization-directory'].get(str)
             except KeyError:
-                str_kustomization_dir = getcwd()
+                str_kustomization_directory = getcwd()
 
         # identify kustomization file name
         # TODO allow kustomization of file name
@@ -94,7 +94,7 @@ class Kustomization():
 
         # write to file
         try:
-            kustomization_file_path = path.normpath(f'{str_kustomization_dir}/{str_kustomization_file_name}')
+            kustomization_file_path = path.normpath(f'{str_kustomization_directory}/{str_kustomization_file_name}')
             with open(kustomization_file_path, 'w') as file:
                 file.write(yaml.dump(self.yaml))
                 logging.debug(f'Successfully wrote to file: {kustomization_file_path}')
@@ -166,8 +166,8 @@ class Kustomization():
             # test if the key to configure is even defined in input helmizer config
             list_kustomization_children = self.helmizer_config['kustomize'][key].get(list)
 
-            if arguments.kustomization_dir:
-                str_kustomization_path = path.abspath(arguments.kustomization_dir)
+            if arguments.kustomization_directory:
+                str_kustomization_path = path.abspath(arguments.kustomization_directory)
             else:
                 str_kustomization_path = path.abspath(self.helmizer_config['helmizer']['kustomization-directory'].get(str))
 
@@ -204,8 +204,8 @@ class Kustomization():
 
     def run_subprocess(self, arguments):
         subprocess_working_directory = str()
-        if arguments.kustomization_dir:
-            subprocess_working_directory = path.abspath(path.normpath(arguments.kustomization_dir))
+        if arguments.kustomization_directory:
+            subprocess_working_directory = path.abspath(path.normpath(arguments.kustomization_directory))
         else:
             subprocess_working_directory = path.abspath(path.normpath(self.helmizer_config['helmizer']['kustomization-directory'].get(str)))
         logging.debug(f'Subprocess working directory: {subprocess_working_directory}')
@@ -243,11 +243,11 @@ def init_arg_parser():
 
         optionals = parser.add_argument_group()
         optionals.add_argument('--debug', dest='debug', action='store_true', help='Enable debug logging', default=False)
-        optionals.add_argument('--dry-run', dest='dry_run', action='store_true', help='Do not write to a file system.', default=False)
+        optionals.add_argument('--dry-run', dest='dry_run', action='store_true', help='Do not write to a file system', default=False)
         optionals.add_argument('--helmizer-directory', dest='helmizer_directory', action='store', type=str,
-                               help='Override helmizer file path')
-        optionals.add_argument('--kustomization-directory', dest='kustomization_dir', action='store', type=str,
-                               help='Set path containing kustomization')
+                               help='Set path containing helmizer file')
+        optionals.add_argument('--kustomization-directory', dest='kustomization_directory', action='store', type=str,
+                               help='Set path containing kustomization file')
         optionals.add_argument('--quiet', '-q', dest='quiet', action='store_true', help='Quiet output from subprocesses',
                                default=False)
         optionals.add_argument('--version', action='version', version='v0.5.2')

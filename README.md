@@ -8,10 +8,10 @@
     - [Installation](#installation)
     - [Putting it in your `$PATH`](#putting-it-in-your-path)
       - [Linux](#linux)
-      - [Build Locally (Optional)](#build-locally-optional)
+    - [virtualenv with pip](#virtualenv-with-pip)
     - [Run](#run)
       - [Local Python](#local-python)
-      - [Docker](#docker)
+      - [~~Docker~~](#docker)
   - [Kustomize Options](#kustomize-options)
     - [Supported](#supported)
     - [Unsupported (Currently)](#unsupported-currently)
@@ -21,7 +21,7 @@
 
 ## About
 
-**Helmizer** takes various inputs from a YAML config file (`helmizer.yaml` by default) and constructs a [kustomization file](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/) from those inputs.
+**Helmizer** takes various inputs from a YAML config file (`helmizer.yaml` by default) and constructs a [kustomization file](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/) from those inputs. It can run a sequence of commands before rendering the kustomization file.
 
 For example, instead of manually entering the paths to [`resources`](https://kubectl.docs.kubernetes.io/references/kustomize/resource/) in a kustomization file, this tool will walk any number of directories containing resources and populate the kustomization with these resources. Or only pull in individual files, it's your choice.
 
@@ -29,10 +29,8 @@ I began transitioning my `helm` charts to local templates via [helm template](ht
 
 ## Usage
 
-The recommended way of using **Helmizer** is via a [YAML config file](./examples/resources/helmizer.yaml). But it can be run entirely from the CLI at parity with config. Don't combine them at the same time, though (e.g. `resources` defined in `helmizer.yaml` and CLI at the same time).
-
 ```
-usage: helmizer [-h] [--debug] [--dry-run] [--helmizer-config HELMIZER_CONFIG] [--kustomization-directory KUSTOMIZATION_DIR] [--quiet] [--version]
+usage: helmizer [-h] [--debug] [--dry-run] [--helmizer-directory HELMIZER_DIRECTORY] [--kustomization-directory KUSTOMIZATION_DIRECTORY] [--quiet] [--version]
 
 Helmizer
 
@@ -40,19 +38,18 @@ optional arguments:
   -h, --help            show this help message and exit
 
   --debug               Enable debug logging (default: False)
-  --dry-run             Do not write to a file system. (default: False)
-  --helmizer-config HELMIZER_CONFIG
-                        Override helmizer file path (default: None)
-  --kustomization-directory KUSTOMIZATION_DIR
-                        Set path containing kustomization (default: None)
+  --dry-run             Do not write to a file system (default: False)
+  --helmizer-directory HELMIZER_DIRECTORY
+                        Set path containing helmizer file (default: None)
+  --kustomization-directory KUSTOMIZATION_DIRECTORY
+                        Set path containing kustomization file (default: None)
   --quiet, -q           Quiet output from subprocesses (default: False)
-  --version             show program's version number and exit```
+  --version             show program's version number and exit
 ```
 
 ## Configuration
 
-Example `helmizer.yaml` config file. The `helm` command is invoked before the content for `kustomization.yaml` is generated. Any number of commands can be added here.
-
+- Example `helmizer.yaml` config file. The `helm` command is invoked before the content for `kustomization.yaml` is generated. Any number of commands can be added here.
 ```yml
 helmizer:
   commandSequence:
@@ -63,7 +60,7 @@ helmizer:
       - "template"
       - "sealed-secrets"
       - --output-dir
-      - '.'
+      - '..'
       - --include-crds
       - --skip-tests
       - --version
@@ -99,12 +96,25 @@ The `sealed-secrets` **Helm** chart is used for examples for its small scope.
 
 For local installation/use of the raw script, I use a local virtual environment to isolate dependencies:
 
-**Requires use of `pip3`**
-
 ```bash
-git clone https://github.com/chicken231/helmizer.git
+git clone https://github.com/chicken231/helmizer.git -b v0.5.2
 cd helmizer
 ```
+
+### Putting it in your `$PATH`
+
+#### Linux
+
+1. Create symlink:
+```bash
+sudo ln -s /absolute/path/to/src/helmizer.py /usr/local/bin/helmizer
+```
+2. Install dependencies:
+```bash
+pip3 install -r ./src/requirements.txt
+```
+
+### virtualenv with pip
 
 1. Update pip:
 ```bash
@@ -133,24 +143,6 @@ If you need to reset the virtual environment for whatever reason:
 virtualenv --clear ./venv/
 ```
 
-### Putting it in your `$PATH`
-
-#### Linux
-
-```bash
-sudo ln -s /absolute/path/to/src/helmizer.py /usr/local/bin/helmizer
-```
-
-```bash
-pip3 install -r ./src/requirements.txt
-```
-
-#### Build Locally (Optional)
-
-```bash
-docker build -t helmizer:v0.5.2 .
-```
-
 ### Run
 
 **For greater detail on running from examples (they assumes you've ran [helm template](https://helm.sh/docs/helm/helm_template/), see the [resource example](examples/resources/README.md))**
@@ -159,8 +151,7 @@ docker build -t helmizer:v0.5.2 .
 
 ```bash
 python3 ./src/helmizer.py \
-  -n sealed-secrets \
-  --resource-paths ./examples/resources/sealed-secrets/templates/ \
+  --helmizer-directory ./examples/resources/
   --kustomization-directory ./examples/resources/
 ```
 
@@ -180,7 +171,9 @@ resources:
 - sealed-secrets/templates/role.yaml
 ```
 
-#### Docker
+#### ~~Docker~~
+
+**You may need a custom docker image depending on if you need certain apps when running commands within helmizer**
 
 In this example (*Nix OS), we're redirecting program output to the (e.g. `kustomization.yaml`) to the desired file because of issues with UID/GID on files bind-mounted from Docker. The redirect is not required however, you can correct permissions after the fact with `sudo chown -R username:groupname .`.
 
@@ -189,8 +182,7 @@ docker run --name helmizer \
   --rm \
   -v "$PWD"/examples:/tmp/helmizer -w /tmp/helmizer \
   docker.pkg.github.com/chicken231/helmizer/helmizer:v0.5.2 /usr/src/app/helmizer.py \
-    -n sealed-secrets \
-    --resource-paths ./resources/sealed-secrets/templates/ \
+    --helmizer-directory ./resources/ \
     --kustomization-directory ./resources/ > ./examples/resources/kustomization.yaml
 ```
 
