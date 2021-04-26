@@ -4,6 +4,7 @@
   - [PyInstaller](#pyinstaller)
     - [Linux](#linux)
   - [~~Flatpak~~](#flatpak)
+  - [Prep release](#prep-release)
 
 ## PyInstaller
 
@@ -49,4 +50,10 @@ Run
 ```bash
 flatpak run --user org.chicken231.Helmizer
 flatpak run org.chicken231.Helmizer
+```
+
+## Prep release
+
+```bash
+find . -type f -exec sed -i 's!v0.0.0!v0.0.1!g' '{}' \;
 ```

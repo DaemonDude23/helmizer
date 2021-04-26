@@ -27,11 +27,7 @@ _These assumes you're in the root directory of this repository_
 ### Raw Python
 
 ```bash
-python3 ./src/helmizer.py \
-  -n sealed-secrets \
-  --resources ./examples/commonAnnotations/sealed-secrets/templates/ \
-  --commonAnnotations ./examples/commonAnnotations/sealed-secrets/templates/ \
-  --kustomization-directory ./examples/commonAnnotations/
+python3 ./src/helmizer.py ./examples/commonAnnotations/helmizer.yaml
 ```
 
 ## Validate

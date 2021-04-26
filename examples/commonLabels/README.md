@@ -27,11 +27,7 @@ _These assumes you're in the root directory of this repository_
 ### Raw Python
 
 ```bash
-python3 ./src/helmizer.py \
-  -n sealed-secrets \
-  --resources ./examples/commonLabels/sealed-secrets/templates/ \
-  --commonLabels "app.kubernetes.io/helmizer=true" "app.kubernetes.io/yes=false" \
-  --kustomization-directory ./examples/commonLabels/
+python3 ./src/helmizer.py ./examples/commonLabels/helmizer.yaml
 ```
 
 ## Validate

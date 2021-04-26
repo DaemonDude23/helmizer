@@ -1,6 +1,7 @@
 # Changelog
 
 - [Changelog](#changelog)
+  - [v0.6.0](#v060)
   - [v0.5.2](#v052)
   - [v0.5.1](#v051)
   - [v0.5.0](#v050)
@@ -9,7 +10,13 @@
 
 ---
 
-## [v0.5.2](https://github.com/chicken231/helmizer/releases/tag/v0.5.1)
+## [v0.6.0](https://github.com/chicken231/helmizer/releases/tag/v0.6.0)
+
+- Reduce arguments to 1 positional argument pointing to helmizer config file.
+- Fix issues with arguments referencing paths.
+- Fix running subprocess _before_ generating kustomization.
+
+## [v0.5.2](https://github.com/chicken231/helmizer/releases/tag/v0.5.2)
 
 - Fix relative/absolute path issues when executing the script from a directory outside of what contains the `kustomization` or `helmizer.yaml`.
 

@@ -3,9 +3,10 @@
         {
             "args": [
                 "--debug",
+                "./examples/resources/helmizer.yaml"
             ],
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/examples/resources",
+            "cwd": "${workspaceFolder}",
             "name": "Example - resources",
             "program": "${workspaceFolder}/src/helmizer.py",
             "request": "launch",
@@ -13,10 +14,11 @@
         },
         {
             "args": [
-                "--debug"
+                "--debug",
+                "./examples/patchesStrategicMerge/helmizer.yaml"
             ],
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/examples/patchesStrategicMerge",
+            "cwd": "${workspaceFolder}",
             "name": "Example - patchesStrategicMerge",
             "program": "${workspaceFolder}/src/helmizer.py",
             "request": "launch",
@@ -24,10 +26,11 @@
         },
         {
             "args": [
-                "--debug"
+                "--debug",
+                "./examples/commonAnnotations/helmizer.yaml"
             ],
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/examples/commonAnnotations",
+            "cwd": "${workspaceFolder}",
             "name": "Example - commonAnnotations",
             "program": "${workspaceFolder}/src/helmizer.py",
             "request": "launch",
@@ -35,10 +38,11 @@
         },
         {
             "args": [
-                "--debug"
+                "--debug",
+                "./examples/commonLabels/helmizer.yaml"
             ],
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/examples/commonLabels",
+            "cwd": "${workspaceFolder}",
             "name": "Example - commonLabels",
             "program": "${workspaceFolder}/src/helmizer.py",
             "request": "launch",

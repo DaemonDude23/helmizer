@@ -7,7 +7,7 @@
     - [Examples](#examples)
     - [Installation](#installation)
     - [Putting it in your `$PATH`](#putting-it-in-your-path)
-      - [Linux](#linux)
+      - [Linux (Simplest Option)](#linux-simplest-option)
     - [virtualenv with pip](#virtualenv-with-pip)
     - [Run](#run)
       - [Local Python](#local-python)
@@ -30,21 +30,18 @@ I began transitioning my `helm` charts to local templates via [helm template](ht
 ## Usage
 
 ```
-usage: helmizer [-h] [--debug] [--dry-run] [--helmizer-directory HELMIZER_DIRECTORY] [--kustomization-directory KUSTOMIZATION_DIRECTORY] [--quiet] [--version]
+usage: helmizer [-h] [--debug] [--dry-run] [--quiet] [--version] helmizer_config
 
 Helmizer
 
 optional arguments:
-  -h, --help            show this help message and exit
+  -h, --help       show this help message and exit
 
-  --debug               Enable debug logging (default: False)
-  --dry-run             Do not write to a file system (default: False)
-  --helmizer-directory HELMIZER_DIRECTORY
-                        Set path containing helmizer file (default: None)
-  --kustomization-directory KUSTOMIZATION_DIRECTORY
-                        Set path containing kustomization file (default: None)
-  --quiet, -q           Quiet output from subprocesses (default: False)
-  --version             show program's version number and exit
+  --debug          enable debug logging (default: False)
+  --dry-run        do not write to a file system (default: False)
+  helmizer_config  path to helmizer config file
+  --quiet, -q      quiet output from subprocesses (default: False)
+  --version        show program's version number and exit
 ```
 
 ## Configuration
@@ -60,12 +57,18 @@ helmizer:
       - "template"
       - "sealed-secrets"
       - --output-dir
-      - '..'
+      - '.'
       - --include-crds
       - --skip-tests
       - --version
       - '1.12.2'
       - stable/sealed-secrets
+  - command: "pre-commit"
+    args:
+      - 'run'
+      - '-a'
+      - '||'
+      - 'true'
   dry-run: false
   kustomization-directory: .
   kustomization-file-name: kustomization.yaml
@@ -97,13 +100,13 @@ The `sealed-secrets` **Helm** chart is used for examples for its small scope.
 For local installation/use of the raw script, I use a local virtual environment to isolate dependencies:
 
 ```bash
-git clone https://github.com/chicken231/helmizer.git -b v0.5.2
+git clone https://github.com/chicken231/helmizer.git -b v0.6.0
 cd helmizer
 ```
 
 ### Putting it in your `$PATH`
 
-#### Linux
+#### Linux (Simplest Option)
 
 1. Create symlink:
 ```bash
@@ -150,9 +153,7 @@ virtualenv --clear ./venv/
 #### Local Python
 
 ```bash
-python3 ./src/helmizer.py \
-  --helmizer-directory ./examples/resources/
-  --kustomization-directory ./examples/resources/
+python3 ./src/helmizer.py ./examples/resources/helmizer.yaml
 ```
 
 Output:
@@ -181,9 +182,8 @@ In this example (*Nix OS), we're redirecting program output to the (e.g. `kustom
 docker run --name helmizer \
   --rm \
   -v "$PWD"/examples:/tmp/helmizer -w /tmp/helmizer \
-  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.5.2 /usr/src/app/helmizer.py \
-    --helmizer-directory ./resources/ \
-    --kustomization-directory ./resources/ > ./examples/resources/kustomization.yaml
+  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.6.0 /usr/src/app/helmizer.py \
+    ./resources/ > ./examples/resources/kustomization.yaml
 ```
 
 ## Kustomize Options

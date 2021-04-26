@@ -19,11 +19,7 @@ _These assumes you're in the root directory of this repository_
 ### Raw Python
 
 ```bash
-python3 ./src/helmizer.py \
-  -n sealed-secrets \
-  --resource-paths ./examples/patchStrategicMerge/sealed-secrets/templates/ \
-  --patchesStrategicMerge ./examples/patchStrategicMerge/patches/ \
-  --kustomization-directory ./examples/patchStrategicMerge/
+python3 ./src/helmizer.py ./examples/patchStrategicMerge/helmizer.yaml
 ```
 
 ## Validate
