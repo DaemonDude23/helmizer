@@ -180,6 +180,15 @@ class Kustomization():
                 for final_target_path in list_target_paths:
                     list_final_target_paths.append(path.relpath(final_target_path, str_kustomization_path))
 
+                # remove any ignored files
+                try:
+                    for ignore in self.helmizer_config['helmizer']['ignore'].get(list):
+                        list_final_target_paths.remove(ignore)
+                except ValueError:
+                    pass
+                except NotFoundError:
+                    pass
+
                 return list_final_target_paths
 
         except NotFoundError:
@@ -229,11 +238,10 @@ def init_arg_parser():
         args = parser.add_argument_group()
         args.add_argument('--debug', dest='debug', action='store_true', help='enable debug logging', default=False)
         args.add_argument('--dry-run', dest='dry_run', action='store_true', help='do not write to a file system', default=False)
-        args.add_argument('helmizer_config', action='store', type=str,
-                               help='path to helmizer config file')
         args.add_argument('--quiet', '-q', dest='quiet', action='store_true', help='quiet output from subprocesses',
                                default=False)
-        args.add_argument('--version', action='version', version='v0.6.0')
+        args.add_argument('--version', action='version', version='v0.7.0')
+        args.add_argument('helmizer_config', action='store', type=str, help='path to helmizer config file')
         arguments = parser.parse_args()
 
         if arguments.quiet:
@@ -266,9 +274,11 @@ def init_helmizer_config(arguments):
             logging.debug(f'Trying helmizer config path from argument: {str_helmizer_config_path}')
             config.set_file(path.normpath(str_helmizer_config_path))
             logging.debug(f'parsed config: {config}')
+
+    # no config file found. Give up
     except confuse.exceptions.ConfigReadError:
-        # no config file found. Give up
-        return dict()
+        logging.error(f'Unable to locate helmizer config. Path provided: {str_helmizer_config_path}')
+        exit(1)
 
     try:
         validate_helmizer_config_version(config['helmizer']['version'].get(str))

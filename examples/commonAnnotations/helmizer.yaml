@@ -18,6 +18,8 @@ helmizer:
   kustomization-file-name: kustomization.yaml
   sort-keys: false
   version: '0.1.0'
+  ignore:
+  - sealed-secrets/templates/helmizer.yaml
 kustomize:
   namespace: sealed-secrets
   resources:

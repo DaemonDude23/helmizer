@@ -39,9 +39,9 @@ optional arguments:
 
   --debug          enable debug logging (default: False)
   --dry-run        do not write to a file system (default: False)
-  helmizer_config  path to helmizer config file
   --quiet, -q      quiet output from subprocesses (default: False)
   --version        show program's version number and exit
+  helmizer_config  path to helmizer config file
 ```
 
 ## Configuration
@@ -75,6 +75,8 @@ helmizer:
   resource-absolute-paths: []
   sort-keys: true
   version: '0.1.0'
+  ignore:
+    - sealed-secrets/templates/helmizer.yaml
 kustomize:
   namespace: sealed-secrets
   resources:
@@ -100,7 +102,7 @@ The `sealed-secrets` **Helm** chart is used for examples for its small scope.
 For local installation/use of the raw script, I use a local virtual environment to isolate dependencies:
 
 ```bash
-git clone https://github.com/chicken231/helmizer.git -b v0.6.0
+git clone https://github.com/chicken231/helmizer.git -b v0.7.0
 cd helmizer
 ```
 
@@ -182,7 +184,7 @@ In this example (*Nix OS), we're redirecting program output to the (e.g. `kustom
 docker run --name helmizer \
   --rm \
   -v "$PWD"/examples:/tmp/helmizer -w /tmp/helmizer \
-  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.6.0 /usr/src/app/helmizer.py \
+  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.7.0 /usr/src/app/helmizer.py \
     ./resources/ > ./examples/resources/kustomization.yaml
 ```
 

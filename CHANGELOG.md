@@ -1,7 +1,8 @@
 # Changelog
 
 - [Changelog](#changelog)
-  - [v0.6.0](#v060)
+  - [v0.7.0](#v070)
+  - [v0.7.0](#v070-1)
   - [v0.5.2](#v052)
   - [v0.5.1](#v051)
   - [v0.5.0](#v050)
@@ -10,7 +11,12 @@
 
 ---
 
-## [v0.6.0](https://github.com/chicken231/helmizer/releases/tag/v0.6.0)
+## [v0.7.0](https://github.com/chicken231/helmizer/releases/tag/v0.7.0)
+
+- Catch when no `helmizer` config detected, giving a user-friendly message.
+- Added `helmizer.ignore` section to helmizer config. Define path(s) to files to not ignore when constructing the final kustomization.
+
+## [v0.7.0](https://github.com/chicken231/helmizer/releases/tag/v0.7.0)
 
 - Reduce arguments to 1 positional argument pointing to helmizer config file.
 - Fix issues with arguments referencing paths.

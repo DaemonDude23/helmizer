@@ -7,13 +7,6 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-# pyinstaller
-# pyinstaller -y --workpath ./build/pyinstaller/linux/workpath --specpath ./build/pyinstaller/linux/ --distpath ./build/pyinstaller/linux/ src/helmizer.py
-# mkdir -p ./build/pyinstaller/linux/releases/
-# zip -9 -T -r "./build/pyinstaller/linux/releases/${TAG}.zip" ./build/pyinstaller/linux/helmizer
-# unlink ./build/pyinstaller/linux/releases/current || true
-# ln -s ./build/pyinstaller/linux/helmizer/helmizer ./build/pyinstaller/linux/releases/current
-
 # docker
 DOCKER_CREATE_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 printf "\n * Docker container label (timestamp): %s" "$DOCKER_CREATE_DATE"

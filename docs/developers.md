@@ -1,16 +1,16 @@
 # Developers
 
 - [Developers](#developers)
-  - [PyInstaller](#pyinstaller)
-    - [Linux](#linux)
+  - [~~PyInstaller~~](#pyinstaller)
+    - [~~Linux~~](#linux)
   - [~~Flatpak~~](#flatpak)
   - [Prep release](#prep-release)
 
-## PyInstaller
+## ~~PyInstaller~~
 
 - https://pyinstaller.readthedocs.io/en/stable/index.html
 
-### Linux
+### ~~Linux~~
 
 1. Install package via `pip`:
 ```bash
