@@ -5,6 +5,7 @@
     - [~~Linux~~](#linux)
   - [~~Flatpak~~](#flatpak)
   - [Prep release](#prep-release)
+    - [Update version nunmber](#update-version-nunmber)
 
 ## ~~PyInstaller~~
 
@@ -53,6 +54,8 @@ flatpak run org.chicken231.Helmizer
 ```
 
 ## Prep release
+
+### Update version nunmber
 
 ```bash
 find . -type f -exec sed -i 's!v0.0.0!v0.0.1!g' '{}' \;

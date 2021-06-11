@@ -1,8 +1,9 @@
 # Changelog
 
 - [Changelog](#changelog)
+  - [v0.8.0](#v080)
   - [v0.7.0](#v070)
-  - [v0.7.0](#v070-1)
+  - [v0.6.0](#v060)
   - [v0.5.2](#v052)
   - [v0.5.1](#v051)
   - [v0.5.0](#v050)
@@ -11,12 +12,31 @@
 
 ---
 
+## [v0.8.0](https://github.com/chicken231/helmizer/releases/tag/v0.8.0)
+
+June 10 2021
+
+**Enhancements:**
+
+- Added configuration support for:
+  - [`components`](https://kubectl.docs.kubernetes.io/guides/config_management/components/)
+  - [`crds`](https://kubectl.docs.kubernetes.io/references/kustomize/crds/)
+  - [`namePrefix`](https://kubectl.docs.kubernetes.io/references/kustomize/nameprefix/)
+  - [`nameSuffix`](https://kubectl.docs.kubernetes.io/references/kustomize/namesuffix/)
+- Added argument `--skip-commands` to not run the `commandSequence` and just generate the `kustomization.yaml`.
+- Added more debug statements.
+
+**Bugfixes:**
+
+- Made argument `--dry-run` do what it says it'll do.
+- Fixed `latest` tag with build script.
+
 ## [v0.7.0](https://github.com/chicken231/helmizer/releases/tag/v0.7.0)
 
 - Catch when no `helmizer` config detected, giving a user-friendly message.
 - Added `helmizer.ignore` section to helmizer config. Define path(s) to files to not ignore when constructing the final kustomization.
 
-## [v0.7.0](https://github.com/chicken231/helmizer/releases/tag/v0.7.0)
+## [v0.6.0](https://github.com/chicken231/helmizer/releases/tag/v0.6.0)
 
 - Reduce arguments to 1 positional argument pointing to helmizer config file.
 - Fix issues with arguments referencing paths.

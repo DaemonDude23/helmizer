@@ -78,13 +78,17 @@ helmizer:
   ignore:
     - sealed-secrets/templates/helmizer.yaml
 kustomize:
-  namespace: sealed-secrets
-  resources:
-    - sealed-secrets/templates/
-  patchesStrategicMerge:
-    - extra/
   commonAnnotations: {}
   commonLabels: {}
+  components: []
+  crds: []
+  namePrefix: []
+  nameSuffix: []
+  namespace: sealed-secrets
+  patchesStrategicMerge:
+    - extra/
+  resources:
+    - sealed-secrets/templates/
 ```
 
 ### Examples
@@ -102,7 +106,7 @@ The `sealed-secrets` **Helm** chart is used for examples for its small scope.
 For local installation/use of the raw script, I use a local virtual environment to isolate dependencies:
 
 ```bash
-git clone https://github.com/chicken231/helmizer.git -b v0.7.0
+git clone https://github.com/chicken231/helmizer.git -b v0.8.0
 cd helmizer
 ```
 
@@ -184,7 +188,7 @@ In this example (*Nix OS), we're redirecting program output to the (e.g. `kustom
 docker run --name helmizer \
   --rm \
   -v "$PWD"/examples:/tmp/helmizer -w /tmp/helmizer \
-  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.7.0 /usr/src/app/helmizer.py \
+  docker.pkg.github.com/chicken231/helmizer/helmizer:v0.8.0 /usr/src/app/helmizer.py \
     ./resources/ > ./examples/resources/kustomization.yaml
 ```
 
@@ -194,20 +198,20 @@ docker run --name helmizer \
 
 - [commonAnnotations](https://kubectl.docs.kubernetes.io/references/kustomize/commonannotations/)
 - [commonLabels](https://kubectl.docs.kubernetes.io/references/kustomize/commonlabels/)
+- [components](https://kubectl.docs.kubernetes.io/guides/config_management/components/)
+- [crds](https://kubectl.docs.kubernetes.io/references/kustomize/crds/)
+- [namePrefix](https://kubectl.docs.kubernetes.io/references/kustomize/nameprefix/)
 - [namespace](https://kubectl.docs.kubernetes.io/references/kustomize/namespace/)
+- [nameSuffix](https://kubectl.docs.kubernetes.io/references/kustomize/namesuffix/)
 - [patchStrategicMerge](https://kubectl.docs.kubernetes.io/references/kustomize/patchesstrategicmerge/)
 - [resources](https://kubectl.docs.kubernetes.io/references/kustomize/resource/)
 
 ### Unsupported (Currently)
 
 - [~~bases~~](https://kubectl.docs.kubernetes.io/references/kustomize/bases/)
-- [components](https://kubectl.docs.kubernetes.io/references/kustomize/components/)
 - [configMapGenerator](https://kubectl.docs.kubernetes.io/references/kustomize/configmapgenerator/)
-- [crds](https://kubectl.docs.kubernetes.io/references/kustomize/crds/)
 - [generatorOptions](https://kubectl.docs.kubernetes.io/references/kustomize/generatoroptions/)
 - [images](https://kubectl.docs.kubernetes.io/references/kustomize/images/)
-- [namePrefix](https://kubectl.docs.kubernetes.io/references/kustomize/nameprefix/)
-- [nameSuffix](https://kubectl.docs.kubernetes.io/references/kustomize/namesuffix/)
 - [patches](https://kubectl.docs.kubernetes.io/references/kustomize/patches/)
 - [patchesJson6902](https://kubectl.docs.kubernetes.io/references/kustomize/patchesjson6902/)
 - [replicas](https://kubectl.docs.kubernetes.io/references/kustomize/replicas/)

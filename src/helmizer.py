@@ -44,6 +44,26 @@ class Kustomization():
         if dict_get_common_labels:
             self.yaml['commonLabels'] = dict_get_common_labels
 
+        # crds
+        list_crds = self.get_files(arguments, 'crds')
+        if list_crds:
+            self.yaml['crds'] = list_crds
+
+        # components
+        list_components = self.get_files(arguments, 'components')
+        if list_components:
+            self.yaml['components'] = list_components
+
+        # namePrefix
+        str_name_prefix = self.get_name_prefix()
+        if str_name_prefix:
+            self.yaml['namePrefix'] = str_name_prefix
+
+        # nameSuffix
+        str_name_suffix = self.get_name_suffix()
+        if str_name_suffix:
+            self.yaml['nameSuffix'] = str_name_suffix
+
         # patchesStrategicMerge
         list_patches_strategic_merge = self.get_files(arguments, 'patchesStrategicMerge')
         if list_patches_strategic_merge:
@@ -72,29 +92,33 @@ class Kustomization():
 
 
     def write_kustomization(self, arguments):
-        # identify kustomization file's parent directory
-        str_kustomization_directory = path.dirname(path.abspath(path.normpath(arguments.helmizer_config)))
+        if self.helmizer_config['helmizer']['dry-run'].get(bool) or arguments.dry_run:
+            logging.debug('Performing dry-run, not writing to a file system')
+        else:
+            # identify kustomization file's parent directory
+            str_kustomization_directory = path.dirname(path.abspath(path.normpath(arguments.helmizer_config)))
 
-        # identify kustomization file name
-        str_kustomization_file_name = str()
-        try:
-            str_kustomization_file_name = self.helmizer_config['helmizer']['kustomization-file-name'].get(str)
-        except KeyError:
-            str_kustomization_file_name = 'kustomization.yaml'
+            # identify kustomization file name
+            str_kustomization_file_name = str()
+            try:
+                str_kustomization_file_name = self.helmizer_config['helmizer']['kustomization-file-name'].get(str)
+            except KeyError:
+                str_kustomization_file_name = 'kustomization.yaml'
 
-        # write to file
-        try:
-            kustomization_file_path = path.normpath(f'{str_kustomization_directory}/{str_kustomization_file_name}')
-            with open(kustomization_file_path, 'w') as file:
-                file.write(yaml.dump(self.yaml))
-                logging.debug(f'Successfully wrote to file: {path.abspath(kustomization_file_path)}')
-        except IsADirectoryError as e:
-            raise e
-        except TypeError:
-            pass
+            # write to file
+            try:
+                kustomization_file_path = path.normpath(f'{str_kustomization_directory}/{str_kustomization_file_name}')
+                with open(kustomization_file_path, 'w') as file:
+                    file.write(yaml.dump(self.yaml))
+                    logging.debug(f'Successfully wrote to file: {path.abspath(kustomization_file_path)}')
+            except IsADirectoryError as e:
+                raise e
+            except TypeError:
+                pass
 
 
     def render_template(self, arguments):
+        logging.debug('Rendering template')
         self.sort_keys()
         self.print_kustomization()
         self.write_kustomization(arguments)
@@ -147,6 +171,30 @@ class Kustomization():
             return dict_common_labels
 
 
+    def get_name_prefix(self):
+        str_name_prefix = str()
+        try:
+            if len(self.helmizer_config['kustomize']['namePrefix'].get(str)) > 0:
+                str_name_prefix = self.helmizer_config['kustomize']['namePrefix'].get(str)
+                logging.debug(f'namespace: {str_name_prefix}')
+        except TypeError:
+            pass
+        finally:
+            return str_name_prefix
+
+
+    def get_name_suffix(self):
+        str_name_suffix = str()
+        try:
+            if len(self.helmizer_config['kustomize']['nameSuffix'].get(str)) > 0:
+                str_name_suffix = self.helmizer_config['kustomize']['nameSuffix'].get(str)
+                logging.debug(f'namespace: {str_name_suffix}')
+        except TypeError:
+            pass
+        finally:
+            return str_name_suffix
+
+
     def get_files(self, arguments, key):
         list_target_paths = list()
         list_final_target_paths = list()
@@ -183,6 +231,7 @@ class Kustomization():
                 # remove any ignored files
                 try:
                     for ignore in self.helmizer_config['helmizer']['ignore'].get(list):
+                        logging.debug(f'Removing ignored file from final list: {ignore}')
                         list_final_target_paths.remove(ignore)
                 except ValueError:
                     pass
@@ -238,21 +287,20 @@ def init_arg_parser():
         args = parser.add_argument_group()
         args.add_argument('--debug', dest='debug', action='store_true', help='enable debug logging', default=False)
         args.add_argument('--dry-run', dest='dry_run', action='store_true', help='do not write to a file system', default=False)
+        args.add_argument('--skip-commands', dest='skip_commands', action='store_true',
+                         help='skip executing commandSequence, just generate kustomization file', default=False)
         args.add_argument('--quiet', '-q', dest='quiet', action='store_true', help='quiet output from subprocesses',
-                               default=False)
-        args.add_argument('--version', action='version', version='v0.7.0')
+                         default=False)
+        args.add_argument('--version', action='version', version='v0.8.0')
         args.add_argument('helmizer_config', action='store', type=str, help='path to helmizer config file')
         arguments = parser.parse_args()
 
         if arguments.quiet:
-            logging.basicConfig(level=logging.INFO, datefmt=None, stream=None,
-                        format='[%(asctime)s %(levelname)s] %(message)s')
+            logging.basicConfig(level=logging.INFO, datefmt=None, stream=None, format='[%(asctime)s %(levelname)s] %(message)s')
         if arguments.debug:
-            logging.basicConfig(level=logging.DEBUG, datefmt=None, stream=stdout,
-                        format='[%(asctime)s %(levelname)s] %(message)s')
+            logging.basicConfig(level=logging.DEBUG, datefmt=None, stream=stdout, format='[%(asctime)s %(levelname)s] %(message)s')
         else:
-            logging.basicConfig(level=logging.INFO, datefmt=None, stream=stdout,
-                        format='[%(asctime)s %(levelname)s] %(message)s')
+            logging.basicConfig(level=logging.INFO, datefmt=None, stream=stdout, format='[%(asctime)s %(levelname)s] %(message)s')
 
         return arguments
     except argparse.ArgumentError as e:
@@ -291,7 +339,8 @@ def init_helmizer_config(arguments):
 def main():
     arguments = init_arg_parser()
     helmizer_config = init_helmizer_config(arguments)
-    run_subprocess(helmizer_config, arguments)
+    if not arguments.skip_commands:
+        run_subprocess(helmizer_config, arguments)
     kustomization = Kustomization(helmizer_config, arguments)
     kustomization.render_template(arguments)
 
