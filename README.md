@@ -30,7 +30,7 @@ I began transitioning my `helm` charts to local templates via [helm template](ht
 ## Usage
 
 ```
-usage: helmizer [-h] [--debug] [--dry-run] [--quiet] [--version] helmizer_config
+usage: helmizer [-h] [--debug] [--dry-run] [--skip-commands] [--quiet] [--version] helmizer_config
 
 Helmizer
 
@@ -39,6 +39,7 @@ optional arguments:
 
   --debug          enable debug logging (default: False)
   --dry-run        do not write to a file system (default: False)
+  --skip-commands  skip executing commandSequence, just generate kustomization file (default: False)
   --quiet, -q      quiet output from subprocesses (default: False)
   --version        show program's version number and exit
   helmizer_config  path to helmizer config file
