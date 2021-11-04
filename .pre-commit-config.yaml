@@ -30,4 +30,8 @@ repos:
       - id: requirements-txt-fixer
       - id: check-ast
     repo: 'git://github.com/pre-commit/pre-commit-hooks'
-    rev: v3.4.0
+    rev: v4.0.1
+  - hooks:
+      - id: black
+    repo: https://github.com/psf/black
+    rev: 21.10b0

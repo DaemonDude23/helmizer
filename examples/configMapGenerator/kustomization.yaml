@@ -1,0 +1,31 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+configMapGenerator:
+- envs:
+  - .env
+  name: test-env
+  namespace: default
+- envs:
+  - .env
+  name: test-env-duplicate
+  namespace: default
+kind: Kustomization
+namespace: default
+resources:
+- ingress-nginx/templates/admission-webhooks/job-patch/clusterrole.yaml
+- ingress-nginx/templates/admission-webhooks/job-patch/clusterrolebinding.yaml
+- ingress-nginx/templates/admission-webhooks/job-patch/job-createSecret.yaml
+- ingress-nginx/templates/admission-webhooks/job-patch/job-patchWebhook.yaml
+- ingress-nginx/templates/admission-webhooks/job-patch/role.yaml
+- ingress-nginx/templates/admission-webhooks/job-patch/rolebinding.yaml
+- ingress-nginx/templates/admission-webhooks/job-patch/serviceaccount.yaml
+- ingress-nginx/templates/admission-webhooks/validating-webhook.yaml
+- ingress-nginx/templates/clusterrole.yaml
+- ingress-nginx/templates/clusterrolebinding.yaml
+- ingress-nginx/templates/controller-configmap.yaml
+- ingress-nginx/templates/controller-deployment.yaml
+- ingress-nginx/templates/controller-ingressclass.yaml
+- ingress-nginx/templates/controller-role.yaml
+- ingress-nginx/templates/controller-rolebinding.yaml
+- ingress-nginx/templates/controller-service-webhook.yaml
+- ingress-nginx/templates/controller-service.yaml
+- ingress-nginx/templates/controller-serviceaccount.yaml

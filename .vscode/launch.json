@@ -50,6 +50,18 @@
         },
         {
             "args": [
+                "--debug",
+                "./examples/configMapGenerator/helmizer.yaml"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "Example - configMapGenerator",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
                 "--help"
             ],
             "console": "integratedTerminal",
