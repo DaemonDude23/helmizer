@@ -4,6 +4,7 @@
   - [~~PyInstaller~~](#pyinstaller)
     - [~~Linux~~](#linux)
   - [~~Flatpak~~](#flatpak)
+  - [Testing](#testing)
   - [Prep release](#prep-release)
     - [Update version nunmber](#update-version-nunmber)
 
@@ -33,7 +34,7 @@ Build
 flatpak-builder \
   --force-clean\
   ./build/flatpak \
-  org.chicken231.Helmizer.yaml
+  org.DaeonDude23.Helmizer.yaml
 ```
 
 Local installation
@@ -43,14 +44,21 @@ flatpak-builder \
   --user \
   --install \
   ./build/flatpak \
-  org.chicken231.Helmizer.yaml && \
-    flatpak run --user org.chicken231.Helmizer
+  org.DaeonDude23.Helmizer.yaml && \
+    flatpak run --user org.DaeonDude23.Helmizer
 ```
 
 Run
 ```bash
-flatpak run --user org.chicken231.Helmizer
-flatpak run org.chicken231.Helmizer
+flatpak run --user org.DaeonDude23.Helmizer
+flatpak run org.DaeonDude23.Helmizer
+```
+
+## Testing
+
+```bash
+find ./examples/ -type d -name 'sealed-secrets' -exec rm -rf {} \;
+find ./examples/ -type f -name 'kustomization.yaml' -exec rm -rf {} \;
 ```
 
 ## Prep release

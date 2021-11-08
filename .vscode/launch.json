@@ -3,11 +3,131 @@
         {
             "args": [
                 "--debug",
-                "./examples/resources/helmizer.yaml"
+                "./examples/commonAnnotations/helmizer.yaml"
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "name": "Example - resources",
+            "name": "Example - commonAnnotations",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
+                "--debug",
+                "./examples/commonLabels/helmizer.yaml"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "Example - commonLabels",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
+                "--debug",
+                "./examples/configMapGenerator/helmizer.yaml"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "Example - configMapGenerator",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
+                "--debug",
+                "./examples/crds/helmizer.yaml"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "Example - crds",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
+                "--debug",
+                "./examples/generatorOptions/helmizer.yaml"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "Example - generatorOptions",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
+                "--debug",
+                "./examples/images/helmizer.yaml"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "Example - images",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
+                "--debug",
+                "./examples/namePrefix/helmizer.yaml"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "Example - namePrefix",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
+                "--debug",
+                "./examples/namespace/helmizer.yaml"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "Example - namespace",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
+                "--debug",
+                "./examples/nameSuffix/helmizer.yaml"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "Example - nameSuffix",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
+                "--debug",
+                "./examples/openapi/helmizer.yaml"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "Example - openapi",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
+                "--debug",
+                "./examples/patchesJson6902/helmizer.yaml"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "Example - patchesJson6902",
             "program": "${workspaceFolder}/src/helmizer.py",
             "request": "launch",
             "type": "python"
@@ -27,11 +147,11 @@
         {
             "args": [
                 "--debug",
-                "./examples/commonAnnotations/helmizer.yaml"
+                "./examples/replacements/helmizer.yaml"
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "name": "Example - commonAnnotations",
+            "name": "Example - replacements",
             "program": "${workspaceFolder}/src/helmizer.py",
             "request": "launch",
             "type": "python"
@@ -39,11 +159,35 @@
         {
             "args": [
                 "--debug",
-                "./examples/commonLabels/helmizer.yaml"
+                "./examples/replicas/helmizer.yaml"
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "name": "Example - commonLabels",
+            "name": "Example - replicas",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
+                "--debug",
+                "./examples/resources/helmizer.yaml"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "Example - resources",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
+                "--debug",
+                "./examples/vars/helmizer.yaml"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "Example - vars",
             "program": "${workspaceFolder}/src/helmizer.py",
             "request": "launch",
             "type": "python"

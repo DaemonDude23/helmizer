@@ -1,0 +1,9 @@
+helmizer:
+  dry-run: false
+  kustomization-directory: .
+  kustomization-file-name: kustomization.yaml
+  sort-keys: true
+  version: '0.1.0'
+kustomize:
+  namespace: default
+  namePrefix: i-am-prefix

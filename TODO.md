@@ -1,0 +1,3 @@
+- Validate...
+  - Inputs for various kustomization keys
+  - with kustomize --dry-run?
