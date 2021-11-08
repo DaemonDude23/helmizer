@@ -1,0 +1,15 @@
+helmizer:
+  sort-keys: true
+  version: '0.1.0'
+kustomize:
+  patchesJson6902:
+  - target:
+      version: v1
+      kind: Deployment
+      name: my-deployment
+    path: add_init_container.yaml
+  - target:
+      version: v1
+      kind: Service
+      name: my-service
+    path: add_service_annotation.yaml

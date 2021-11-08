@@ -1,0 +1,12 @@
+helmizer:
+  sort-keys: true
+  version: '0.1.0'
+kustomize:
+  vars:
+  - name: A_SERVICE_NAME
+    objref:
+      kind: Service
+      name: this-service
+      apiVersion: v1
+    fieldref:
+      fieldpath: metadata.name

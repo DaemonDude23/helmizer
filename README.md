@@ -13,9 +13,6 @@
       - [Local Python](#local-python)
       - [~~Docker~~](#docker)
   - [Kustomize Options](#kustomize-options)
-    - [Supported](#supported)
-    - [Unsupported (Currently)](#unsupported-currently)
-  - [References](#references)
 
 ---
 
@@ -107,7 +104,7 @@ The `sealed-secrets` **Helm** chart is used for examples for its small scope.
 For local installation/use of the raw script, I use a local virtual environment to isolate dependencies:
 
 ```bash
-git clone https://github.com/DaeonDude23/helmizer.git -b v0.9.0
+git clone https://github.com/DaemonDude23/helmizer.git -b v0.9.0
 cd helmizer
 ```
 
@@ -121,7 +118,8 @@ sudo ln -s /absolute/path/to/src/helmizer.py /usr/local/bin/helmizer
 ```
 2. Install dependencies:
 ```bash
-pip3 install -r ./src/requirements.txt
+pip3 install -U -r ./src/requirements.txt
+pip3 install -U -r ./src/requirements-newest.txt
 ```
 
 ### virtualenv with pip
@@ -145,7 +143,8 @@ source ./venv/bin/activate
 ```
 5. Install requirements into virtual environment.
 ```bash
-pip3 install -r ./src/requirements.txt
+pip3 install -U -r ./src/requirements.txt
+pip3 install -U -r ./src/requirements-newest.txt
 ```
 
 If you need to reset the virtual environment for whatever reason:
@@ -182,6 +181,7 @@ resources:
 #### ~~Docker~~
 
 **You may need a custom docker image depending on if you need certain apps when running commands within helmizer**
+**I'm not maintaing the docker image anymore but you could build it easily from the included Dockerfile**
 
 In this example (*Nix OS), we're redirecting program output to the (e.g. `kustomization.yaml`) to the desired file because of issues with UID/GID on files bind-mounted from Docker. The redirect is not required however, you can correct permissions after the fact with `sudo chown -R username:groupname .`.
 
@@ -189,36 +189,12 @@ In this example (*Nix OS), we're redirecting program output to the (e.g. `kustom
 docker run --name helmizer \
   --rm \
   -v "$PWD"/examples:/tmp/helmizer -w /tmp/helmizer \
-  docker.pkg.github.com/DaeonDude23/helmizer/helmizer:v0.9.0 /usr/src/app/helmizer.py \
+  docker.pkg.github.com/DaemonDude23/helmizer/helmizer:v0.9.0 /usr/src/app/helmizer.py \
     ./resources/ > ./examples/resources/kustomization.yaml
 ```
 
 ## Kustomize Options
 
-### Supported
-
-- [commonAnnotations](https://kubectl.docs.kubernetes.io/references/kustomize/commonannotations/)
-- [commonLabels](https://kubectl.docs.kubernetes.io/references/kustomize/commonlabels/)
-- [components](https://kubectl.docs.kubernetes.io/guides/config_management/components/)
-- [crds](https://kubectl.docs.kubernetes.io/references/kustomize/crds/)
-- [namePrefix](https://kubectl.docs.kubernetes.io/references/kustomize/nameprefix/)
-- [namespace](https://kubectl.docs.kubernetes.io/references/kustomize/namespace/)
-- [nameSuffix](https://kubectl.docs.kubernetes.io/references/kustomize/namesuffix/)
-- [patchStrategicMerge](https://kubectl.docs.kubernetes.io/references/kustomize/patchesstrategicmerge/)
-- [resources](https://kubectl.docs.kubernetes.io/references/kustomize/resource/)
-
-### Unsupported (Currently)
-
-- [~~bases~~](https://kubectl.docs.kubernetes.io/references/kustomize/bases/)
-- [configMapGenerator](https://kubectl.docs.kubernetes.io/references/kustomize/configmapgenerator/)
-- [generatorOptions](https://kubectl.docs.kubernetes.io/references/kustomize/generatoroptions/)
-- [images](https://kubectl.docs.kubernetes.io/references/kustomize/images/)
-- [patches](https://kubectl.docs.kubernetes.io/references/kustomize/patches/)
-- [patchesJson6902](https://kubectl.docs.kubernetes.io/references/kustomize/patchesjson6902/)
-- [replicas](https://kubectl.docs.kubernetes.io/references/kustomize/replicas/)
-- [secretGenerator](https://kubectl.docs.kubernetes.io/references/kustomize/secretgenerator/)
-- [vars](https://kubectl.docs.kubernetes.io/references/kustomize/vars/)
-
-## References
-
 - [Kustomize Docs](https://kubectl.docs.kubernetes.io/references/kustomize/)
+
+All `kustomize` configuration options are supported. See [here](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/) for reference.

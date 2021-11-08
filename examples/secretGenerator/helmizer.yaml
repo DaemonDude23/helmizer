@@ -1,0 +1,10 @@
+helmizer:
+  sort-keys: true
+  version: '0.1.0'
+kustomize:
+  secretGenerator:
+  - name: tls
+    files:
+    - secret/tls.cert
+    - secret/tls.key
+    type: "kubernetes.io/tls"

@@ -15,13 +15,22 @@
 
 ## [v0.9.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.9.0)
 
-TBD
+November 7 2021
+
+**Bugfixes**
+
+- Fixed exceptions when not including keys in helmizer.yaml, falling back to defaults if not defined.
 
 **Enhancements:**
 
 - Added configuration support for **all** keys in a kustomization.
-  -
-- Added pre-commit python formatter.
+  - Standardized functions to return various data types depending on kustomization key structure
+
+**Housekeeping**
+
+- Updated dependencies - added more lax `requirements.txt` file.
+- Added some Python pre-commit hooks.
+- Added examples for all supported kustomization file.
 
 ## [v0.8.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.8.0)
 

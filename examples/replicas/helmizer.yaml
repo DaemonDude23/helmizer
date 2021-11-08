@@ -1,0 +1,7 @@
+helmizer:
+  sort-keys: true
+  version: '0.1.0'
+kustomize:
+  replicas:
+  - name: deployment-name
+    count: 5

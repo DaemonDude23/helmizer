@@ -1,0 +1,11 @@
+helmizer:
+  sort-keys: true
+  version: '0.1.0'
+kustomize:
+  replacements:
+    - source:
+        kind: Deployment
+        fieldPath: metadata.name
+      targets:
+      - select:
+          name: some-resource
