@@ -104,7 +104,7 @@ The `sealed-secrets` **Helm** chart is used for examples for its small scope.
 For local installation/use of the raw script, I use a local virtual environment to isolate dependencies:
 
 ```bash
-git clone https://github.com/DaemonDude23/helmizer.git -b v0.9.0
+git clone https://github.com/DaemonDude23/helmizer.git -b v0.9.1
 cd helmizer
 ```
 
@@ -189,7 +189,7 @@ In this example (*Nix OS), we're redirecting program output to the (e.g. `kustom
 docker run --name helmizer \
   --rm \
   -v "$PWD"/examples:/tmp/helmizer -w /tmp/helmizer \
-  docker.pkg.github.com/DaemonDude23/helmizer/helmizer:v0.9.0 /usr/src/app/helmizer.py \
+  docker.pkg.github.com/DaemonDude23/helmizer/helmizer:v0.9.1 /usr/src/app/helmizer.py \
     ./resources/ > ./examples/resources/kustomization.yaml
 ```
 

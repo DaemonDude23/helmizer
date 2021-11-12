@@ -68,12 +68,14 @@ class Kustomization:
                 pass
 
     def sort_keys(self):
-        try:
-            self.helmizer_config["helmizer"]["sort-keys"].get(bool)
-            for array in ["crds", "components", "patchesStrategicMerge", "resources"]:
-                self.yaml[array].sort()
-        except KeyError:
-            pass
+        self.helmizer_config["helmizer"]["sort-keys"].get(bool)
+        for key in ["crds", "components", "patchesStrategicMerge", "resources"]:
+            try:
+                self.yaml[key].sort()
+            except KeyError:
+                pass
+        logging.debug("keys sorted")
+
 
     def print_kustomization(self):
         try:
@@ -83,29 +85,35 @@ class Kustomization:
 
     def write_kustomization(self, arguments):
         try:
-            if self.helmizer_config["helmizer"]["dry-run"].get(bool) or arguments.dry_run:
+            if arguments.dry_run:
                 logging.debug("Performing dry-run, not writing to a file system")
+                return 0
+            elif self.helmizer_config["helmizer"]["dry-run"].get(bool):
+                logging.debug("Performing dry-run, not writing to a file system")
+                return 0
         except NotFoundError:
-            # identify kustomization file's parent directory
-            str_kustomization_directory = path.dirname(path.abspath(path.normpath(arguments.helmizer_config)))
+            pass
 
-            # identify kustomization file name
-            str_kustomization_file_name = str()
-            try:
-                str_kustomization_file_name = self.helmizer_config["helmizer"]["kustomization-file-name"].get(str)
-            except NotFoundError:
-                str_kustomization_file_name = "kustomization.yaml"
+        # identify kustomization file's parent directory
+        str_kustomization_directory = path.dirname(path.abspath(path.normpath(arguments.helmizer_config)))
 
-            # write to file
-            try:
-                kustomization_file_path = path.normpath(f"{str_kustomization_directory}/{str_kustomization_file_name}")
-                with open(kustomization_file_path, "w") as file:
-                    file.write(yaml.dump(self.yaml))
-                    logging.debug(f"Successfully wrote to file: {path.abspath(kustomization_file_path)}")
-            except IsADirectoryError as e:
-                raise e
-            except TypeError:
-                pass
+        # identify kustomization file name
+        str_kustomization_file_name = str()
+        try:
+            str_kustomization_file_name = self.helmizer_config["helmizer"]["kustomization-file-name"].get(str)
+        except NotFoundError:
+            str_kustomization_file_name = "kustomization.yaml"
+
+        # write to file
+        try:
+            kustomization_file_path = path.normpath(f"{str_kustomization_directory}/{str_kustomization_file_name}")
+            with open(kustomization_file_path, "w") as file:
+                file.write(yaml.dump(self.yaml))
+                logging.debug(f"Successfully wrote to file: {path.abspath(kustomization_file_path)}")
+        except IsADirectoryError as e:
+            raise e
+        except TypeError:
+            pass
 
     def render_template(self, arguments):
         logging.debug("Rendering template")
@@ -318,7 +326,7 @@ def init_arg_parser():
             help="quiet output from subprocesses",
             default=False,
         )
-        args.add_argument("--version", "-v", action="version", version="v0.9.0")
+        args.add_argument("--version", "-v", action="version", version="v0.9.1")
         args.add_argument(
             "helmizer_config",
             action="store",

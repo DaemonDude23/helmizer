@@ -1,6 +1,7 @@
 # Changelog
 
 - [Changelog](#changelog)
+  - [v0.9.1](#v091)
   - [v0.9.0](#v090)
   - [v0.8.0](#v080)
   - [v0.7.0](#v070)
@@ -12,6 +13,15 @@
   - [v0.4.0](#v040)
 
 ---
+
+## [v0.9.1](https://github.com/DaemonDude23/helmizer/releases/tag/v0.9.1)
+
+November 11 2021
+
+**Bugfixes**
+
+- Fixed `kustomization.yaml` not being written to disk... wtf?
+- Fixed config property `sort-keys` being unenforced.
 
 ## [v0.9.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.9.0)
 

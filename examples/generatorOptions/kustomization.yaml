@@ -5,4 +5,3 @@ generatorOptions:
   labels:
     kustomize.generated.resources: bla-bla
 kind: Kustomization
-namespace: default
