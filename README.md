@@ -4,7 +4,6 @@
   - [About](#about)
   - [Usage](#usage)
   - [Configuration](#configuration)
-    - [Examples](#examples)
     - [Installation](#installation)
     - [Putting it in your `$PATH`](#putting-it-in-your-path)
       - [Linux (Simplest Option)](#linux-simplest-option)
@@ -12,17 +11,24 @@
     - [Run](#run)
       - [Local Python](#local-python)
       - [~~Docker~~](#docker)
+    - [Examples](#examples)
   - [Kustomize Options](#kustomize-options)
 
 ---
 
 ## About
 
+[Thou shall not _glob_](https://github.com/kubernetes-sigs/kustomize/issues/3205), said the **kustomize** developers (thus far).
+
 **Helmizer** takes various inputs from a YAML config file (`helmizer.yaml` by default) and constructs a [kustomization file](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/) from those inputs. It can run a sequence of commands before rendering the kustomization file.
 
-For example, instead of manually entering the paths to [`resources`](https://kubectl.docs.kubernetes.io/references/kustomize/resource/) in a kustomization file, this tool will walk any number of directories containing resources and populate the kustomization with these resources. Or only pull in individual files, it's your choice.
+Instead of manually entering the paths to [`resources`](https://kubectl.docs.kubernetes.io/references/kustomize/resource/) in a kustomization file, this tool will walk any number of directories containing resources and populate the kustomization with these resources. Or only pull in individual files, it's your choice.
 
-I began transitioning my `helm` charts to local templates via [helm template](https://helm.sh/docs/helm/helm_template/), which were then applied to the cluster separately via [Kustomize](https://kustomize.io/). I didn't enjoy having to manually manage the relative paths to files in the **kustomization**. I wanted a repeatable way for me to generate **Kubernetes** manifests from a helm chart, and tack on any patches or adjustments later. Thus, **helmizer**. **But [`Helm`](https://helm.sh/) is in no way required to make this tool useful.**
+I began transitioning my `helm` charts to local templates via [`helm template`](https://helm.sh/docs/helm/helm_template/), which were then applied to the cluster separately via [Kustomize](https://kustomize.io/). I didn't enjoy having to manually manage the relative paths to files in the **kustomization**. I wanted a repeatable process to generate **Kubernetes** manifests from a helm chart, _and_ tack on any patches or related resources later with a single command. Thus, **helmizer**. **But [Helm](https://helm.sh/) is in no way required to make this tool useful** - have it walk your raw manifests as well.
+
+**TLDR**
+
+Provides the ability to run commands (e.g. `helm template`) on your OS prior to generating a kustomization, and will compose the kustomization fields that deal with file paths (e.g. `resources`) with glob-like features, as well as pass-through all other kustomization configurations. No need to explicitly enumerate every file individually.
 
 ## Usage
 
@@ -45,7 +51,7 @@ optional arguments:
 ## Configuration
 
 - Example `helmizer.yaml` config file. The `helm` command is invoked before the content for `kustomization.yaml` is generated. Any number of commands can be added here.
-```yml
+```yaml
 helmizer:
   commandSequence:
   - command: "helm"
@@ -70,34 +76,81 @@ helmizer:
   dry-run: false
   kustomization-directory: .
   kustomization-file-name: kustomization.yaml
-  resource-absolute-paths: []
   sort-keys: true
   version: '0.1.0'
-  ignore:
-    - sealed-secrets/templates/helmizer.yaml
+  ignore: []
 kustomize:
   commonAnnotations: {}
   commonLabels: {}
-  components: []
+  configMapGenerator: []
   crds: []
+  generatorOptions: {}
+  images: []
   namePrefix: []
+  namespace: ""
   nameSuffix: []
-  namespace: sealed-secrets
-  patchesStrategicMerge:
-    - extra/
-  resources:
-    - sealed-secrets/templates/
+  openapi: {}
+  patchesJson6902: []
+  patchesStrategicMerge: []
+  replacements: []
+  replicas: []
+  resources: []
+  secretGenerator: []
+  vars: []
 ```
 
-### Examples
+<details>
+<summary>Click to expand this bit to see the above, but with explanations for the configuration properties</summary>
 
-- [commonAnnotations](examples/commonAnnotations/)
-- [commonLabels](examples/commonLabels/)
-- [patchStrategicMerge](examples/patchesStrategicMerge/)
-- [resources](examples/resources/)
+```yaml
+helmizer:
+  commandSequence:  # list of commands/args executed serially. Inherits your $PATH
+  - command: "helm"
+    args:
+      - "-n"
+      - "sealed-secrets"
+      - "template"
+      - "sealed-secrets"
+      - --output-dir
+      - '.'
+      - --include-crds
+      - --skip-tests
+      - --version
+      - '1.12.2'
+      - stable/sealed-secrets
+  - command: "pre-commit"
+    args:
+      - 'run'
+      - '-a'
+      - '||'
+      - 'true'
+  dry-run: false  # optional - if true, does not write to a filesystem
+  kustomization-directory: .  # optional - when referring to files with relative paths in a kustomization, if the kustomization.yaml is going to be in a special place relative to its files, set that path here
+  kustomization-file-name: kustomization.yaml  # optional - name of kustomization file to write
+  sort-keys: true  # optional - sort keys under crds, resources, patchesStrategicMerge
+  version: '0.1.0'  # not yet validated
+  ignore: []  # optional - list of files/directories to ignore
+kustomize:  # this is essentially an overlay for your eventual kustomization.yaml
+  commonAnnotations: {}
+  commonLabels: {}
+  configMapGenerator: []
+  crds: []
+  generatorOptions: {}
+  images: []
+  namePrefix: []
+  namespace: ""
+  nameSuffix: []
+  openapi: {}
+  patchesJson6902: []
+  patchesStrategicMerge: []
+  replacements: []
+  replicas: []
+  resources: []
+  secretGenerator: []
+  vars: []
+```
 
-_With [vscode](https://code.visualstudio.com/) you can utilize the included [launch.json](.vscode/launch.json) to test these more quickly, or reference for your configuration._
-The `sealed-secrets` **Helm** chart is used for examples for its small scope.
+</details>
 
 ### Installation
 
@@ -158,11 +211,40 @@ virtualenv --clear ./venv/
 
 #### Local Python
 
+Input file:
+```yaml
+helmizer:
+  commandSequence:
+  - command: "helm"
+    args:
+      - "-n"
+      - "sealed-secrets"
+      - "template"
+      - "sealed-secrets"
+      - --output-dir
+      - '.'
+      - --include-crds
+      - --skip-tests
+      - --version
+      - '1.12.2'
+      - stable/sealed-secrets
+  dry-run: false
+  kustomization-directory: .
+  kustomization-file-name: kustomization.yaml
+  sort-keys: true
+  version: '0.1.0'
+kustomize:
+  namespace: sealed-secrets
+  resources:
+    - ./sealed-secrets/templates/
+```
+
+Helmize-ify it:
 ```bash
 python3 ./src/helmizer.py ./examples/resources/helmizer.yaml
 ```
 
-Output:
+Output - enumerating the files within the specified directory:
 ```yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -181,7 +263,7 @@ resources:
 #### ~~Docker~~
 
 **You may need a custom docker image depending on if you need certain apps when running commands within helmizer**
-**I'm not maintaing the docker image anymore but you could build it easily from the included Dockerfile**
+**I'm not maintaining the docker image anymore, but you could build it easily from the included Dockerfile**
 
 In this example (*Nix OS), we're redirecting program output to the (e.g. `kustomization.yaml`) to the desired file because of issues with UID/GID on files bind-mounted from Docker. The redirect is not required however, you can correct permissions after the fact with `sudo chown -R username:groupname .`.
 
@@ -191,6 +273,120 @@ docker run --name helmizer \
   -v "$PWD"/examples:/tmp/helmizer -w /tmp/helmizer \
   docker.pkg.github.com/DaemonDude23/helmizer/helmizer:v0.9.1 /usr/src/app/helmizer.py \
     ./resources/ > ./examples/resources/kustomization.yaml
+```
+
+### Examples
+
+_With [vscode](https://code.visualstudio.com/) you can utilize the included [launch.json](.vscode/launch.json) to test these more quickly, or reference for your configuration._
+The `sealed-secrets` **Helm** chart is used for examples for its small scope. Here's another.
+
+- [commonAnnotations](examples/commonAnnotations/)
+- [commonLabels](examples/commonLabels/)
+- [configMapGenerator](examples/configMapGenerator/)
+- [crds](examples/crds/)
+- [generatorOptions](examples/generatorOptions/)
+- [images](examples/images/)
+- [namePrefix](examples/namePrefix/)
+- [namespace](examples/namespace/)
+- [nameSuffix](examples/nameSuffix/)
+- [openapi](examples/openapi/)
+- [patchesJson6902](examples/patchesJson6902/)
+- [patchStrategicMerge](examples/patchesStrategicMerge/)
+- [replacements](examples/replacements/)
+- [resources](examples/resources/)
+- [secretGenerator](examples/secretGenerator/)
+- [vars](examples/vars/)
+
+---
+
+Which looks easier to write/maintain through future chart updates for the [Prometheus Operator/kube-prometheus-stack](), this helmizer.yaml?
+
+
+```yaml
+helmizer:
+  commandSequence:
+  - command: "helm"
+    args:
+      - "-n"
+      - "monitoring"
+      - "template"
+      - "kube-prometheus-stack"
+      - --output-dir
+      - '..'
+      - --include-crds
+      - --skip-tests
+      - --validate
+      - --version
+      - '18.0.8'
+      - --values
+      - 'values.yaml'
+      - prometheus-community/kube-prometheus-stack
+  sort-keys: true
+  version: '0.1.0'
+kustomize:
+  namespace: monitoring
+  resources:
+    - ./charts/
+    - ./extra/prometheusRules/
+    - ./extra/vpa.yaml
+    - ./templates/
+```
+
+Or this `kustomization.yaml` which `helmizer` generated?
+
+```yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: monitoring
+resources:
+- charts/kube-state-metrics/templates/clusterrolebinding.yaml
+- charts/kube-state-metrics/templates/deployment.yaml
+- charts/kube-state-metrics/templates/podsecuritypolicy.yaml
+- charts/kube-state-metrics/templates/psp-clusterrole.yaml
+- charts/kube-state-metrics/templates/psp-clusterrolebinding.yaml
+- charts/kube-state-metrics/templates/role.yaml
+- charts/kube-state-metrics/templates/service.yaml
+- charts/kube-state-metrics/templates/serviceaccount.yaml
+- charts/prometheus-node-exporter/templates/daemonset.yaml
+- charts/prometheus-node-exporter/templates/psp-clusterrole.yaml
+- charts/prometheus-node-exporter/templates/psp-clusterrolebinding.yaml
+- charts/prometheus-node-exporter/templates/psp.yaml
+- charts/prometheus-node-exporter/templates/service.yaml
+- charts/prometheus-node-exporter/templates/serviceaccount.yaml
+- templates/exporters/core-dns/service.yaml
+- templates/exporters/core-dns/servicemonitor.yaml
+- templates/exporters/kube-api-server/servicemonitor.yaml
+- templates/exporters/kube-controller-manager/service.yaml
+- templates/exporters/kube-controller-manager/servicemonitor.yaml
+- templates/exporters/kube-etcd/service.yaml
+- templates/exporters/kube-etcd/servicemonitor.yaml
+- templates/exporters/kube-proxy/service.yaml
+- templates/exporters/kube-proxy/servicemonitor.yaml
+- templates/exporters/kube-scheduler/service.yaml
+- templates/exporters/kube-scheduler/servicemonitor.yaml
+- templates/exporters/kube-state-metrics/serviceMonitor.yaml
+- templates/exporters/kubelet/servicemonitor.yaml
+- templates/exporters/node-exporter/servicemonitor.yaml
+- templates/prometheus-operator/clusterrole.yaml
+- templates/prometheus-operator/clusterrolebinding.yaml
+- templates/prometheus-operator/deployment.yaml
+- templates/prometheus-operator/psp-clusterrole.yaml
+- templates/prometheus-operator/psp-clusterrolebinding.yaml
+- templates/prometheus-operator/psp.yaml
+- templates/prometheus-operator/service.yaml
+- templates/prometheus-operator/serviceaccount.yaml
+- templates/prometheus-operator/servicemonitor.yaml
+- templates/prometheus/additionalScrapeConfigs.yaml
+- templates/prometheus/clusterrole.yaml
+- templates/prometheus/clusterrolebinding.yaml
+- templates/prometheus/ingress.yaml
+- templates/prometheus/prometheus.yaml
+- templates/prometheus/psp-clusterrole.yaml
+- templates/prometheus/psp-clusterrolebinding.yaml
+- templates/prometheus/psp.yaml
+- templates/prometheus/service.yaml
+- templates/prometheus/serviceaccount.yaml
+- templates/prometheus/servicemonitor.yaml
 ```
 
 ## Kustomize Options
