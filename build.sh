@@ -3,7 +3,6 @@
 set -e
 
 TAG="${1}"
-#REGISTRY_URL="docker.pkg.github.com/DaeonDude23/helmizer/helmizer"
 REGISTRY_URL="docker.k8s.home/daemondude23/helmizer/helmizer"
 
 if [ $# -eq 0 ]; then

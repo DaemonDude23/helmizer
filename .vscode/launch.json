@@ -213,6 +213,18 @@
             "program": "${workspaceFolder}/src/helmizer.py",
             "request": "launch",
             "type": "python"
+        },
+        {
+            "args": [
+                "--debug",
+                "/home/drew/Nextcloud/TECH/git/private/lab-k8s/flux/kustomize/helm/cert-manager/helmizer.yaml"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "TEMP",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
         }
     ],
     "version": "0.2.0"

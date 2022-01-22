@@ -171,8 +171,11 @@ sudo ln -s /absolute/path/to/src/helmizer.py /usr/local/bin/helmizer
 ```
 2. Install dependencies:
 ```bash
+# latest and greatest dependency versions
 pip3 install -U -r ./src/requirements.txt
-pip3 install -U -r ./src/requirements-newest.txt
+
+# more flexible requirements
+pip3 install -U -r ./src/requirements-old.txt
 ```
 
 ### virtualenv with pip

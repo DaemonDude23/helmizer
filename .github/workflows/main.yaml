@@ -1,0 +1,33 @@
+name: Package Application with Pyinstaller
+on:
+  push:
+    branches: [ main ]
+    # tags:
+    # - 'v*'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: PyInstaller Linux
+      uses: JackMcKew/pyinstaller-action-linux@0.1.4
+      with:
+        path: src
+        spec: helmizer-linux-x86_64.spec
+    - name: PyInstaller Windows
+      uses: JackMcKew/pyinstaller-action-windows@v0.1.2
+      with:
+        path: src
+        spec: helmizer-windows-x86_64.spec
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      # if: startsWith(github.ref, 'refs/tags/')
+      with:
+        draft: true
+        prerelease: true
+        # tag_name: pyinstaller
+        fail_on_unmatched_files: true
+        files: |
+          src/dist/linux/helmizer-linux-x86_64
+          src/dist/windows/helmizer-windows-x86_64.exe

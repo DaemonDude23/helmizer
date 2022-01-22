@@ -1,6 +1,7 @@
 # Changelog
 
 - [Changelog](#changelog)
+  - [v0.10.0](#v0100)
   - [v0.9.1](#v091)
   - [v0.9.0](#v090)
   - [v0.8.0](#v080)
@@ -13,6 +14,23 @@
   - [v0.4.0](#v040)
 
 ---
+
+## [v0.10.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.10.0)
+
+January 21 2022
+
+**Bugfixes**
+
+- Fixed `helmizer.ignore` to optionally ignore directories recursively so that one doesn't have to enumerate each individual file path.
+
+**Enhancements**
+
+- Added CI for generating PyInstaller images for Linux and Windows.
+
+**Housekeeping**
+
+- `pre-commit` updates.
+- Tweaked `requirements`.
 
 ## [v0.9.1](https://github.com/DaemonDude23/helmizer/releases/tag/v0.9.1)
 
@@ -31,7 +49,7 @@ November 7 2021
 
 - Fixed exceptions when not including keys in helmizer.yaml, falling back to defaults if not defined.
 
-**Enhancements:**
+**Enhancements**
 
 - Added configuration support for **all** keys in a kustomization.
   - Standardized functions to return various data types depending on kustomization key structure
@@ -46,7 +64,7 @@ November 7 2021
 
 June 10 2021
 
-**Enhancements:**
+**Enhancements**
 
 - Added configuration support for:
   - [`components`](https://kubectl.docs.kubernetes.io/guides/config_management/components/)

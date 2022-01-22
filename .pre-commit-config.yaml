@@ -28,8 +28,8 @@ repos:
         id: check-added-large-files
       - id: requirements-txt-fixer
       - id: check-ast
-    repo: 'git://github.com/pre-commit/pre-commit-hooks'
-    rev: v4.0.1
+    repo: 'https://github.com/pre-commit/pre-commit-hooks'
+    rev: v4.1.0
   - hooks:
       - id: black
         language_version: python3.9
@@ -37,7 +37,7 @@ repos:
           - --line-length
           - "140"
     repo: https://github.com/psf/black
-    rev: 21.10b0
+    rev: 21.12b0
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.9.2
     hooks:

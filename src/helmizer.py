@@ -76,7 +76,6 @@ class Kustomization:
                 pass
         logging.debug("keys sorted")
 
-
     def print_kustomization(self):
         try:
             print(yaml.dump(self.yaml, sort_keys=False))
@@ -174,19 +173,29 @@ class Kustomization:
                     elif validate_url(str_child_path):
                         list_target_paths.append(str_child_path)
 
-                # convert absolute paths into paths relative to the kustomization directory
-                for final_target_path in list_target_paths:
-                    list_final_target_paths.append(path.relpath(final_target_path, str_kustomization_path))
-
                 # remove any ignored files
                 try:
+                    # walk directory to remove multiple files
                     for ignore in self.helmizer_config["helmizer"]["ignore"].get(list):
-                        logging.debug(f"Removing ignored file from final list: {ignore}")
-                        list_final_target_paths.remove(ignore)
+                        str_ignore_abspath = path.abspath(path.join(str_kustomization_path, ignore))
+                        if path.isdir(str_ignore_abspath):
+                            for (dirpath, _, filenames) in walk(str_ignore_abspath):
+                                for filename in filenames:
+                                    file_path = path.join(dirpath, filename)
+                                    logging.debug(f"Removing ignored file from final list: {file_path}")
+                                    list_target_paths.remove(file_path)
+                        # remove a file
+                        else:
+                            logging.debug(f"Removing ignored file from final list: {path.join(str_kustomization_path, ignore)}")
+                            list_target_paths.remove(path.join(str_kustomization_path, ignore))  # just one file
                 except ValueError:
                     pass
                 except NotFoundError:
                     pass
+
+                # convert absolute paths into paths relative to the kustomization directory
+                for final_target_path in list_target_paths:
+                    list_final_target_paths.append(path.relpath(final_target_path, str_kustomization_path))
 
                 return list_final_target_paths
 
