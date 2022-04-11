@@ -18,17 +18,21 @@
 
 ## About
 
+**TLDR**
+
+Generates a `kustomization.yaml file`, optionally providing the ability to run commands (e.g. `helm template`) on your OS prior to generating a kustomization, and will compose the kustomization fields that deal with file paths (e.g. `resources`) with glob-like features, as well as pass-through all other kustomization configuration properties. No need to explicitly enumerate every file to be kustomized individually.
+
+It takes a config file as input, telling **Helmizer** if you want to run any commands. Then if you give it one or more directories for `resources`, for example, it will recursively lookup all of those files and render them into your kustomization.yaml. Want to skip including one file like `templates/secret.yaml`? Just add the relative path to `helmizer.ignore` to `helmizer.yaml`.
+
+---
+
 [Thou shall not _glob_](https://github.com/kubernetes-sigs/kustomize/issues/3205), said the **kustomize** developers (thus far).
 
 **Helmizer** takes various inputs from a YAML config file (`helmizer.yaml` by default) and constructs a [kustomization file](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/) from those inputs. It can run a sequence of commands before rendering the kustomization file.
 
 Instead of manually entering the paths to [`resources`](https://kubectl.docs.kubernetes.io/references/kustomize/resource/) in a kustomization file, this tool will walk any number of directories containing resources and populate the kustomization with these resources. Or only pull in individual files, it's your choice.
 
-I began transitioning my `helm` charts to local templates via [`helm template`](https://helm.sh/docs/helm/helm_template/), which were then applied to the cluster separately via [Kustomize](https://kustomize.io/). I didn't enjoy having to manually manage the relative paths to files in the **kustomization**. I wanted a repeatable process to generate **Kubernetes** manifests from a helm chart, _and_ tack on any patches or related resources later with a single command. Thus, **helmizer**. **But [Helm](https://helm.sh/) is in no way required to make this tool useful** - have it walk your raw manifests as well.
-
-**TLDR**
-
-Provides the ability to run commands (e.g. `helm template`) on your OS prior to generating a kustomization, and will compose the kustomization fields that deal with file paths (e.g. `resources`) with glob-like features, as well as pass-through all other kustomization configurations. No need to explicitly enumerate every file individually.
+I began transitioning my `helm` charts to local manifests via [`helm template`](https://helm.sh/docs/helm/helm_template/), which were then applied to the cluster separately via [Kustomize](https://kustomize.io/). I didn't enjoy having to manually manage the relative paths to files in the **kustomization**. I wanted a repeatable process to generate **Kubernetes** manifests from a helm chart, _and_ tack on any patches or related resources later with a single command. Thus, **helmizer**. **But [Helm](https://helm.sh/) is in no way required to make this tool useful** - have it walk your raw manifests as well. This is just a wrapper that allows combining steps, and glob-like behavior, to managing `kustomization.yaml` files.
 
 ## Usage
 
@@ -157,7 +161,7 @@ kustomize:  # this is essentially an overlay for your eventual kustomization.yam
 For local installation/use of the raw script, I use a local virtual environment to isolate dependencies:
 
 ```bash
-git clone https://github.com/DaemonDude23/helmizer.git -b v0.10.0
+git clone https://github.com/DaemonDude23/helmizer.git -b v0.11.0
 cd helmizer
 ```
 
@@ -274,7 +278,7 @@ In this example (*Nix OS), we're redirecting program output to the (e.g. `kustom
 docker run --name helmizer \
   --rm \
   -v "$PWD"/examples:/tmp/helmizer -w /tmp/helmizer \
-  docker.pkg.github.com/DaemonDude23/helmizer/helmizer:v0.10.0 /usr/src/app/helmizer.py \
+  docker.pkg.github.com/DaemonDude23/helmizer/helmizer:v0.11.0 /usr/src/app/helmizer.py \
     ./resources/ > ./examples/resources/kustomization.yaml
 ```
 

@@ -1,6 +1,7 @@
 # Changelog
 
 - [Changelog](#changelog)
+  - [v0.11.0](#v0110)
   - [v0.10.0](#v0100)
   - [v0.9.1](#v091)
   - [v0.9.0](#v090)
@@ -14,6 +15,18 @@
   - [v0.4.0](#v040)
 
 ---
+
+## [v0.11.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.11.0)
+
+April 11 2022
+
+**Enhancements**
+
+- Added support for `buildMetadata  and `patches`.
+
+**Housekeeping**
+
+- Cleaned up vscode configs.
 
 ## [v0.10.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.10.0)
 

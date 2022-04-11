@@ -41,7 +41,7 @@ class Kustomization:
                 pass
 
         # get lists
-        for key in ["configMapGenerator", "images", "patchesJson6902", "replicas", "replacements", "vars"]:
+        for key in ["buildMetadata", "configMapGenerator", "images", "patches", "patchesJson6902", "replicas", "replacements", "vars"]:
             try:
                 list_key = self.get_list(key)
                 if list_key:
@@ -216,10 +216,8 @@ class Kustomization:
                 logging.debug(f"{key}: {dict_raw_yaml}")
         except NotFoundError:
             logging.debug(f"key not found: {key}")
-            pass
         except KeyError:
             logging.debug(f"key not found: {key}")
-            pass
         except TypeError:
             pass
         return dict_raw_yaml
@@ -232,10 +230,8 @@ class Kustomization:
                 logging.debug(f"{key}: {str_raw_yaml}")
         except NotFoundError:
             logging.debug(f"key not found: {key}")
-            pass
         except KeyError:
             logging.debug(f"key not found: {key}")
-            pass
         except TypeError:
             pass
         return str_raw_yaml
@@ -248,10 +244,8 @@ class Kustomization:
                 logging.debug(f"{key}: {list_raw_yaml}")
         except NotFoundError:
             logging.debug(f"key not found: {key}")
-            pass
         except KeyError:
             logging.debug(f"key not found: {key}")
-            pass
         except TypeError:
             pass
         return list_raw_yaml
@@ -335,7 +329,7 @@ def init_arg_parser():
             help="quiet output from subprocesses",
             default=False,
         )
-        args.add_argument("--version", "-v", action="version", version="v0.10.0")
+        args.add_argument("--version", "-v", action="version", version="v0.11.0")
         args.add_argument(
             "helmizer_config",
             action="store",
