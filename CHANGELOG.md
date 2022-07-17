@@ -22,7 +22,7 @@ April 11 2022
 
 **Enhancements**
 
-- Added support for `buildMetadata  and `patches`.
+- Added support for `buildMetadata`  and `patches`.
 
 **Housekeeping**
 
