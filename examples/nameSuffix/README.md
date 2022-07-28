@@ -1,6 +1,6 @@
-# configMapGenerator
+# nameSuffix
 
-- [configMapGenerator](#configmapgenerator)
+- [nameSuffix](#namesuffix)
   - [Generating the Helm Template](#generating-the-helm-template)
   - [Generate Kustomization](#generate-kustomization)
     - [Local Python](#local-python)
@@ -27,7 +27,7 @@ _These assumes you're in the root directory of this repository_
 ### Local Python
 
 ```bash
-python3 ./src/helmizer.py ./examples/configMapGenerator/helmizer.yaml
+python3 ./src/helmizer.py ./examples/nameSuffix/helmizer.yaml
 ```
 
 ## Validate

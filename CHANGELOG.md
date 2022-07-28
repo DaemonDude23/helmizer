@@ -1,6 +1,7 @@
 # Changelog
 
 - [Changelog](#changelog)
+  - [v0.12.0](#v0120)
   - [v0.11.0](#v0110)
   - [v0.10.0](#v0100)
   - [v0.9.1](#v091)
@@ -15,6 +16,26 @@
   - [v0.4.0](#v040)
 
 ---
+
+## [v0.12.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.12.0)
+
+July 27 2022
+
+**Bugfixes**
+
+- Fixed missing support for `secretGenerator` despite having something in [`secretGenerator` examples](./examples/secretGenerator/).
+- Don't crash if `helmizer.version` and/or `helmizer.sort-keys` are not defined in the `helmizer.yaml` config... or practically anything. Omit the `helmizer` section of the config if you wish.
+
+**Enhancements**
+
+- Added `--no-sort-keys` CLI flag to disable key sorting of _all_ keys output kustomization.yaml on the CLI.
+
+**Housekeeping**
+
+- Added READMEs to example folders that didn't have them, and fixed other example READMEs.
+- Bumped to latest versions in `requirements.txt` for no particular reason.
+- Updated each relevant line with _type hinting_ for future experimentation.
+- `pre-commit` config updates.
 
 ## [v0.11.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.11.0)
 

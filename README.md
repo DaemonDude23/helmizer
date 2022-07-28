@@ -1,26 +1,25 @@
-# Helmizer
+**Helmizer**
 
-- [Helmizer](#helmizer)
-  - [About](#about)
-  - [Usage](#usage)
-  - [Configuration](#configuration)
-    - [Installation](#installation)
-    - [Putting it in your `$PATH`](#putting-it-in-your-path)
-      - [Linux (Simplest Option)](#linux-simplest-option)
-    - [virtualenv with pip](#virtualenv-with-pip)
-    - [Run](#run)
-      - [Local Python](#local-python)
-      - [~~Docker~~](#docker)
-    - [Examples](#examples)
-  - [Kustomize Options](#kustomize-options)
+- [About](#about)
+- [Usage](#usage)
+- [Configuration](#configuration)
+  - [Installation](#installation)
+  - [Putting it in your `$PATH`](#putting-it-in-your-path)
+    - [Linux (Simplest Option)](#linux-simplest-option)
+  - [virtualenv with pip](#virtualenv-with-pip)
+  - [Run](#run)
+    - [Local Python](#local-python)
+    - [~~Docker~~](#docker)
+  - [Examples](#examples)
+- [Kustomize Options](#kustomize-options)
 
 ---
 
-## About
+# About
 
 **TLDR**
 
-Generates a `kustomization.yaml` file, optionally providing the ability to run commands (e.g. `helm template`) on your OS prior to generating a kustomization, and will compose the kustomization fields that deal with file paths (e.g. `resources`) with glob-like features, as well as pass-through all other kustomization configuration properties. No need to explicitly enumerate every file to be kustomized individually.
+Generates a `kustomization.yaml` file, optionally providing the ability to run commands (e.g. `helm template`) on your OS prior to generating a kustomization, and will compose the kustomization fields that deal with file paths (e.g. `resources`) with glob-like features, as well as pass-through all other kustomization configuration properties. No need to explicitly enumerate every file to be 'kustomized' individually.
 
 It takes a config file as input, telling **Helmizer** if you want to run any commands. Then if you give it one or more directories for `resources`, for example, it will recursively lookup all of those files and render them into your kustomization.yaml. Want to skip including one file like `templates/secret.yaml`? Just add the relative path to `helmizer.ignore` to `helmizer.yaml`.
 
@@ -34,10 +33,10 @@ Instead of manually entering the paths to [`resources`](https://kubectl.docs.kub
 
 I began transitioning my `helm` charts to local manifests via [`helm template`](https://helm.sh/docs/helm/helm_template/), which were then applied to the cluster separately via [Kustomize](https://kustomize.io/). I didn't enjoy having to manually manage the relative paths to files in the **kustomization**. I wanted a repeatable process to generate **Kubernetes** manifests from a helm chart, _and_ tack on any patches or related resources later with a single command. Thus, **helmizer**. **But [Helm](https://helm.sh/) is in no way required to make this tool useful** - have it walk your raw manifests as well. This is just a wrapper that allows combining steps, and glob-like behavior, to managing `kustomization.yaml` files.
 
-## Usage
+# Usage
 
 ```
-usage: helmizer [-h] [--debug] [--dry-run] [--skip-commands] [--quiet] [--version] helmizer_config
+usage: helmizer [-h] [--debug] [--dry-run] [--skip-commands] [--no-sort-keys] [--quiet] [--version] helmizer_config
 
 Helmizer
 
@@ -47,12 +46,13 @@ optional arguments:
   --debug          enable debug logging (default: False)
   --dry-run        do not write to a file system (default: False)
   --skip-commands  skip executing commandSequence, just generate kustomization file (default: False)
+  --no-sort-keys   disables alphabetical sorting of keys in output kustomization file (default: False)
   --quiet, -q      quiet output from subprocesses (default: False)
-  --version        show program's version number and exit
+  --version, -v    show program's version number and exit
   helmizer_config  path to helmizer config file
 ```
 
-## Configuration
+# Configuration
 
 - Example `helmizer.yaml` config file. The `helm` command is invoked before the content for `kustomization.yaml` is generated. Any number of commands can be added here.
 ```yaml
@@ -156,18 +156,18 @@ kustomize:  # this is essentially an overlay for your eventual kustomization.yam
 
 </details>
 
-### Installation
+## Installation
 
 For local installation/use of the raw script, I use a local virtual environment to isolate dependencies:
 
 ```bash
-git clone https://github.com/DaemonDude23/helmizer.git -b v0.11.0
+git clone https://github.com/DaemonDude23/helmizer.git -b v0.12.0
 cd helmizer
 ```
 
-### Putting it in your `$PATH`
+## Putting it in your `$PATH`
 
-#### Linux (Simplest Option)
+### Linux (Simplest Option)
 
 1. Create symlink:
 ```bash
@@ -182,16 +182,15 @@ pip3 install -U -r ./src/requirements.txt
 pip3 install -U -r ./src/requirements-old.txt
 ```
 
-### virtualenv with pip
+## virtualenv with pip
 
 1. Update pip:
 ```bash
 python3 -m pip install --upgrade pip
-./venv/bin/python -m pip install --upgrade pip
 ```
 2. Install `virtualenv` for your user:
 ```bash
-./venv/bin/pip3 install virtualenv==20.4.2
+pip3 install -U virtualenv==20.16.2
 ```
 3. Setup relative virtual environment:
 ```bash
@@ -212,11 +211,11 @@ If you need to reset the virtual environment for whatever reason:
 virtualenv --clear ./venv/
 ```
 
-### Run
+## Run
 
 **For greater detail on running from examples (they assumes you've ran [helm template](https://helm.sh/docs/helm/helm_template/), see the [resource example](examples/resources/README.md))**
 
-#### Local Python
+### Local Python
 
 Input file:
 ```yaml
@@ -235,11 +234,6 @@ helmizer:
       - --version
       - '1.12.2'
       - stable/sealed-secrets
-  dry-run: false
-  kustomization-directory: .
-  kustomization-file-name: kustomization.yaml
-  sort-keys: true
-  version: '0.1.0'
 kustomize:
   namespace: sealed-secrets
   resources:
@@ -267,7 +261,7 @@ resources:
 - sealed-secrets/templates/role.yaml
 ```
 
-#### ~~Docker~~
+### ~~Docker~~
 
 **You may need a custom docker image depending on if you need certain apps when running commands within helmizer**
 **I'm not maintaining the docker image anymore, but you could build it easily from the included Dockerfile**
@@ -278,11 +272,11 @@ In this example (*Nix OS), we're redirecting program output to the (e.g. `kustom
 docker run --name helmizer \
   --rm \
   -v "$PWD"/examples:/tmp/helmizer -w /tmp/helmizer \
-  docker.pkg.github.com/DaemonDude23/helmizer/helmizer:v0.11.0 /usr/src/app/helmizer.py \
+  docker.pkg.github.com/DaemonDude23/helmizer/helmizer:v0.12.0 /usr/src/app/helmizer.py \
     ./resources/ > ./examples/resources/kustomization.yaml
 ```
 
-### Examples
+## Examples
 
 _With [vscode](https://code.visualstudio.com/) you can utilize the included [launch.json](.vscode/launch.json) to test these more quickly, or reference for your configuration._
 The `sealed-secrets` **Helm** chart is used for examples for its small scope. Here's another.
@@ -396,7 +390,7 @@ resources:
 - templates/prometheus/servicemonitor.yaml
 ```
 
-## Kustomize Options
+# Kustomize Options
 
 - [Kustomize Docs](https://kubectl.docs.kubernetes.io/references/kustomize/)
 

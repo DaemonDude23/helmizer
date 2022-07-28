@@ -20,15 +20,6 @@ helm -n sealed-secrets template \
   stable/sealed-secrets
 ```
 
-```bash
-helm -n cert-manager template \
-  cert-manager \
-  --output-dir . \
-  --skip-tests \
-  --version 1.1.0 \
-  jetstack/cert-manager
-```
-
 ## Generate Kustomization
 
 _These assumes you're in the root directory of this repository_

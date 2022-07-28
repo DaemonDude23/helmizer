@@ -1,5 +1,5 @@
-confuse==1.6.0
-decorator==5.1.0
+confuse==2.0.0
+decorator==5.1.1
 PyYAML==6.0
 six==1.16.0
-validators==0.18.0
+validators==0.20.0
