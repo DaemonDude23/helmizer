@@ -1,4 +1,4 @@
-FROM docker.io/python:3.8-alpine
+FROM docker.io/python:3.11-alpine
 ARG HELMIZER_WORK_DIR='/usr/src/app/'
 # ARG HELMIZER_HELM_VERSION='3.5.2'
 WORKDIR ${HELMIZER_WORK_DIR}
