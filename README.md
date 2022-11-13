@@ -9,7 +9,6 @@
   - [virtualenv with pip](#virtualenv-with-pip)
   - [Run](#run)
     - [Local Python](#local-python)
-    - [~~Docker~~](#docker)
   - [Examples](#examples)
 - [Kustomize Options](#kustomize-options)
 
@@ -259,21 +258,6 @@ resources:
 - sealed-secrets/templates/service-account.yaml
 - sealed-secrets/templates/sealedsecret-crd.yaml
 - sealed-secrets/templates/role.yaml
-```
-
-### ~~Docker~~
-
-**You may need a custom docker image depending on if you need certain apps when running commands within helmizer**
-**I'm not maintaining the docker image anymore, but you could build it easily from the included Dockerfile**
-
-In this example (*Nix OS), we're redirecting program output to the (e.g. `kustomization.yaml`) to the desired file because of issues with UID/GID on files bind-mounted from Docker. The redirect is not required however, you can correct permissions after the fact with `sudo chown -R username:groupname .`.
-
-```bash
-docker run --name helmizer \
-  --rm \
-  -v "$PWD"/examples:/tmp/helmizer -w /tmp/helmizer \
-  docker.pkg.github.com/DaemonDude23/helmizer/helmizer:v0.12.0 /usr/src/app/helmizer.py \
-    ./resources/ > ./examples/resources/kustomization.yaml
 ```
 
 ## Examples
