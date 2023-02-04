@@ -1,9 +1,12 @@
-# Changelog
+**Changelog**
 
-- [Changelog](#changelog)
+- [2023](#2023)
+  - [v0.13.0](#v0130)
+- [2022](#2022)
   - [v0.12.0](#v0120)
   - [v0.11.0](#v0110)
   - [v0.10.0](#v0100)
+- [2021](#2021)
   - [v0.9.1](#v091)
   - [v0.9.0](#v090)
   - [v0.8.0](#v080)
@@ -17,17 +20,34 @@
 
 ---
 
+# 2023
+
+## [v0.13.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.13.0)
+
+February 4 2023
+
+**Enhancements**
+
+- Improved type checking thanks to `mypy`.
+- Fixed missing support for `sortOptions` and added an example.
+
+**Housekeeping**
+
+- Updated pre-commit dependencies and added `mypy`.
+
+# 2022
+
 ## [v0.12.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.12.0)
 
 July 27 2022
 
 **Bugfixes**
 
-- Fixed missing support for `secretGenerator` despite having something in [`secretGenerator` examples](./examples/secretGenerator/).
 - Don't crash if `helmizer.version` and/or `helmizer.sort-keys` are not defined in the `helmizer.yaml` config... or practically anything. Omit the `helmizer` section of the config if you wish.
 
 **Enhancements**
 
+- Fixed missing support for `secretGenerator` despite having something in [`secretGenerator` examples](./examples/secretGenerator/).
 - Added `--no-sort-keys` CLI flag to disable key sorting of _all_ keys output kustomization.yaml on the CLI.
 
 **Housekeeping**
@@ -65,6 +85,8 @@ January 21 2022
 
 - `pre-commit` updates.
 - Tweaked `requirements`.
+
+# 2021
 
 ## [v0.9.1](https://github.com/DaemonDude23/helmizer/releases/tag/v0.9.1)
 

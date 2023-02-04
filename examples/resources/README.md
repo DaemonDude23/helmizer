@@ -1,14 +1,15 @@
-# resources
+**resources**
 
-- [resources](#resources)
-  - [Generating the Helm Template](#generating-the-helm-template)
-  - [Generate Kustomization](#generate-kustomization)
-    - [Local Python](#local-python)
-  - [Validate](#validate)
+- [Generating the Helm Template](#generating-the-helm-template)
+- [Generate Kustomization](#generate-kustomization)
+  - [Local Python](#local-python)
+- [Validate](#validate)
 
 ---
 
-## Generating the Helm Template
+[https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/resource/](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/resource/)
+
+# Generating the Helm Template
 
 ```bash
 helm -n sealed-secrets template \
@@ -20,18 +21,18 @@ helm -n sealed-secrets template \
   stable/sealed-secrets
 ```
 
-## Generate Kustomization
+# Generate Kustomization
 
 _These assumes you're in the root directory of this repository_
 
-### Local Python
+## Local Python
 
 ```bash
 python3 ./src/helmizer.py ./examples/resources/helmizer.yaml
 ```
 
-## Validate
+# Validate
 
 ```bash
-kubectl kustomize .
+kubectl kustomize ./examples/resources/
 ```

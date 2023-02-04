@@ -18,64 +18,64 @@ from validators import url as validate_url
 
 
 class Kustomization:
-    def __init__(self: object, helmizer_config: object, arguments: object):
-        self.helmizer_config: object = helmizer_config
-        self.arguments: object = arguments
+    def __init__(self, helmizer_config, arguments) -> None:
+        self.helmizer_config = helmizer_config
+        self.arguments = arguments
         self.yaml: dict = dict()
 
-        # apiVersion
-        self.yaml["apiVersion"]: str = self.get_api_version()
+        # get apiVersion
+        self.yaml["apiVersion"] = self.get_api_version()
 
-        # kind
-        self.yaml["kind"]: str = "Kustomization"
+        # get kind
+        self.yaml["kind"] = "Kustomization"
 
         # get strings
-        for key_list in ["namePrefix", "nameSuffix", "namespace"]:
+        for list_of_keys in ["namePrefix", "nameSuffix", "namespace"]:
             try:
-                key: str = self.get_str(key_list)
-                if key:
-                    self.yaml[key_list] = key
+                key_string: str = self.get_str(list_of_keys)
+                if key_string:
+                    self.yaml[list_of_keys] = key_string
             except NotFoundError:
                 pass
 
         # get lists
-        for key_list in [
+        for list_of_keys in [
             "buildMetadata",
             "configMapGenerator",
             "images",
             "patches",
             "patchesJson6902",
-            "replicas",
             "replacements",
+            "replicas",
             "secretGenerator",
             "vars",
         ]:
             try:
-                key: list = self.get_list(key_list)
-                if key:
-                    self.yaml[key_list] = key
+                key_list = self.get_list(list_of_keys)
+                if key_list:
+                    self.yaml[list_of_keys] = key_list
             except NotFoundError:
                 pass
 
         # get dicts
-        for key_list in ["commonAnnotations", "commonLabels", "generatorOptions", "openapi"]:
+        for list_of_keys in ["commonAnnotations", "commonLabels", "generatorOptions", "openapi", "sortOptions"]:
             try:
-                key = self.get_dict(key_list)
-                if key:
-                    self.yaml[key_list] = key
+                key_dict = self.get_dict(list_of_keys)
+                if key_dict:
+                    self.yaml[list_of_keys] = key_dict
             except NotFoundError:
                 pass
 
         # get files
-        for key_list in ["crds", "components", "patchesStrategicMerge", "resources"]:
+        for list_of_keys in ["crds", "components", "patchesStrategicMerge", "resources"]:
             try:
-                key = self.get_files(arguments, key_list)
-                if key:
-                    self.yaml[key_list] = key
+                key_paths = self.get_files(arguments, list_of_keys)
+                if key_paths:
+                    self.yaml[list_of_keys] = key_paths
             except NotFoundError:
                 pass
 
-    def sort_keys(self: object, arguments: object) -> bool:
+    def sort_keys(self, arguments) -> bool:
         if arguments.no_sort_keys:
             return True
         else:
@@ -97,7 +97,7 @@ class Kustomization:
             finally:
                 return True
 
-    def print_kustomization(self: object) -> bool:
+    def print_kustomization(self) -> bool:
         try:
             print(yaml.dump(self.yaml, sort_keys=False))
         except KeyError:
@@ -105,7 +105,7 @@ class Kustomization:
         finally:
             return True
 
-    def write_kustomization(self: object, arguments: object) -> bool:
+    def write_kustomization(self, arguments) -> bool:
         try:
             if arguments.dry_run:
                 logging.debug("Performing dry-run, not writing to a file system")
@@ -122,9 +122,9 @@ class Kustomization:
         # identify kustomization file name
         kustomization_file_name: str = str()
         try:
-            kustomization_file_name: str = self.helmizer_config["helmizer"]["kustomization-file-name"].get(str)
+            kustomization_file_name = self.helmizer_config["helmizer"]["kustomization-file-name"].get(str)
         except NotFoundError:
-            kustomization_file_name: str = "kustomization.yaml"
+            kustomization_file_name = "kustomization.yaml"
 
         # write to file
         try:
@@ -132,29 +132,30 @@ class Kustomization:
             with open(kustomization_file_path, "w") as file:
                 file.write(yaml.dump(self.yaml))
                 logging.debug(f"Successfully wrote to file: {path.abspath(kustomization_file_path)}")
+            return True
         except IsADirectoryError as e:
             raise e
-        except TypeError:
-            pass
+        except TypeError as e:
+            raise e
 
-    def render_template(self: object, arguments: object) -> bool:
+    def render_template(self, arguments) -> bool:
         logging.debug("Rendering template")
         self.sort_keys(arguments)
         self.print_kustomization()
         self.write_kustomization(arguments)
         return True
 
-    def get_api_version(self: object) -> str:
+    def get_api_version(self) -> str:
         api_version: str = str()
         try:
-            api_version: str = self.helmizer_config["kustomize"]["apiVersion"].get(str)
+            api_version = self.helmizer_config["kustomize"]["apiVersion"].get(str)
         except NotFoundError:
-            api_version: str = "kustomize.config.k8s.io/v1beta1"
+            api_version = "kustomize.config.k8s.io/v1beta1"
         finally:
             logging.debug(f"apiVersion: {api_version}")
             return api_version
 
-    def get_files(self: object, arguments: object, key: str) -> list:
+    def get_files(self, arguments, key: str) -> list:
         target_paths: list = list()
         final_target_paths: list = list()
         kustomization_path: str = str()
@@ -164,9 +165,9 @@ class Kustomization:
             kustomization_children: list = self.helmizer_config["kustomize"][key].get(list)
             kustomization_directory: str = str()
             try:
-                kustomization_directory: str = self.helmizer_config["helmizer"]["kustomization-directory"].get(str)
+                kustomization_directory = self.helmizer_config["helmizer"]["kustomization-directory"].get(str)
             except NotFoundError:
-                kustomization_directory: str = "."
+                kustomization_directory = "."
 
             kustomization_path = path.dirname(
                 path.abspath(
@@ -186,7 +187,7 @@ class Kustomization:
 
                     # walk directory
                     if path.isdir(child_path):
-                        for (dirpath, _, filenames) in walk(child_path):
+                        for dirpath, _, filenames in walk(child_path):
                             for filename in filenames:
                                 target_paths.append(path.join(dirpath, filename))
 
@@ -204,7 +205,7 @@ class Kustomization:
                     for ignore in self.helmizer_config["helmizer"]["ignore"].get(list):
                         ignore_abspath: str = path.abspath(path.join(kustomization_path, ignore))
                         if path.isdir(ignore_abspath):
-                            for (dirpath, _, filenames) in walk(ignore_abspath):
+                            for dirpath, _, filenames in walk(ignore_abspath):
                                 for filename in filenames:
                                     file_path: str = path.join(dirpath, filename)
                                     logging.debug(f"Removing ignored file from final list: {file_path}")
@@ -224,22 +225,33 @@ class Kustomization:
 
                 return final_target_paths
 
-        except NotFoundError or KeyError or TypeError:
+        except NotFoundError:
             logging.debug(f"key not found: {key}")
+        except KeyError:
+            logging.debug(f"key not found: {key}")
+        except TypeError:
+            logging.debug(f"key not of valid type: {key}")
+        finally:
             return final_target_paths
 
-    def get_dict(self: object, key: str) -> dict:
+    def get_dict(self, key: str) -> dict:
         raw_yaml: dict = dict()
         try:
             if self.helmizer_config["kustomize"][key].get(dict):
                 raw_yaml = json.loads(json.dumps(self.helmizer_config["kustomize"][key].get(dict)))
                 logging.debug(f"{key}: {raw_yaml}")
-        except NotFoundError or KeyError or TypeError:
+        except NotFoundError:
             logging.debug(f"key not found: {key}")
+            return raw_yaml
+        except KeyError:
+            logging.debug(f"key not found: {key}")
+            return raw_yaml
+        except TypeError:
+            logging.debug(f"key not of valid type: {key}")
             return raw_yaml
         return raw_yaml
 
-    def get_str(self: object, key: str) -> str:
+    def get_str(self, key: str) -> str:
         raw_yaml: str = str()
         try:
             if self.helmizer_config["kustomize"][key].get(str):
@@ -253,20 +265,24 @@ class Kustomization:
             pass
         return raw_yaml
 
-    def get_list(self: object, key: str) -> list:
+    def get_list(self, key: str) -> list:
         raw_yaml: list = list()
         try:
             if len(self.helmizer_config["kustomize"][key].get(list)) > 0:
-                raw_yaml: list = json.loads(json.dumps(self.helmizer_config["kustomize"][key].get(list)))
+                raw_yaml = json.loads(json.dumps(self.helmizer_config["kustomize"][key].get(list)))
                 logging.debug(f"{key}: {raw_yaml}")
-        except NotFoundError or KeyError or TypeError:
+        except NotFoundError:
             logging.debug(f"key not found: {key}")
+        except KeyError:
+            logging.debug(f"key not found: {key}")
+        except TypeError:
+            logging.debug(f"key not of valid type: {key}")
         return raw_yaml
 
 
-def run_subprocess(helmizer_config: object, arguments: object):
+def run_subprocess(helmizer_config, arguments):
     # TODO return type checking
-    subprocess_working_directory: object = path.dirname(path.abspath(path.normpath(arguments.helmizer_config)))
+    subprocess_working_directory = path.dirname(path.abspath(path.normpath(arguments.helmizer_config)))
     logging.debug(f"Subprocess working directory: {subprocess_working_directory}")
     command_string: list = list()
     try:
@@ -275,7 +291,7 @@ def run_subprocess(helmizer_config: object, arguments: object):
             if config_command["command"]:
                 command: str = config_command["command"].get(str)
                 if config_command["args"]:
-                    args: list = " ".join(config_command["args"].get(list))  # combine list elements into space-delimited
+                    args: str = " ".join(config_command["args"].get(list))  # combine list elements into space-delimited
                     command_string.append(f"{command} {args}")
                 else:
                     command_string.append(f"{command}")
@@ -350,14 +366,14 @@ def init_arg_parser():
             help="quiet output from subprocesses",
             default=False,
         )
-        args.add_argument("--version", "-v", action="version", version="v0.12.0")
+        args.add_argument("--version", "-v", action="version", version="v0.13.0")
         args.add_argument(
             "helmizer_config",
             action="store",
             type=str,
             help="path to helmizer config file",
         )
-        arguments: object = parser.parse_args()
+        arguments = parser.parse_args()
 
         if arguments.quiet:
             logging.basicConfig(
@@ -393,10 +409,10 @@ def validate_helmizer_config_version(helmizer_config_version: str) -> bool:
     return True
 
 
-def init_helmizer_config(arguments: object) -> object:
+def init_helmizer_config(arguments) -> object:
     helmizer_config_path = arguments.helmizer_config
 
-    config: object = confuse.Configuration("helmizer", __name__)
+    config = confuse.Configuration("helmizer", __name__)
     try:
         if helmizer_config_path:
             logging.debug(f"Trying helmizer config path from argument: {helmizer_config_path}")
@@ -417,16 +433,18 @@ def init_helmizer_config(arguments: object) -> object:
 
 
 def main():
-    arguments: object = init_arg_parser()  # parse args
-    helmizer_config: object = init_helmizer_config(arguments)  # parse config file
+    arguments = init_arg_parser()  # parse args
+    helmizer_config = init_helmizer_config(arguments)  # parse config file
     if not arguments.skip_commands:  # run subprocesses
         run_subprocess(helmizer_config, arguments)
-    kustomization: object = Kustomization(helmizer_config, arguments)  # render kustomization
+    kustomization = Kustomization(helmizer_config, arguments)  # render kustomization
     kustomization.render_template(arguments)  # instantiate kustomization YAML
 
 
 if __name__ == "__main__":
     try:
         main()
-    except KeyboardInterrupt or SystemExit:
+    except SystemExit:
+        exit(1)
+    except KeyboardInterrupt:
         exit(1)

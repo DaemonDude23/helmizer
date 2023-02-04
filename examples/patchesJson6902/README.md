@@ -1,14 +1,15 @@
-# patchesJson6902
+**patchesJson6902**
 
-- [patchesJson6902](#patchesjson6902)
-  - [Generating the Helm Template](#generating-the-helm-template)
-  - [Generate Kustomization](#generate-kustomization)
-    - [Local Python](#local-python)
-  - [Validate](#validate)
+- [Generating the Helm Template](#generating-the-helm-template)
+- [Generate Kustomization](#generate-kustomization)
+  - [Local Python](#local-python)
+- [Validate](#validate)
 
 ---
 
-## Generating the Helm Template
+[https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/patchesjson6902/](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/patchesjson6902/)
+
+# Generating the Helm Template
 
 ```bash
 helm -n sealed-secrets template \
@@ -20,18 +21,18 @@ helm -n sealed-secrets template \
   stable/sealed-secrets
 ```
 
-## Generate Kustomization
+# Generate Kustomization
 
 _These assumes you're in the root directory of this repository_
 
-### Local Python
+## Local Python
 
 ```bash
 python3 ./src/helmizer.py ./examples/patchesJson6902/helmizer.yaml
 ```
 
-## Validate
+# Validate
 
 ```bash
-kubectl kustomize .
+kubectl kustomize ./examples/patchesJson6902/
 ```

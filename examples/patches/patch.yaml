@@ -1,0 +1,8 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sealed-secrets
+  namespace: sealed-secrets
+spec:
+  minReadySeconds: 10

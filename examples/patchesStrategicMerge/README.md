@@ -1,6 +1,15 @@
-# patchesStrategicMerge
+**patchesStrategicMerge**
 
-## Generating the Helm Template
+- [Generating the Helm Template](#generating-the-helm-template)
+- [Generate Kustomization](#generate-kustomization)
+  - [Raw Python](#raw-python)
+- [Validate](#validate)
+
+---
+
+[https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/patchesstrategicmerge/](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/patchesstrategicmerge/)
+
+# Generating the Helm Template
 
 ```bash
 helm -n sealed-secrets template \
@@ -12,18 +21,18 @@ helm -n sealed-secrets template \
   stable/sealed-secrets
 ```
 
-## Generate Kustomization
+# Generate Kustomization
 
 _These assumes you're in the root directory of this repository_
 
-### Raw Python
+## Raw Python
 
 ```bash
 python3 ./src/helmizer.py ./examples/patchStrategicMerge/helmizer.yaml
 ```
 
-## Validate
+# Validate
 
 ```bash
-kubectl kustomize .
+kubectl kustomize ./examples/patchStrategicMerge/
 ```

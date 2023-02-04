@@ -17,8 +17,10 @@ kustomize:
   namespace: sealed-secrets
   resources:
     - sealed-secrets/templates/
-  patchesStrategicMerge:
-    - extra/
-  commonLabels:
-    app.kubernetes.io/helmizer: 'true'
-    app.kubernetes.io/yes: 'false'
+  patches:
+    - path: patch.yaml
+      target:
+        group: apps
+        version: v1
+        kind: Deployment
+        name: sealed-secrets

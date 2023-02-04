@@ -1,4 +1,4 @@
-**openapi**
+**sortOptions**
 
 - [Generating the Helm Template](#generating-the-helm-template)
 - [Generate Kustomization](#generate-kustomization)
@@ -7,7 +7,7 @@
 
 ---
 
-[https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/commonannotations/](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/commonannotations/)
+https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/sortOptions/
 
 # Generating the Helm Template
 
@@ -28,11 +28,11 @@ _These assumes you're in the root directory of this repository_
 ## Local Python
 
 ```bash
-python3 ./src/helmizer.py ./examples/openapi/helmizer.yaml
+python3 ./src/helmizer.py ./examples/sortOptions/helmizer.yaml
 ```
 
 # Validate
 
 ```bash
-kubectl kustomize ./examples/openapi/
+kubectl kustomize ./examples/sortOptions/
 ```

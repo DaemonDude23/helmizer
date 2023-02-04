@@ -93,6 +93,7 @@ kustomize:
   namespace: ""
   nameSuffix: []
   openapi: {}
+  patches: []
   patchesJson6902: []
   patchesStrategicMerge: []
   replacements: []
@@ -144,6 +145,7 @@ kustomize:  # this is essentially an overlay for your eventual kustomization.yam
   namespace: ""
   nameSuffix: []
   openapi: {}
+  patches: []
   patchesJson6902: []
   patchesStrategicMerge: []
   replacements: []
@@ -160,7 +162,7 @@ kustomize:  # this is essentially an overlay for your eventual kustomization.yam
 For local installation/use of the raw script, I use a local virtual environment to isolate dependencies:
 
 ```bash
-git clone https://github.com/DaemonDude23/helmizer.git -b v0.12.0
+git clone https://github.com/DaemonDude23/helmizer.git -b v0.13.0
 cd helmizer
 ```
 
@@ -193,7 +195,7 @@ pip3 install -U virtualenv==20.16.2
 ```
 3. Setup relative virtual environment:
 ```bash
-virtualenv --python=python3.9 ./venv/
+virtualenv --python=python3.10 ./venv/
 ```
 4. _Activate_ this virtual environment for pip3:
 ```bash
@@ -275,6 +277,7 @@ The `sealed-secrets` **Helm** chart is used for examples for its small scope. He
 - [namespace](examples/namespace/)
 - [nameSuffix](examples/nameSuffix/)
 - [openapi](examples/openapi/)
+- [patches](examples/patches/)
 - [patchesJson6902](examples/patchesJson6902/)
 - [patchStrategicMerge](examples/patchesStrategicMerge/)
 - [replacements](examples/replacements/)
@@ -378,4 +381,4 @@ resources:
 
 - [Kustomize Docs](https://kubectl.docs.kubernetes.io/references/kustomize/)
 
-All `kustomize` configuration options are supported. See [here](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/) for reference.
+All `kustomize` configuration options which are not deprecated by `kustomize` are supported. See [here](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/) for reference.

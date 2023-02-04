@@ -196,6 +196,18 @@
         {
             "args": [
                 "--debug",
+                "./examples/sortOptions/helmizer.yaml"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "name": "Example - sortOptions",
+            "program": "${workspaceFolder}/src/helmizer.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
+                "--debug",
                 "./examples/vars/helmizer.yaml"
             ],
             "console": "integratedTerminal",
