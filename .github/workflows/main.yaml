@@ -2,32 +2,38 @@ name: Package Application with Pyinstaller
 on:
   push:
     branches: [ main ]
-    # tags:
-    # - 'v*'
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - name: PyInstaller Linux
-      uses: JackMcKew/pyinstaller-action-linux@0.1.4
+    - name: Setup Python
+      uses: actions/setup-python@v4
       with:
-        path: src
-        spec: helmizer-linux-x86_64.spec
-    - name: PyInstaller Windows
-      uses: JackMcKew/pyinstaller-action-windows@v0.1.2
+        python-version: '3.11.4'
+        architecture: 'x64'
+        cache: 'pip'
+        cache-dependency-path: |
+          src/requirements*.txt
+    - name: Install Dependencies
+      run: |
+        pip install -r src/requirements.txt
+    - name: Build Executable
+      uses: Nuitka/Nuitka-Action@main
       with:
-        path: src
-        spec: helmizer-windows-x86_64.spec
-    - name: Release
-      uses: softprops/action-gh-release@v1
-      # if: startsWith(github.ref, 'refs/tags/')
+        nuitka-version: main
+        script-name: helmizer
+        onefile: true
+        working-directory: src
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
       with:
-        draft: true
-        prerelease: true
-        # tag_name: pyinstaller
-        fail_on_unmatched_files: true
-        files: |
-          src/dist/linux/helmizer-linux-x86_64
-          src/dist/windows/helmizer-windows-x86_64.exe
+        name: Upload binary - ${{ runner.os }}
+        path: |
+          src/build/*.exe
+          src/build/*.bin
+          src/build/*.app/**/*

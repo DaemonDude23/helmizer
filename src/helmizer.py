@@ -9,6 +9,7 @@ import logging
 import subprocess
 from os import path
 from os import walk
+from sys import exit
 from sys import stdout
 
 import confuse

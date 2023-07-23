@@ -1,7 +1,9 @@
-venv/
 .flatpak-builder/
+**/__pycache__/
 build/flatpak/**
 build/pyinstaller/**
 dist/linux/**
 dist/windows/**
-**/__pycache__/
+src/*-build/
+src/*.bin
+venv/
