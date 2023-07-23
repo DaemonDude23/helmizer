@@ -29,14 +29,13 @@ jobs:
         script-name: helmizer.py
         onefile: true
         working-directory: src
-    - name: Release
+    - name: ${{ runner.os }} Release
       uses: softprops/action-gh-release@v1
-      # if: startsWith(github.ref, 'refs/tags/')
       with:
         draft: true
         prerelease: true
         fail_on_unmatched_files: true
         files: |
-          build/helmizer.exe
-          build/helmizer.bin
-          build/helmizer.app/**/*
+          src/build/helmizer.exe
+          src/build/helmizer.bin
+          src/build/helmizer.app/**/*
