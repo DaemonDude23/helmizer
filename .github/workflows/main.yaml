@@ -34,6 +34,6 @@ jobs:
       with:
         name: Upload binary - ${{ runner.os }}
         path: |
-          src/build/*.exe
-          src/build/*.bin
-          src/build/*.app/**/*
+          build/*.exe
+          build/*.bin
+          build/*.app/**/*
