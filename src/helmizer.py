@@ -367,7 +367,7 @@ def init_arg_parser():
             help="quiet output from subprocesses",
             default=False,
         )
-        args.add_argument("--version", "-v", action="version", version="v0.13.0")
+        args.add_argument("--version", "-v", action="version", version="v0.14.0")
         args.add_argument(
             "helmizer_config",
             action="store",

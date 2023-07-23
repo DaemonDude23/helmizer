@@ -38,4 +38,4 @@ jobs:
         files: |
           src/build/helmizer.exe
           src/build/helmizer.bin
-          src/build/helmizer.app/**/*
+          src/build/*.helmizer.app/**/*

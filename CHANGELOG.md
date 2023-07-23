@@ -1,7 +1,8 @@
 **Changelog**
 
 - [2023](#2023)
-  - [v0.13.0](#v0130)
+  - [v0.14.0](#v0140)
+  - [v0.14.0](#v0140-1)
 - [2022](#2022)
   - [v0.12.0](#v0120)
   - [v0.11.0](#v0110)
@@ -22,7 +23,15 @@
 
 # 2023
 
-## [v0.13.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.13.0)
+## [v0.14.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.14.0)
+
+July 23 2023
+
+**Enhancements**
+
+- Switched to using Nuitka for packaging into a single file, replacing PyInstaller. Otherwise no code changes.
+
+## [v0.14.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.14.0)
 
 February 4 2023
 

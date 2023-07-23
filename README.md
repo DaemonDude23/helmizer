@@ -162,7 +162,7 @@ kustomize:  # this is essentially an overlay for your eventual kustomization.yam
 For local installation/use of the raw script, I use a local virtual environment to isolate dependencies:
 
 ```bash
-git clone https://github.com/DaemonDude23/helmizer.git -b v0.13.0
+git clone https://github.com/DaemonDude23/helmizer.git -b v0.14.0
 cd helmizer
 ```
 
