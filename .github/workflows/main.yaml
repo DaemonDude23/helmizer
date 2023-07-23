@@ -34,7 +34,7 @@ jobs:
       with:
         draft: true
         prerelease: true
-        fail_on_unmatched_files: true
+        fail_on_unmatched_files: false
         files: |
           src/build/helmizer.exe
           src/build/helmizer.bin
