@@ -29,11 +29,14 @@ jobs:
         script-name: helmizer.py
         onefile: true
         working-directory: src
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v3
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      # if: startsWith(github.ref, 'refs/tags/')
       with:
-        name: Upload binary - ${{ runner.os }}
-        path: |
-          build/*.exe
-          build/*.bin
-          build/*.app/**/*
+        draft: true
+        prerelease: true
+        fail_on_unmatched_files: true
+        files: |
+          build/helmizer.exe
+          build/helmizer.bin
+          build/helmizer.app/**/*
