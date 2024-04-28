@@ -1,0 +1,18 @@
+builds:
+  - binary: helmizer
+    dir: ./src
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+      - arm64
+      - '386'
+    goos:
+      - linux
+      - darwin
+      - windows
+    id: helmizer
+checksum:
+  name_template: checksums.txt
+release:
+  draft: true

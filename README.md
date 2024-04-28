@@ -4,11 +4,9 @@
 - [Usage](#usage)
 - [Configuration](#configuration)
   - [Installation](#installation)
-  - [Putting it in your `$PATH`](#putting-it-in-your-path)
-    - [Linux (Simplest Option)](#linux-simplest-option)
-  - [virtualenv with pip](#virtualenv-with-pip)
+    - [Linux](#linux)
+    - [Windows](#windows)
   - [Run](#run)
-    - [Local Python](#local-python)
   - [Examples](#examples)
 - [Kustomize Options](#kustomize-options)
 
@@ -35,53 +33,68 @@ I began transitioning my `helm` charts to local manifests via [`helm template`](
 # Usage
 
 ```
-usage: helmizer [-h] [--debug] [--dry-run] [--skip-commands] [--no-sort-keys] [--quiet] [--version] helmizer_config
+Usage: helmizer [--log-format LOG-FORMAT] [--log-level LOG-LEVEL] [--log-colors] [--api-version API-VERSION] [--dry-run] [--kustomization-path KUSTOMIZATION-PATH] [--quiet-commands] [--quiet-helmizer] [--skip-commands] [--skip-postcommands] [--skip-precommands] [--stop-on-error] CONFIGFILEPATH
 
-Helmizer
+Positional arguments:
+  CONFIGFILEPATH         Path to Helmizer config file
 
-optional arguments:
-  -h, --help       show this help message and exit
-
-  --debug          enable debug logging (default: False)
-  --dry-run        do not write to a file system (default: False)
-  --skip-commands  skip executing commandSequence, just generate kustomization file (default: False)
-  --no-sort-keys   disables alphabetical sorting of keys in output kustomization file (default: False)
-  --quiet, -q      quiet output from subprocesses (default: False)
-  --version, -v    show program's version number and exit
-  helmizer_config  path to helmizer config file
+Options:
+  --log-format LOG-FORMAT
+                         Set log format: plain or JSON [default: plain]
+  --log-level LOG-LEVEL, -l LOG-LEVEL
+                         Set log level: INFO, DEBUG, ERROR, WARNING [default: INFO]
+  --log-colors           Enables color in the log output [default: true]
+  --api-version API-VERSION
+                         Set the API version for the kustomization.yaml file [default: kustomize.config.k8s.io/v1beta1]
+  --dry-run              Don't write the kustomization.yaml file. This does not affect pre/post commands [default: false]
+  --kustomization-path KUSTOMIZATION-PATH
+                         Set the path to write kustomization.yaml file [default: .]
+  --quiet-commands, -q   Don't output stdout/stderr for pre and post command sequences [default: false]
+  --quiet-helmizer       Don't output logs or the kustomization [default: false]
+  --skip-commands        Skip executing pre and post command sequences [default: false]
+  --skip-postcommands    Skip executing the post-command sequence [default: false]
+  --skip-precommands     Skip executing the pre-command sequence [default: false]
+  --stop-on-error        Stop execution on first error [default: true]
+  --help, -h             display this help and exit
+  --version              display version and exit
 ```
+
+![docs/diagrams/outputs/helmizer.png](docs/diagrams/outputs/helmizer.png)
 
 # Configuration
 
 - Example `helmizer.yaml` config file. The `helm` command is invoked before the content for `kustomization.yaml` is generated. Any number of commands can be added here.
 ```yaml
 helmizer:
-  commandSequence:
-  - command: "helm"
-    args:
-      - "-n"
-      - "sealed-secrets"
-      - "template"
-      - "sealed-secrets"
-      - --output-dir
-      - '.'
-      - --include-crds
-      - --skip-tests
-      - --version
-      - '1.12.2'
-      - stable/sealed-secrets
-  - command: "pre-commit"
-    args:
-      - 'run'
-      - '-a'
-      - '||'
-      - 'true'
-  dry-run: false
-  kustomization-directory: .
-  kustomization-file-name: kustomization.yaml
-  sort-keys: true
-  version: '0.1.0'
+  apiVersion: "kustomize.config.k8s.io/v1beta1"
+  dryRun: false
   ignore: []
+  kustomizationPath: "."
+  preCommands:
+    - command: helm
+      args:
+        - '-n'
+        - cert-manager
+        - template
+        - cert-manager
+        - '--output-dir'
+        - .
+        - '--include-crds'
+        - '--skip-tests'
+        - '--version'
+        - 1.14.3
+        - jetstack/cert-manager
+  postCommands:
+    - command: pre-commit
+      args:
+        - run
+        - '-a'
+        - '||'
+        - 'true'
+  quietCommands: false
+  skipCommands: false
+  skipPostCommands: false
+  skipPreCommands: false
 kustomize:
   commonAnnotations: {}
   commonLabels: {}
@@ -108,32 +121,35 @@ kustomize:
 
 ```yaml
 helmizer:
-  commandSequence:  # list of commands/args executed serially. Inherits your $PATH
-  - command: "helm"
-    args:
-      - "-n"
-      - "sealed-secrets"
-      - "template"
-      - "sealed-secrets"
-      - --output-dir
-      - '.'
-      - --include-crds
-      - --skip-tests
-      - --version
-      - '1.12.2'
-      - stable/sealed-secrets
-  - command: "pre-commit"
-    args:
-      - 'run'
-      - '-a'
-      - '||'
-      - 'true'
-  dry-run: false  # optional - if true, does not write to a filesystem
-  kustomization-directory: .  # optional - when referring to files with relative paths in a kustomization, if the kustomization.yaml is going to be in a special place relative to its files, set that path here
-  kustomization-file-name: kustomization.yaml  # optional - name of kustomization file to write
-  sort-keys: true  # optional - sort keys under crds, resources, patchesStrategicMerge
-  version: '0.1.0'  # not yet validated
+  dryRun: false  # optional - if true, does not write to a filesystem
   ignore: []  # optional - list of files/directories to ignore
+  kustomizationPath: "yaml"  # optional - 'yaml' or 'yml'
+  preCommands:  # optional - list of commands/args executed serially. Inherits your $PATH
+    - command: "helm"
+      args:
+        - "-n"
+        - "cert-manager"
+        - "template"
+        - "cert-manager"
+        - --output-dir
+        - '.'
+        - --include-crds
+        - --skip-tests
+        - --version
+        - 1.14.3
+        - jetstack/cert-manager
+  postCommands:  # optional - list of commands/args executed serially. Inherits your $PATH
+    - command: "pre-commit"
+      args:
+        - 'run'
+        - '-a'
+        - '||'
+        - 'true'
+  quietCommands: false
+  skipCommands: false
+  skipPostCommands: false
+  skipPreCommands: false
+  stopOnError: true
 kustomize:  # this is essentially an overlay for your eventual kustomization.yaml
   commonAnnotations: {}
   commonLabels: {}
@@ -159,113 +175,81 @@ kustomize:  # this is essentially an overlay for your eventual kustomization.yam
 
 ## Installation
 
-For local installation/use of the raw script, I use a local virtual environment to isolate dependencies:
+### Linux
 
 ```bash
-git clone https://github.com/DaemonDude23/helmizer.git -b v0.14.0
-cd helmizer
+curl -L "https://github.com/DaemonDude23/helmizer/releases/download/v0.15.0/helmizer_0.15.0_linux_amd64.tar.gz" -o helmizer.tar.gz && \
+tar -xzf helmizer.tar.gz helmizer && \
+sudo mv helmizer /usr/local/bin/ && \
+rm helmizer.tar.gz && \
+sudo chmod +x /usr/local/bin/helmizer
 ```
 
-## Putting it in your `$PATH`
+### Windows
 
-### Linux (Simplest Option)
-
-1. Create symlink:
-```bash
-sudo ln -s /absolute/path/to/src/helmizer.py /usr/local/bin/helmizer
-```
-2. Install dependencies:
-```bash
-# latest and greatest dependency versions
-pip3 install -U -r ./src/requirements.txt
-
-# more flexible requirements
-pip3 install -U -r ./src/requirements-old.txt
-```
-
-## virtualenv with pip
-
-1. Update pip:
-```bash
-python3 -m pip install --upgrade pip
-```
-2. Install `virtualenv` for your user:
-```bash
-pip3 install -U virtualenv==20.16.2
-```
-3. Setup relative virtual environment:
-```bash
-virtualenv --python=python3.10 ./venv/
-```
-4. _Activate_ this virtual environment for pip3:
-```bash
-source ./venv/bin/activate
-```
-5. Install requirements into virtual environment.
-```bash
-pip3 install -U -r ./src/requirements.txt
-pip3 install -U -r ./src/requirements-newest.txt
-```
-
-If you need to reset the virtual environment for whatever reason:
-```bash
-virtualenv --clear ./venv/
-```
+1. Download the Windows version.
+2. Untar it and put it in your `$PATH``.
 
 ## Run
 
 **For greater detail on running from examples (they assumes you've ran [helm template](https://helm.sh/docs/helm/helm_template/), see the [resource example](examples/resources/README.md))**
 
-### Local Python
-
 Input file:
 ```yaml
 helmizer:
-  commandSequence:
-  - command: "helm"
-    args:
-      - "-n"
-      - "sealed-secrets"
-      - "template"
-      - "sealed-secrets"
-      - --output-dir
-      - '.'
-      - --include-crds
-      - --skip-tests
-      - --version
-      - '1.12.2'
-      - stable/sealed-secrets
+  preCommands:
+    - command: "helm"
+      args:
+        - "-n"
+        - "cert-manager"
+        - "template"
+        - "cert-manager"
+        - --output-dir
+        - '.'
+        - --include-crds
+        - --skip-tests
+        - --version
+        - 1.14.3
+        - jetstack/cert-manager
 kustomize:
-  namespace: sealed-secrets
+  namespace: cert-manager
   resources:
-    - ./sealed-secrets/templates/
+    - ./cert-manager/
 ```
 
 Helmize-ify it:
 ```bash
-python3 ./src/helmizer.py ./examples/resources/helmizer.yaml
+helmizer ./examples/resources/helmizer.yaml
 ```
 
 Output - enumerating the files within the specified directory:
 ```yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: sealed-secrets
+namespace: cert-manager
 resources:
-- sealed-secrets/templates/deployment.yaml
-- sealed-secrets/templates/role-binding.yaml
-- sealed-secrets/templates/service.yaml
-- sealed-secrets/templates/cluster-role-binding.yaml
-- sealed-secrets/templates/cluster-role.yaml
-- sealed-secrets/templates/service-account.yaml
-- sealed-secrets/templates/sealedsecret-crd.yaml
-- sealed-secrets/templates/role.yaml
+  - cert-manager/cainjector-deployment.yaml
+  - cert-manager/cainjector-rbac.yaml
+  - cert-manager/cainjector-serviceaccount.yaml
+  - cert-manager/deployment.yaml
+  - cert-manager/rbac.yaml
+  - cert-manager/service.yaml
+  - cert-manager/serviceaccount.yaml
+  - cert-manager/startupapicheck-job.yaml
+  - cert-manager/startupapicheck-rbac.yaml
+  - cert-manager/startupapicheck-serviceaccount.yaml
+  - cert-manager/webhook-deployment.yaml
+  - cert-manager/webhook-mutating-webhook.yaml
+  - cert-manager/webhook-rbac.yaml
+  - cert-manager/webhook-service.yaml
+  - cert-manager/webhook-serviceaccount.yaml
+  - cert-manager/webhook-validating-webhook.yaml
 ```
 
 ## Examples
 
 _With [vscode](https://code.visualstudio.com/) you can utilize the included [launch.json](.vscode/launch.json) to test these more quickly, or reference for your configuration._
-The `sealed-secrets` **Helm** chart is used for examples for its small scope. Here's another.
+The `cert-manager` **Helm** chart is used for examples for its small scope. Here's another.
 
 - [commonAnnotations](examples/commonAnnotations/)
 - [commonLabels](examples/commonLabels/)
@@ -292,31 +276,26 @@ Which looks easier to write/maintain through future chart updates for the [Prome
 
 ```yaml
 helmizer:
-  commandSequence:
-  - command: "helm"
-    args:
-      - "-n"
-      - "monitoring"
-      - "template"
-      - "kube-prometheus-stack"
-      - --output-dir
-      - '..'
-      - --include-crds
-      - --skip-tests
-      - --validate
-      - --version
-      - '18.0.8'
-      - --values
-      - 'values.yaml'
-      - prometheus-community/kube-prometheus-stack
-  sort-keys: true
-  version: '0.1.0'
+  preCommands:
+    - command: "helm"
+      args:
+        - "-n"
+        - "cert-manager"
+        - "template"
+        - "cert-manager"
+        - --output-dir
+        - '..'
+        - --include-crds
+        - --skip-tests
+        - --validate
+        - --version
+        - '1.14.3'
+        - --values
+        - 'values.yaml'
+        - jetstack/cert-manager
 kustomize:
   namespace: monitoring
   resources:
-    - ./charts/
-    - ./extra/prometheusRules/
-    - ./extra/vpa.yaml
     - ./templates/
 ```
 
@@ -325,56 +304,24 @@ Or this `kustomization.yaml` which `helmizer` generated?
 ```yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: monitoring
+namespace: cert-manager
 resources:
-- charts/kube-state-metrics/templates/clusterrolebinding.yaml
-- charts/kube-state-metrics/templates/deployment.yaml
-- charts/kube-state-metrics/templates/podsecuritypolicy.yaml
-- charts/kube-state-metrics/templates/psp-clusterrole.yaml
-- charts/kube-state-metrics/templates/psp-clusterrolebinding.yaml
-- charts/kube-state-metrics/templates/role.yaml
-- charts/kube-state-metrics/templates/service.yaml
-- charts/kube-state-metrics/templates/serviceaccount.yaml
-- charts/prometheus-node-exporter/templates/daemonset.yaml
-- charts/prometheus-node-exporter/templates/psp-clusterrole.yaml
-- charts/prometheus-node-exporter/templates/psp-clusterrolebinding.yaml
-- charts/prometheus-node-exporter/templates/psp.yaml
-- charts/prometheus-node-exporter/templates/service.yaml
-- charts/prometheus-node-exporter/templates/serviceaccount.yaml
-- templates/exporters/core-dns/service.yaml
-- templates/exporters/core-dns/servicemonitor.yaml
-- templates/exporters/kube-api-server/servicemonitor.yaml
-- templates/exporters/kube-controller-manager/service.yaml
-- templates/exporters/kube-controller-manager/servicemonitor.yaml
-- templates/exporters/kube-etcd/service.yaml
-- templates/exporters/kube-etcd/servicemonitor.yaml
-- templates/exporters/kube-proxy/service.yaml
-- templates/exporters/kube-proxy/servicemonitor.yaml
-- templates/exporters/kube-scheduler/service.yaml
-- templates/exporters/kube-scheduler/servicemonitor.yaml
-- templates/exporters/kube-state-metrics/serviceMonitor.yaml
-- templates/exporters/kubelet/servicemonitor.yaml
-- templates/exporters/node-exporter/servicemonitor.yaml
-- templates/prometheus-operator/clusterrole.yaml
-- templates/prometheus-operator/clusterrolebinding.yaml
-- templates/prometheus-operator/deployment.yaml
-- templates/prometheus-operator/psp-clusterrole.yaml
-- templates/prometheus-operator/psp-clusterrolebinding.yaml
-- templates/prometheus-operator/psp.yaml
-- templates/prometheus-operator/service.yaml
-- templates/prometheus-operator/serviceaccount.yaml
-- templates/prometheus-operator/servicemonitor.yaml
-- templates/prometheus/additionalScrapeConfigs.yaml
-- templates/prometheus/clusterrole.yaml
-- templates/prometheus/clusterrolebinding.yaml
-- templates/prometheus/ingress.yaml
-- templates/prometheus/prometheus.yaml
-- templates/prometheus/psp-clusterrole.yaml
-- templates/prometheus/psp-clusterrolebinding.yaml
-- templates/prometheus/psp.yaml
-- templates/prometheus/service.yaml
-- templates/prometheus/serviceaccount.yaml
-- templates/prometheus/servicemonitor.yaml
+  - cert-manager/cainjector-deployment.yaml
+  - cert-manager/cainjector-rbac.yaml
+  - cert-manager/cainjector-serviceaccount.yaml
+  - cert-manager/deployment.yaml
+  - cert-manager/rbac.yaml
+  - cert-manager/service.yaml
+  - cert-manager/serviceaccount.yaml
+  - cert-manager/startupapicheck-job.yaml
+  - cert-manager/startupapicheck-rbac.yaml
+  - cert-manager/startupapicheck-serviceaccount.yaml
+  - cert-manager/webhook-deployment.yaml
+  - cert-manager/webhook-mutating-webhook.yaml
+  - cert-manager/webhook-rbac.yaml
+  - cert-manager/webhook-service.yaml
+  - cert-manager/webhook-serviceaccount.yaml
+  - cert-manager/webhook-validating-webhook.yaml
 ```
 
 # Kustomize Options

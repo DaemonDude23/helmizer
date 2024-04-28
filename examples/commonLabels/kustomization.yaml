@@ -1,15 +1,23 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
-commonLabels:
-  app.kubernetes.io/helmizer: 'true'
-  app.kubernetes.io/yes: 'false'
 kind: Kustomization
-namespace: sealed-secrets
+namespace: cert-manager
+commonLabels:
+  app.kubernetes.io/helmizer: "true"
+  app.kubernetes.io/yes: "false"
 resources:
-- sealed-secrets/templates/cluster-role-binding.yaml
-- sealed-secrets/templates/cluster-role.yaml
-- sealed-secrets/templates/deployment.yaml
-- sealed-secrets/templates/role-binding.yaml
-- sealed-secrets/templates/role.yaml
-- sealed-secrets/templates/sealedsecret-crd.yaml
-- sealed-secrets/templates/service-account.yaml
-- sealed-secrets/templates/service.yaml
+  - cert-manager/templates/cainjector-deployment.yaml
+  - cert-manager/templates/cainjector-rbac.yaml
+  - cert-manager/templates/cainjector-serviceaccount.yaml
+  - cert-manager/templates/deployment.yaml
+  - cert-manager/templates/rbac.yaml
+  - cert-manager/templates/service.yaml
+  - cert-manager/templates/serviceaccount.yaml
+  - cert-manager/templates/startupapicheck-job.yaml
+  - cert-manager/templates/startupapicheck-rbac.yaml
+  - cert-manager/templates/startupapicheck-serviceaccount.yaml
+  - cert-manager/templates/webhook-deployment.yaml
+  - cert-manager/templates/webhook-mutating-webhook.yaml
+  - cert-manager/templates/webhook-rbac.yaml
+  - cert-manager/templates/webhook-service.yaml
+  - cert-manager/templates/webhook-serviceaccount.yaml
+  - cert-manager/templates/webhook-validating-webhook.yaml

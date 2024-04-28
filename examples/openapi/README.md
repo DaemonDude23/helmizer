@@ -12,13 +12,13 @@
 # Generating the Helm Template
 
 ```bash
-helm -n sealed-secrets template \
-  sealed-secrets \
+helm -n cert-manager template \
+  cert-manager \
   --output-dir . \
   --include-crds \
   --skip-tests \
-  --version 1.12.2 \
-  stable/sealed-secrets
+  --version 1.14.3 \
+  jetstack/cert-manager
 ```
 
 # Generate Kustomization
@@ -28,7 +28,7 @@ _These assumes you're in the root directory of this repository_
 ## Local Python
 
 ```bash
-python3 ./src/helmizer.py ./examples/openapi/helmizer.yaml
+helmizer ./examples/openapi/helmizer.yaml
 ```
 
 # Validate

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "docker": {
+    "enabled": true
+  },
+  "extends": [
+    "config:base"
+  ],
+  "golang": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "enabled": true,
+      "managers": [
+        "dockerfile"
+      ],
+      "matchFiles": [
+        "**/Dockerfile"
+      ]
+    },
+    {
+      "enabled": true,
+      "managers": [
+        "gomod"
+      ],
+      "matchFiles": [
+        "**/go.mod"
+      ]
+    },
+    {
+      "enabled": true,
+      "managers": [
+        "helm-requirements",
+        "helm-values"
+      ],
+      "matchFiles": [
+        "**/Chart.yaml"
+      ]
+    },
+    {
+      "enabled": true,
+      "managers": [
+        "helmfile"
+      ],
+      "matchFiles": [
+        "**/helmfile.yaml"
+      ]
+    },
+    {
+      "enabled": true,
+      "managers": [
+        "kustomize"
+      ],
+      "matchFiles": [
+        "**/kustomization.yaml"
+      ]
+    },
+    {
+      "enabled": true,
+      "managers": [
+        "pre-commit"
+      ],
+      "matchFiles": [
+        "**/.pre-commit-config.yaml"
+      ]
+    }
+  ],
+  "pre-commit": {
+    "enabled": true
+  },
+  "rangeStrategy": "replace",
+  "timezone": "America/Los_Angeles"
+}

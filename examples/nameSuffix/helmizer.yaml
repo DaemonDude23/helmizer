@@ -1,5 +1,2 @@
-helmizer:
-  sort-keys: true
-  version: '0.1.0'
 kustomize:
   nameSuffix: just-a-suffix

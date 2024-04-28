@@ -1,24 +1,17 @@
 helmizer:
-  commandSequence:
-  - command: "helm"
-    args:
-      - "-n"
-      - "sealed-secrets"
-      - "template"
-      - "sealed-secrets"
-      - --output-dir
-      - '.'
-      - --include-crds
-      - --skip-tests
-      - --version
-      - '1.12.2'
-      - stable/sealed-secrets
+  preCommands:
+    - command: "helmfile"
+      args:
+        - template
+        - --skip-deps
+        - --output-dir-template
+        - "../"
 kustomize:
-  namespace: sealed-secrets
-  resources:
-    - sealed-secrets/templates/
-  patchesStrategicMerge:
-    - extra/
   commonAnnotations:
     app.kubernetes.io/annotation: yeah
     linkerd.io/inject: enabled
+  namespace: cert-manager
+  patchesStrategicMerge:
+    - extra/
+  resources:
+    - cert-manager/

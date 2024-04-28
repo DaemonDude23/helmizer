@@ -1,7 +1,7 @@
 kustomize:
   secretGenerator:
-  - name: tls
-    files:
-    - secret/tls.cert
-    - secret/tls.key
-    type: "kubernetes.io/tls"
+    - name: tls
+      files:
+        - secret/tls.cert
+        - secret/tls.key
+      type: "kubernetes.io/tls"

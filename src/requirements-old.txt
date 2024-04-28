@@ -1,4 +1,0 @@
-# these are mostly untested guestimates, but more loose to avoid dependency hell
-confuse>=1.0.0      # https://pypi.org/project/confuse/
-PyYaml>=5.0.0       # https://pypi.org/project/PyYAML/
-validators>=0.14.0  # https://pypi.org/project/validators/

@@ -1,6 +1,4 @@
 helmizer:
-  sort-keys: true
-  version: '0.1.0'
 kustomize:
   crds:
     - crds/

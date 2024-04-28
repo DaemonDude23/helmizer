@@ -1,9 +1,4 @@
-.flatpak-builder/
-**/__pycache__/
-build/flatpak/**
-build/pyinstaller/**
-dist/linux/**
-dist/windows/**
-src/*-build/
-src/*.bin
+.mypy_cache/
+*/.go/
+build/
 venv/

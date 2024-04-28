@@ -1,28 +1,15 @@
 helmizer:
-  commandSequence:
-  - command: "helm"
-    args:
-      - "-n"
-      - "default"
-      - "template"
-      - "ingress-nginx"
-      - --output-dir
-      - '.'
-      - --include-crds
-      - --skip-tests
-      - --version
-      - '4.0.6'
-      - ingress-nginx/ingress-nginx
-  dry-run: false
-  kustomization-directory: .
-  kustomization-file-name: kustomization.yaml
-  sort-keys: true
-  version: '0.1.0'
+  preCommands:
+    - command: "helmfile"
+      args:
+        - template
+        - --skip-deps
+        - --output-dir-template
+        - "../"
 kustomize:
   namespace: default
   resources:
-    - ingress-nginx/admission-webhooks/
-    - ingress-nginx/templates/
+    - cert-manager/
   configMapGenerator:
     - name: test-env
       namespace: default

@@ -1,244 +1,288 @@
 {
     "configurations": [
         {
-            "args": [
-                "--debug",
-                "--no-sort-keys",
-                "./examples/commonAnnotations/helmizer.yaml"
-            ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "name": "Example - commonAnnotations",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "name": "Diagrams",
+            "program": "${workspaceFolder}/docs/diagrams/main.py",
             "request": "launch",
-            "type": "python"
+            "type": "debugpy"
         },
         {
             "args": [
-                "--debug",
-                "./examples/commonLabels/helmizer.yaml"
+                "--help",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - commonLabels",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "name": "Help",
+            "type": "go",
             "request": "launch",
-            "type": "python"
+            "program": "${workspaceFolder}/src/"
         },
         {
             "args": [
-                "--debug",
-                "./examples/configMapGenerator/helmizer.yaml"
+                "--version",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - configMapGenerator",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "name": "Version",
+            "type": "go",
             "request": "launch",
-            "type": "python"
+            "program": "${workspaceFolder}/src/"
+        },
+        {
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "mode": "test",
+            "name": "Run tests",
+            "program": "${workspaceFolder}/src/",
+            "request": "launch",
+            "type": "go"
         },
         {
             "args": [
-                "--debug",
-                "./examples/crds/helmizer.yaml"
+                "--log-level=INFO",
+                "../examples/commonAnnotations/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - crds",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "commonAnnotations",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
+            "type": "go"
         },
         {
             "args": [
-                "--debug",
-                "./examples/generatorOptions/helmizer.yaml"
+                "--log-level=INFO",
+                "../examples/commonLabels/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - generatorOptions",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "commonLabels",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
+            "type": "go"
         },
         {
             "args": [
-                "--debug",
-                "./examples/images/helmizer.yaml"
+                "--log-level=INFO",
+                "../examples/configMapGenerator/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - images",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "configMapGenerator",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
+            "type": "go"
         },
         {
             "args": [
-                "--debug",
-                "./examples/namePrefix/helmizer.yaml"
+                "--log-level=INFO",
+                "../examples/crds/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - namePrefix",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "crds",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
+            "type": "go"
         },
         {
             "args": [
-                "--debug",
-                "./examples/namespace/helmizer.yaml"
+                "--log-level=INFO",
+                "../examples/generatorOptions/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - namespace",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "generatorOptions",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
+            "type": "go"
         },
         {
             "args": [
-                "--debug",
-                "./examples/nameSuffix/helmizer.yaml"
+                "--log-level=INFO",
+                "../examples/images/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - nameSuffix",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "images",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
+            "type": "go"
         },
         {
             "args": [
-                "--debug",
-                "./examples/openapi/helmizer.yaml"
+                "--log-level=INFO",
+                "../examples/namePrefix/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - openapi",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "namePrefix",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
+            "type": "go"
         },
         {
             "args": [
-                "--debug",
-                "./examples/patchesJson6902/helmizer.yaml"
+                "--log-level=INFO",
+                "../examples/namespace/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - patchesJson6902",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "namespace",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
+            "type": "go"
         },
         {
             "args": [
-                "--debug",
-                "./examples/patchesStrategicMerge/helmizer.yaml"
+                "--log-level=INFO",
+                "../examples/nameSuffix/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - patchesStrategicMerge",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "nameSuffix",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
+            "type": "go"
         },
         {
             "args": [
-                "--debug",
-                "./examples/replacements/helmizer.yaml"
+                "--log-level=INFO",
+                "../examples/openapi/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - replacements",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "openapi",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
+            "type": "go"
         },
         {
             "args": [
-                "--debug",
-                "./examples/replicas/helmizer.yaml"
+                "--log-level=INFO",
+                "../examples/patches/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - replicas",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "patches",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
+            "type": "go"
         },
         {
             "args": [
-                "--debug",
-                "./examples/resources/helmizer.yaml"
+                "--log-level=INFO",
+                "../examples/patchesJson6902/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - resources",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "patchesJson6902",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
+            "type": "go"
         },
         {
             "args": [
-                "--debug",
-                "./examples/secretGenerator/helmizer.yaml"
+                "--log-level=INFO",
+                "../examples/patchesStrategicMerge/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - secretGenerator",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "patchesStrategicMerge",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
+            "type": "go"
         },
         {
             "args": [
-                "--debug",
-                "./examples/sortOptions/helmizer.yaml"
+                "--log-level=INFO",
+                "../examples/replacements/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - sortOptions",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "replacements",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
+            "type": "go"
         },
         {
             "args": [
-                "--debug",
-                "./examples/vars/helmizer.yaml"
+                "--log-level=INFO",
+                "../examples/replicas/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - vars",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "replicas",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
+            "type": "go"
         },
         {
             "args": [
-                "--help"
+                "--stop-on-error=false",
+                "../examples/resources/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - help",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "resources",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
+            "type": "go"
         },
         {
             "args": [
-                "--version"
+                "--log-level=INFO",
+                "../examples/secretGenerator/helmizer.yaml",
             ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "name": "Example - version",
-            "program": "${workspaceFolder}/src/helmizer.py",
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "secretGenerator",
+            "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "python"
-        }
+            "type": "go"
+        },
+        {
+            "args": [
+                "--log-level=INFO",
+                "../examples/sortOptions/helmizer.yaml",
+            ],
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "sortOptions",
+            "program": "${workspaceFolder}/src/",
+            "request": "launch",
+            "type": "go"
+        },
+        {
+            "args": [
+                "--log-level=INFO",
+                "../examples/vars/helmizer.yaml",
+            ],
+            "env": {
+                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
+            },
+            "name": "vars",
+            "program": "${workspaceFolder}/src/",
+            "request": "launch",
+            "type": "go"
+        },
     ],
     "version": "0.2.0"
 }

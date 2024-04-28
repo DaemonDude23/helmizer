@@ -1,10 +1,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 vars:
-- fieldref:
-    fieldpath: metadata.name
-  name: A_SERVICE_NAME
-  objref:
-    apiVersion: v1
-    kind: Service
-    name: this-service
+  - fieldref:
+      fieldpath: metadata.name
+    name: A_SERVICE_NAME
+    objref:
+      apiVersion: v1
+      kind: Service
+      name: this-service

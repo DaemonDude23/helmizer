@@ -1,24 +1,30 @@
 helmizer:
-  commandSequence:
-  - command: "helm"
-    args:
-      - "-n"
-      - "sealed-secrets"
-      - "template"
-      - "sealed-secrets"
-      - --output-dir
-      - '.'
-      - --include-crds
-      - --skip-tests
-      - --version
-      - '1.12.2'
-      - stable/sealed-secrets
   dry-run: false
-  kustomization-directory: .
-  kustomization-file-name: kustomization.yaml
-  sort-keys: true
-  version: '0.1.0'
+  kustomizationPath: "."
+  preCommands:
+    - command: helm
+      args:
+        - "-n"
+        - "cert-manager"
+        - "template"
+        - "cert-manager"
+        - --output-dir
+        - '.'
+        - --include-crds
+        - --skip-tests
+        - --version
+        - 1.14.3
+        - jetstack/cert-manager
+  postCommands:
+    - command: echo
+      args:
+        - "Done"
+  quietCommands: false
+  skipCommands: false
+  skipPostCommands: false
+  skipPreCommands: false
+  stopOnError: true
 kustomize:
-  namespace: sealed-secrets
+  namespace: cert-manager
   resources:
-    - ./sealed-secrets/templates/
+    - ./cert-manager/

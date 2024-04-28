@@ -1,26 +1,19 @@
 helmizer:
-  commandSequence:
-  - command: "helm"
-    args:
-      - "-n"
-      - "sealed-secrets"
-      - "template"
-      - "sealed-secrets"
-      - --output-dir
-      - '.'
-      - --include-crds
-      - --skip-tests
-      - --version
-      - '1.12.2'
-      - stable/sealed-secrets
+  preCommands:
+    - command: "helmfile"
+      args:
+        - template
+        - --skip-deps
+        - --output-dir-template
+        - "../"
 kustomize:
-  namespace: sealed-secrets
+  namespace: cert-manager
   resources:
-    - sealed-secrets/templates/
+    - cert-manager/
   patches:
     - path: patch.yaml
       target:
         group: apps
-        version: v1
         kind: Deployment
-        name: sealed-secrets
+        name: cert-manager
+        version: v1
