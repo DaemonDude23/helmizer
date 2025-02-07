@@ -1,14 +1,13 @@
 repos:
   # General pre-commit hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: check-case-conflict
       - id: check-docstring-first
       - id: check-executables-have-shebangs
       - id: check-merge-conflict
       - id: destroyed-symlinks
-      - id: detect-aws-credentials
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: fix-byte-order-marker
@@ -41,20 +40,20 @@ repos:
       - id: go-fmt-repo
   # Python specific hooks
   - repo: https://github.com/asottile/reorder_python_imports
-    rev: v3.12.0
+    rev: v3.14.0
     hooks:
       - id: reorder-python-imports
-        args: [--application-directories, '.:src', --py311-plus]
+        args: [--application-directories, '.:src', --py312-plus]
   - repo: https://github.com/psf/black
-    rev: 24.4.2
+    rev: 25.1.0
     hooks:
       - id: black
-        language_version: python3.11
+        language_version: python3.12
         args:
           - --line-length
           - "140"
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.0
+    rev: v1.15.0
     hooks:
       - id: mypy
         args:

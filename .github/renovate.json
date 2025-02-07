@@ -59,10 +59,10 @@
     {
       "enabled": true,
       "managers": [
-        "pre-commit"
+        "github-actions"
       ],
       "matchFiles": [
-        "**/.pre-commit-config.yaml"
+        "**/.github/workflows/*.yml"
       ]
     }
   ],
