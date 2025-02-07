@@ -27,9 +27,6 @@
             "program": "${workspaceFolder}/src/"
         },
         {
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "mode": "test",
             "name": "Run tests",
             "program": "${workspaceFolder}/src/",
@@ -41,9 +38,6 @@
                 "--log-level=INFO",
                 "../examples/commonAnnotations/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "commonAnnotations",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -54,9 +48,6 @@
                 "--log-level=INFO",
                 "../examples/commonLabels/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "commonLabels",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -67,9 +58,6 @@
                 "--log-level=INFO",
                 "../examples/configMapGenerator/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "configMapGenerator",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -80,9 +68,6 @@
                 "--log-level=INFO",
                 "../examples/crds/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "crds",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -93,9 +78,6 @@
                 "--log-level=INFO",
                 "../examples/generatorOptions/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "generatorOptions",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -106,9 +88,6 @@
                 "--log-level=INFO",
                 "../examples/images/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "images",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -119,9 +98,6 @@
                 "--log-level=INFO",
                 "../examples/namePrefix/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "namePrefix",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -132,9 +108,6 @@
                 "--log-level=INFO",
                 "../examples/namespace/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "namespace",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -145,9 +118,6 @@
                 "--log-level=INFO",
                 "../examples/nameSuffix/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "nameSuffix",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -158,9 +128,6 @@
                 "--log-level=INFO",
                 "../examples/openapi/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "openapi",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -171,9 +138,6 @@
                 "--log-level=INFO",
                 "../examples/patches/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "patches",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -184,9 +148,6 @@
                 "--log-level=INFO",
                 "../examples/patchesJson6902/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "patchesJson6902",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -197,9 +158,6 @@
                 "--log-level=INFO",
                 "../examples/patchesStrategicMerge/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "patchesStrategicMerge",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -210,9 +168,6 @@
                 "--log-level=INFO",
                 "../examples/replacements/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "replacements",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -223,9 +178,6 @@
                 "--log-level=INFO",
                 "../examples/replicas/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "replicas",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -236,9 +188,6 @@
                 "--stop-on-error=false",
                 "../examples/resources/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "resources",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -249,9 +198,6 @@
                 "--log-level=INFO",
                 "../examples/secretGenerator/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "secretGenerator",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -262,9 +208,6 @@
                 "--log-level=INFO",
                 "../examples/sortOptions/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "sortOptions",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
@@ -275,9 +218,6 @@
                 "--log-level=INFO",
                 "../examples/vars/helmizer.yaml",
             ],
-            "env": {
-                "PATH": "/home/${env:USER}/.asdf/shims:${env:PATH}"
-            },
             "name": "vars",
             "program": "${workspaceFolder}/src/",
             "request": "launch",

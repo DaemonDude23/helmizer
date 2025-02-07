@@ -1,6 +1,6 @@
 module daemondude23/helmizer/m
 
-go 1.22.0
+go 1.23.4
 
 require (
 	github.com/alexflint/go-arg v1.5.1
@@ -10,5 +10,5 @@ require (
 
 require (
 	github.com/alexflint/go-scalar v1.2.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 )

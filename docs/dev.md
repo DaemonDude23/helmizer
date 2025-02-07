@@ -45,8 +45,8 @@ find . -type f -name helmizer.yaml -exec ./build/test/helmizer '{}' \;
 # Trigger goreleaser
 
 ```bash
-git tag v0.15.0
-git push origin v0.15.0
+git tag v0.16.0
+git push origin v0.16.0
 ```
 
 # Nix
@@ -54,5 +54,5 @@ git push origin v0.15.0
 - Installs some dependencies you can use to run **Helmizer**.
 
 ```bash
-nix-shell ./dev-tools.nix
+nix-shell
 ```

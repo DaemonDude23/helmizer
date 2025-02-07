@@ -1,9 +1,24 @@
 **Changelog**
 
-- [2024](#2024)
+- [2025](#2025)
   - [v0.15.0](#v0150)
+- [2024](#2024)
+  - [v0.15.0](#v0150-1)
 
 ---
+
+# 2025
+
+## [v0.15.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.16.0)
+
+Just a maintenance release with various dependency updates. No code changes.
+
+**Housekeeping**
+
+- Updated Go to 1.23.4.
+  - Updated Go dependencies.
+- Removed old Python changelog.
+- Removed `asdf` environment variables from `launch.json`.
 
 # 2024
 
