@@ -1,22 +1,25 @@
 **Changelog**
 
 - [2025](#2025)
-  - [v0.15.0](#v0150)
+  - [v0.16.0](#v0160)
 - [2024](#2024)
-  - [v0.15.0](#v0150-1)
+  - [v0.15.0](#v0150)
 
 ---
 
 # 2025
 
-## [v0.15.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.16.0)
+## [v0.16.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.16.0)
+
+February 10 2025
 
 Just a maintenance release with various dependency updates. No code changes.
 
 **Housekeeping**
 
-- Updated Go to 1.23.4.
+- Updated Go to `1.23.4`.
   - Updated Go dependencies.
+- Added a Dockerfile, testing with docker, and docs for copying helmizer out of a container.
 - Removed old Python changelog.
 - Removed `asdf` environment variables from `launch.json`.
 

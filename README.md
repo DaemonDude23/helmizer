@@ -2,9 +2,12 @@
 
 - [About](#about)
 - [Usage](#usage)
+  - [CLI](#cli)
 - [Configuration](#configuration)
   - [Installation](#installation)
     - [Linux](#linux)
+    - [Docker](#docker)
+      - [In your Docker Image](#in-your-docker-image)
     - [Windows](#windows)
   - [Run](#run)
   - [Examples](#examples)
@@ -18,7 +21,7 @@
 
 Generates a `kustomization.yaml` file, optionally providing the ability to run commands (e.g. `helm template`) on your OS prior to generating a kustomization, and will compose the kustomization fields that deal with file paths (e.g. `resources`) with glob-like features, as well as pass-through all other kustomization configuration properties. No need to explicitly enumerate every file to be 'kustomized' individually.
 
-Takes a config file as input, telling **Helmizer** if you want to run any commands. Then if you give it one or more directories for `crds`/`components`/`patchesStrategicMerge`/`resources`, it will recursively lookup all of those files and render them into your kustomization.yaml. Want to skip including one file like `templates/secret.yaml`? Just add the relative path to `helmizer.ignore` to `helmizer.yaml`.
+`helmizer` takes a config file as input, telling **Helmizer** if you want to run any commands. Then if you give it one or more directories for `crds`/`components`/`patchesStrategicMerge`/`resources`, it will recursively lookup all of those files and render them into your kustomization.yaml. Want to skip including one file like `templates/secret.yaml`? Just add the relative path to `helmizer.ignore` to `helmizer.yaml`.
 
 ---
 
@@ -31,6 +34,8 @@ Instead of manually entering the paths to [`resources`](https://kubectl.docs.kub
 I began transitioning my `helm` charts to local manifests via [`helm template`](https://helm.sh/docs/helm/helm_template/), which were then applied to the cluster separately via [Kustomize](https://kustomize.io/). I didn't enjoy having to manually manage the relative paths to files in the **kustomization**. I wanted a repeatable process to generate **Kubernetes** manifests from a helm chart, _and_ tack on any patches or related resources later with a single command. Thus, **helmizer**. **But [Helm](https://helm.sh/) is in no way required to make this tool useful** - have it walk your raw manifests as well. This is just a wrapper that allows combining steps, and glob-like behavior, to managing `kustomization.yaml` files.
 
 # Usage
+
+## CLI
 
 ```
 Usage: helmizer [--log-format LOG-FORMAT] [--log-level LOG-LEVEL] [--log-colors] [--api-version API-VERSION] [--dry-run] [--kustomization-path KUSTOMIZATION-PATH] [--quiet-commands] [--quiet-helmizer] [--skip-commands] [--skip-postcommands] [--skip-precommands] [--stop-on-error] CONFIGFILEPATH
@@ -178,11 +183,24 @@ kustomize:  # this is essentially an overlay for your eventual kustomization.yam
 ### Linux
 
 ```bash
-curl -L "https://github.com/DaemonDude23/helmizer/releases/download/v0.15.0/helmizer_0.15.0_linux_amd64.tar.gz" -o helmizer.tar.gz && \
+curl -L "https://github.com/DaemonDude23/helmizer/releases/download/v0.16.0/helmizer_0.16.0_linux_amd64.tar.gz" -o helmizer.tar.gz && \
 tar -xzf helmizer.tar.gz helmizer && \
 sudo mv helmizer /usr/local/bin/ && \
 rm helmizer.tar.gz && \
 sudo chmod +x /usr/local/bin/helmizer
+```
+
+### Docker
+
+#### In your Docker Image
+
+```dockerfile
+# Builder stage
+FROM ghcr.io/DaemonDude23/helmizer:v0.16.0 AS builder
+
+# Final minimal stage
+FROM scratch
+COPY --from=builder /usr/local/bin/helmizer /usr/local/bin/helmizer
 ```
 
 ### Windows

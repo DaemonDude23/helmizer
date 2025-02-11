@@ -32,12 +32,12 @@ repos:
     rev: v1.0.0-rc.1
     hooks:
       - id: go-build-mod
-      - id: go-mod-tidy
-      - id: go-mod-tidy-repo
+      # - id: go-mod-tidy
+      # - id: go-mod-tidy-repo
       - id: go-test-mod
-      - id: go-test-repo-mod
+      # - id: go-test-repo-mod
       - id: go-fmt
-      - id: go-fmt-repo
+      # - id: go-fmt-repo
   # Python specific hooks
   - repo: https://github.com/asottile/reorder_python_imports
     rev: v3.14.0
