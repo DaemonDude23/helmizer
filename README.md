@@ -183,7 +183,7 @@ kustomize:  # this is essentially an overlay for your eventual kustomization.yam
 ### Linux
 
 ```bash
-curl -L "https://github.com/DaemonDude23/helmizer/releases/download/v0.16.0/helmizer_0.16.0_linux_amd64.tar.gz" -o helmizer.tar.gz && \
+curl -L "https://github.com/DaemonDude23/helmizer/releases/download/v0.17.0/helmizer_0.17.0_linux_amd64.tar.gz" -o helmizer.tar.gz && \
 tar -xzf helmizer.tar.gz helmizer && \
 sudo mv helmizer /usr/local/bin/ && \
 rm helmizer.tar.gz && \
@@ -196,7 +196,7 @@ sudo chmod +x /usr/local/bin/helmizer
 
 ```dockerfile
 # Builder stage
-FROM ghcr.io/DaemonDude23/helmizer:v0.16.0 AS builder
+FROM ghcr.io/DaemonDude23/helmizer:v0.17.0 AS builder
 
 # Final minimal stage
 FROM scratch
@@ -206,13 +206,14 @@ COPY --from=builder /usr/local/bin/helmizer /usr/local/bin/helmizer
 ### Windows
 
 1. Download the Windows version.
-2. Untar it and put it in your `$PATH``.
+2. Untar it and put it in your `$PATH`.
 
 ## Run
 
 **For greater detail on running from examples (they assumes you've ran [helm template](https://helm.sh/docs/helm/helm_template/), see the [resource example](examples/resources/README.md))**
 
 Input file:
+
 ```yaml
 helmizer:
   preCommands:
@@ -236,11 +237,13 @@ kustomize:
 ```
 
 Helmize-ify it:
+
 ```bash
 helmizer ./examples/resources/helmizer.yaml
 ```
 
 Output - enumerating the files within the specified directory:
+
 ```yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -289,8 +292,7 @@ The `cert-manager` **Helm** chart is used for examples for its small scope. Here
 
 ---
 
-Which looks easier to write/maintain through future chart updates for the [Prometheus Operator/kube-prometheus-stack](), this helmizer.yaml?
-
+Which looks easier to write/maintain through future chart updates for the **Prometheus Operator/kube-prometheus-stack**, this helmizer.yaml?
 
 ```yaml
 helmizer:

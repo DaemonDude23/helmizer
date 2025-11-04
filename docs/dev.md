@@ -1,6 +1,6 @@
-**Dev Docs**
+# Developer Docs
 
-# Go init
+## Go init
 
 - Install Go dependencies
 
@@ -18,7 +18,7 @@ cd ./src/
 rm -f go.mod ; go mod init daemondude23/helmizer/m ; go mod tidy
 ```
 
-# Build Executable
+## Build Executable
 
 ```bash
 cd ./src/
@@ -26,11 +26,12 @@ go build -o ../build/test/helmizer
 ```
 
 If built on **NixOS**, you can override the interpreter so it'll work on a conventional Linux Distribution:
+
 ```bash
 patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 ../build/test/helmizer
 ```
 
-# Delete All Kustomization Files
+## Delete All Kustomization Files
 
 - Use when test if the file is being created
 
@@ -42,14 +43,14 @@ find . -type f -name kustomization.yaml -exec rm -f '{}' \;
 find . -type f -name helmizer.yaml -exec ./build/test/helmizer '{}' \;
 ```
 
-# Trigger goreleaser
+## Trigger goreleaser
 
 ```bash
-git tag v0.16.0
-git push origin v0.16.0
+git tag v0.17.0
+git push origin v0.17.0
 ```
 
-# Nix
+## Nix
 
 - Installs some dependencies you can use to run **Helmizer**.
 

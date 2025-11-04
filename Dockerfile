@@ -1,5 +1,5 @@
 # Builder stage
-FROM docker.io/library/golang:1.23.4 AS builder
+FROM docker.io/library/golang:1.25.3 AS builder
 WORKDIR /build
 # Copy go mod files and download dependencies
 COPY ./src/go.mod ./src/go.sum ./

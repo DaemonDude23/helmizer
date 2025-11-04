@@ -1,6 +1,7 @@
 **Changelog**
 
 - [2025](#2025)
+  - [v0.17.0](#v0170)
   - [v0.16.0](#v0160)
 - [2024](#2024)
   - [v0.15.0](#v0150)
@@ -8,6 +9,19 @@
 ---
 
 # 2025
+
+## [v0.17.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.17.0)
+
+February 10 2025
+
+Just a maintenance release with various dependency updates. No code changes.
+
+**Housekeeping**
+
+- Updated Go to `1.25.3`.
+  - Updated Go dependencies.
+- Updated Python from `3.12` to `3.13` version and dependencies (just for the diagrams).
+- Updated pre-commit hook versions.
 
 ## [v0.16.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.16.0)
 
