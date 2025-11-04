@@ -12,7 +12,7 @@
 
 ## [v0.17.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.17.0)
 
-February 10 2025
+November 4 2025
 
 Just a maintenance release with various dependency updates. No code changes.
 
