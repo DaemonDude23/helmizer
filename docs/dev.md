@@ -47,6 +47,7 @@ find . -type f -name kustomization.yaml -exec rm -f '{}' \;
 ## Trigger goreleaser
 
 ```bash
+git tag -d v0.18.0
 git fetch --prune --prune-tags
 git tag v0.18.0
 git push origin refs/tags/v0.18.0

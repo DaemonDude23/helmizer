@@ -81,7 +81,7 @@ jobs:
           #   -f Dockerfile.helm \
           #   -t ghcr.io/daemondude23/helmizer/helmizer-helm:${{ github.ref_name }} \
           #   -t ghcr.io/daemondude23/helmizer/helmizer-helm:latest \
-            --push .
+          #   --push .
 
 permissions:
   contents: write
