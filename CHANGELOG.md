@@ -19,7 +19,6 @@ January 20 2025
 **Enhancements**
 
 - Added `buildMetadata`, `helmCharts`, and `labels` support in generated kustomization output, plus examples for each.
-- Added a `Dockerfile.helm` scratch variant bundling `helm` version `v4.0.5`.
 - Added `--config-glob` flag so that you don't need to use other recursive tools like `find`.
 
 **Fixes**
