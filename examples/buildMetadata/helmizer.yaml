@@ -1,0 +1,8 @@
+kustomize:
+  namespace: cert-manager
+  buildMetadata:
+    - originAnnotations
+    - transformerAnnotations
+    - managedByLabel
+  resources:
+    - cert-manager/

@@ -9,9 +9,13 @@ COPY ./src/ ./
 # Build the helmizer binary with CGO disabled for a fully static binary
 RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o helmizer .
 
+# Helm stage
+FROM ghcr.io/helm/helm:v4.0.5 AS helm
+
 # Final stage
 FROM scratch AS final
-# Copy the helmizer binary to a known location
+# Copy the helm binary and helmizer binary to a known location
+COPY --from=helm /usr/bin/helm /usr/local/bin/helm
 COPY --from=builder /build/helmizer /usr/local/bin/helmizer
 # Provide CA certificates for TLS
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt

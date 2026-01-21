@@ -15,7 +15,8 @@ go mod init daemondude23/helmizer/m
 ```bash
 # optionally download deps and update go.sum
 cd ./src/
-rm -f go.mod ; go mod init daemondude23/helmizer/m ; go mod tidy
+go get -u ./...
+go mod tidy
 ```
 
 ## Build Executable
@@ -40,14 +41,14 @@ find . -type f -name kustomization.yaml -exec rm -f '{}' \;
 ```
 
 ```bash
-find . -type f -name helmizer.yaml -exec ./build/test/helmizer '{}' \;
+./build/test/helmizer --config-glob "**/helmizer.yaml"
 ```
 
 ## Trigger goreleaser
 
 ```bash
-git tag v0.17.0
-git push origin v0.17.0
+git tag v0.18.0
+git push origin v0.18.0
 ```
 
 ## Nix

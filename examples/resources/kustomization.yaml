@@ -4,6 +4,7 @@ namespace: cert-manager
 resources:
   - cert-manager/templates/cainjector-deployment.yaml
   - cert-manager/templates/cainjector-rbac.yaml
+  - cert-manager/templates/cainjector-service.yaml
   - cert-manager/templates/cainjector-serviceaccount.yaml
   - cert-manager/templates/deployment.yaml
   - cert-manager/templates/rbac.yaml

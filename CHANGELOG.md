@@ -1,5 +1,7 @@
 **Changelog**
 
+- [2026](#2026)
+  - [v0.18.0](#v0180)
 - [2025](#2025)
   - [v0.17.0](#v0170)
   - [v0.16.0](#v0160)
@@ -7,6 +9,34 @@
   - [v0.15.0](#v0150)
 
 ---
+
+# 2026
+
+## [v0.18.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.18.0)
+
+January 20 2025
+
+**Enhancements**
+
+- Added `buildMetadata`, `helmCharts`, and `labels` support in generated kustomization output, plus examples for each.
+- Added a `Dockerfile.helm` scratch variant bundling `helm` version `v4.0.5`.
+- Added `--config-glob` flag so that you don't need to use other recursive tools like `find`.
+
+**Fixes**
+
+- Fixed `labels` typing and the `kustomizationPath` config key so configs load and render correctly.
+- Added CA certificates to scratch images for TLS support.
+
+**Docs**
+
+- Updated README configuration examples, `docker` usage, and example lists (including `patchesStrategicMerge` paths).
+
+**Housekeeping**
+
+- Updated CI tooling (checkout `v6`), Go versions (Docker builder + CI to `1.25.6`, module `go` to `1.25`), and release CI now publishes the `helmizer-helm` image.
+- Updated pre-commit `mypy` to `v1.19.1` and `diagrams` to `0.25.1`.
+- Added VS Code launch entries for `buildMetadata`, `helmCharts`, and `labels` examples.
+- Updated examples with latest `cert-manager` chart version.
 
 # 2025
 

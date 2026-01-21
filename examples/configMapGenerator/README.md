@@ -17,7 +17,7 @@ helm -n cert-manager template \
   --output-dir . \
   --include-crds \
   --skip-tests \
-  --version 1.14.3 \
+  --version 1.19.2 \
   jetstack/cert-manager
 ```
 

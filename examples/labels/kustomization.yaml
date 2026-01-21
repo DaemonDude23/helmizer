@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: cert-manager
+labels:
+  - pairs:
+      app.kubernetes.io/managed-by: helmizer
+      app.kubernetes.io/part-of: cert-manager
+    includeSelectors: true
+    includeTemplates: true
