@@ -1,0 +1,11 @@
+kustomize:
+  namespace: cert-manager
+  helmCharts:
+    - name: cert-manager
+      repo: https://charts.jetstack.io
+      version: 1.19.2
+      releaseName: cert-manager
+      namespace: cert-manager
+      valuesInline:
+        installCRDs: true
+      includeCRDs: true

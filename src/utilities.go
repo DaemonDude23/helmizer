@@ -3,15 +3,19 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
+	"sort"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v3"
 )
 
 func (CLIArgs) Version() string {
-	return "helmizer 0.17.0"
+	return "helmizer 0.18.0"
 }
 
 // Compares two lists and removes any elements from list2 that are present in list1.
@@ -98,4 +102,203 @@ func ConstructPaths(d string, f string) (string, string) {
 	}
 
 	return absolutePath, relativePath
+}
+
+func ResolveConfigPaths(args CLIArgs) ([]string, error) {
+	var patterns []string
+
+	if strings.TrimSpace(args.ConfigFilePath) != "" {
+		patterns = append(patterns, strings.TrimSpace(args.ConfigFilePath))
+	}
+	patterns = append(patterns, splitConfigPatterns(args.ConfigGlob)...)
+
+	if len(patterns) == 0 {
+		return nil, fmt.Errorf("no Helmizer config file specified; provide a path or --config-glob")
+	}
+
+	var matches []string
+	for _, pattern := range patterns {
+		expanded, err := expandConfigPattern(pattern)
+		if err != nil {
+			return nil, err
+		}
+		if len(expanded) == 0 {
+			log.Warnf("No Helmizer config files matched: %s", pattern)
+			continue
+		}
+		matches = append(matches, expanded...)
+	}
+
+	unique := make(map[string]struct{})
+	var results []string
+	for _, match := range matches {
+		if strings.TrimSpace(match) == "" {
+			continue
+		}
+		abs, err := filepath.Abs(match)
+		if err != nil {
+			return nil, fmt.Errorf("failed to resolve config path %q: %w", match, err)
+		}
+		if _, exists := unique[abs]; exists {
+			continue
+		}
+		unique[abs] = struct{}{}
+		results = append(results, abs)
+	}
+
+	sort.Strings(results)
+	if len(results) == 0 {
+		return nil, fmt.Errorf("no Helmizer config files matched")
+	}
+	return results, nil
+}
+
+func splitConfigPatterns(raw string) []string {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return nil
+	}
+	parts := strings.FieldsFunc(raw, func(r rune) bool {
+		return r == ',' || r == '\n' || r == '\r'
+	})
+	var patterns []string
+	for _, part := range parts {
+		trimmed := strings.TrimSpace(part)
+		if trimmed != "" {
+			patterns = append(patterns, trimmed)
+		}
+	}
+	return patterns
+}
+
+func expandConfigPattern(pattern string) ([]string, error) {
+	pattern = strings.TrimSpace(pattern)
+	if pattern == "" {
+		return nil, nil
+	}
+	if !hasGlobMeta(pattern) {
+		return []string{pattern}, nil
+	}
+	if strings.Contains(pattern, "**") {
+		return matchWithDoublestar(pattern)
+	}
+	matches, err := filepath.Glob(pattern)
+	if err != nil {
+		return nil, err
+	}
+	return filterFileMatches(matches), nil
+}
+
+func hasGlobMeta(pattern string) bool {
+	return strings.ContainsAny(pattern, "*?[")
+}
+
+func filterFileMatches(matches []string) []string {
+	var filtered []string
+	for _, match := range matches {
+		info, err := os.Stat(match)
+		if err != nil {
+			continue
+		}
+		if info.Mode().IsRegular() {
+			filtered = append(filtered, match)
+		}
+	}
+	return filtered
+}
+
+func matchWithDoublestar(pattern string) ([]string, error) {
+	base := globBase(pattern)
+	if _, err := os.Stat(base); err != nil {
+		if os.IsNotExist(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	var matches []string
+	err := filepath.WalkDir(base, func(pathToFile string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+		if matchGlob(pattern, pathToFile) {
+			matches = append(matches, pathToFile)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return filterFileMatches(matches), nil
+}
+
+func globBase(pattern string) string {
+	index := strings.IndexAny(pattern, "*?[")
+	if index == -1 {
+		return filepath.Dir(pattern)
+	}
+	prefix := pattern[:index]
+	if prefix == "" {
+		return "."
+	}
+	base := filepath.Dir(prefix)
+	if base == "." && filepath.IsAbs(pattern) {
+		return string(os.PathSeparator)
+	}
+	return base
+}
+
+func matchGlob(pattern string, target string) bool {
+	pattern = filepath.ToSlash(filepath.Clean(pattern))
+	target = filepath.ToSlash(filepath.Clean(target))
+
+	if filepath.IsAbs(pattern) {
+		absTarget, err := filepath.Abs(target)
+		if err != nil {
+			return false
+		}
+		target = filepath.ToSlash(absTarget)
+	}
+
+	if strings.HasPrefix(pattern, "/") {
+		pattern = strings.TrimPrefix(pattern, "/")
+	}
+	if strings.HasPrefix(target, "/") {
+		target = strings.TrimPrefix(target, "/")
+	}
+
+	patternParts := strings.Split(pattern, "/")
+	targetParts := strings.Split(target, "/")
+	return matchSegments(patternParts, targetParts)
+}
+
+func matchSegments(patternParts []string, targetParts []string) bool {
+	if len(patternParts) == 0 {
+		return len(targetParts) == 0
+	}
+
+	if patternParts[0] == "**" {
+		if matchSegments(patternParts[1:], targetParts) {
+			return true
+		}
+		for i := 0; i < len(targetParts); i++ {
+			if matchSegments(patternParts[1:], targetParts[i+1:]) {
+				return true
+			}
+		}
+		return false
+	}
+
+	if len(targetParts) == 0 {
+		return false
+	}
+
+	matched, err := path.Match(patternParts[0], targetParts[0])
+	if err != nil || !matched {
+		return false
+	}
+	return matchSegments(patternParts[1:], targetParts[1:])
 }

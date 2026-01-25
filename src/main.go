@@ -15,6 +15,23 @@ func main() {
 	arg.MustParse(&args)
 	SetupLogging(args)
 
+	configPaths, err := ResolveConfigPaths(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, configPath := range configPaths {
+		runArgs := args
+		runArgs.ConfigFilePath = configPath
+		if len(configPaths) > 1 {
+			log.Infof("Processing config: %s", configPath)
+		}
+		RunHelmizer(runArgs)
+	}
+	os.Exit(0)
+}
+
+func RunHelmizer(args CLIArgs) {
 	// Read config file and reconcile it with arguments
 	// Arguments override the config file
 	reconciledHelmizerConfig := ReconcileHelmizerConfig(args, ReadYamlFile(args))
@@ -32,12 +49,15 @@ func main() {
 	k.Kind = "Kustomization"
 	k.Namespace = reconciledHelmizerConfig.Kustomize.Namespace
 
+	k.BuildMetadata = reconciledHelmizerConfig.Kustomize.BuildMetadata
 	k.CommonAnnotations = reconciledHelmizerConfig.Kustomize.CommonAnnotations
 	k.CommonLabels = reconciledHelmizerConfig.Kustomize.CommonLabels
 	k.ConfigMapGenerator = reconciledHelmizerConfig.Kustomize.ConfigMapGenerator
 	k.Crds = GetFilesOrURLs("Crds", args.ConfigFilePath, reconciledHelmizerConfig)
 	k.GeneratorOptions = reconciledHelmizerConfig.Kustomize.GeneratorOptions
+	k.HelmCharts = reconciledHelmizerConfig.Kustomize.HelmCharts
 	k.Images = reconciledHelmizerConfig.Kustomize.Images
+	k.Labels = reconciledHelmizerConfig.Kustomize.Labels
 	k.NamePrefix = reconciledHelmizerConfig.Kustomize.NamePrefix
 	k.NameSuffix = reconciledHelmizerConfig.Kustomize.NameSuffix
 	k.OpenAPI = reconciledHelmizerConfig.Kustomize.OpenAPI
@@ -66,5 +86,4 @@ func main() {
 	} else {
 		log.Info("Skipping post-command sequence")
 	}
-	os.Exit(0)
 }

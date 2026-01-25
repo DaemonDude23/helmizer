@@ -6,7 +6,7 @@ releases:
       - global:
           commonLabels:
             dude: helmizer
-    version: 1.14.3
+    version: 1.19.2
 repositories:
   - name: jetstack
     url: https://charts.jetstack.io

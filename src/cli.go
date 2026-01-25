@@ -25,7 +25,8 @@ type CLIArgs struct {
 	SkipPreCommands   bool   `arg:"--skip-precommands" default:"false" help:"Skip executing the pre-command sequence"`
 	StopOnError       bool   `arg:"--stop-on-error" default:"true" help:"Stop execution on first error"`
 
-	ConfigFilePath string `arg:"positional, required" help:"Path to Helmizer config file"`
+	ConfigGlob     string `arg:"--config-glob" help:"Glob pattern(s) for Helmizer config files; supports ** and comma-separated values"`
+	ConfigFilePath string `arg:"positional" help:"Path to Helmizer config file (optional if --config-glob is set)"`
 }
 
 // Checks the CLI arguments and sets up logging

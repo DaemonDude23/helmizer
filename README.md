@@ -38,10 +38,10 @@ I began transitioning my `helm` charts to local manifests via [`helm template`](
 ## CLI
 
 ```
-Usage: helmizer [--log-format LOG-FORMAT] [--log-level LOG-LEVEL] [--log-colors] [--api-version API-VERSION] [--dry-run] [--kustomization-path KUSTOMIZATION-PATH] [--quiet-commands] [--quiet-helmizer] [--skip-commands] [--skip-postcommands] [--skip-precommands] [--stop-on-error] CONFIGFILEPATH
+Usage: helmizer [--log-format LOG-FORMAT] [--log-level LOG-LEVEL] [--log-colors] [--api-version API-VERSION] [--dry-run] [--kustomization-path KUSTOMIZATION-PATH] [--quiet-commands] [--quiet-helmizer] [--skip-commands] [--skip-postcommands] [--skip-precommands] [--stop-on-error] [--config-glob CONFIG-GLOB] [CONFIGFILEPATH]
 
 Positional arguments:
-  CONFIGFILEPATH         Path to Helmizer config file
+  CONFIGFILEPATH         Path to Helmizer config file (optional if --config-glob is set)
 
 Options:
   --log-format LOG-FORMAT
@@ -60,9 +60,19 @@ Options:
   --skip-postcommands    Skip executing the post-command sequence [default: false]
   --skip-precommands     Skip executing the pre-command sequence [default: false]
   --stop-on-error        Stop execution on first error [default: true]
+  --config-glob CONFIG-GLOB
+                         Glob pattern(s) for Helmizer config files; supports ** and comma-separated values
   --help, -h             display this help and exit
   --version              display version and exit
 ```
+
+Run against multiple configs with `--config-glob` instead of shelling out to `find`. Example:
+
+```bash
+helmizer --config-glob "**/helmizer.yaml"
+```
+
+You can also pass comma-separated patterns, for example: `--config-glob "apps/**/helmizer.yaml,clusters/**/helmizer.yaml"`.
 
 ![docs/diagrams/outputs/helmizer.png](docs/diagrams/outputs/helmizer.png)
 
@@ -87,7 +97,7 @@ helmizer:
         - '--include-crds'
         - '--skip-tests'
         - '--version'
-        - 1.14.3
+        - 1.19.2
         - jetstack/cert-manager
   postCommands:
     - command: pre-commit
@@ -97,7 +107,7 @@ helmizer:
         - '||'
         - 'true'
   quietCommands: false
-  skipCommands: false
+  skipAllCommands: false
   skipPostCommands: false
   skipPreCommands: false
 kustomize:
@@ -107,9 +117,9 @@ kustomize:
   crds: []
   generatorOptions: {}
   images: []
-  namePrefix: []
+  namePrefix: ""
   namespace: ""
-  nameSuffix: []
+  nameSuffix: ""
   openapi: {}
   patches: []
   patchesJson6902: []
@@ -128,7 +138,7 @@ kustomize:
 helmizer:
   dryRun: false  # optional - if true, does not write to a filesystem
   ignore: []  # optional - list of files/directories to ignore
-  kustomizationPath: "yaml"  # optional - 'yaml' or 'yml'
+  kustomizationPath: "."  # optional - path to write kustomization.yaml
   preCommands:  # optional - list of commands/args executed serially. Inherits your $PATH
     - command: "helm"
       args:
@@ -141,7 +151,7 @@ helmizer:
         - --include-crds
         - --skip-tests
         - --version
-        - 1.14.3
+        - 1.19.2
         - jetstack/cert-manager
   postCommands:  # optional - list of commands/args executed serially. Inherits your $PATH
     - command: "pre-commit"
@@ -151,20 +161,23 @@ helmizer:
         - '||'
         - 'true'
   quietCommands: false
-  skipCommands: false
+  skipAllCommands: false
   skipPostCommands: false
   skipPreCommands: false
   stopOnError: true
 kustomize:  # this is essentially an overlay for your eventual kustomization.yaml
+  buildMetadata: []
   commonAnnotations: {}
   commonLabels: {}
   configMapGenerator: []
   crds: []
   generatorOptions: {}
+  helmCharts: []
   images: []
-  namePrefix: []
+  labels: []
+  namePrefix: ""
   namespace: ""
-  nameSuffix: []
+  nameSuffix: ""
   openapi: {}
   patches: []
   patchesJson6902: []
@@ -173,6 +186,7 @@ kustomize:  # this is essentially an overlay for your eventual kustomization.yam
   replicas: []
   resources: []
   secretGenerator: []
+  sortOptions: {}
   vars: []
 ```
 
@@ -183,7 +197,7 @@ kustomize:  # this is essentially an overlay for your eventual kustomization.yam
 ### Linux
 
 ```bash
-curl -L "https://github.com/DaemonDude23/helmizer/releases/download/v0.17.0/helmizer_0.17.0_linux_amd64.tar.gz" -o helmizer.tar.gz && \
+curl -L "https://github.com/DaemonDude23/helmizer/releases/download/v0.18.0/helmizer_0.18.0_linux_amd64.tar.gz" -o helmizer.tar.gz && \
 tar -xzf helmizer.tar.gz helmizer && \
 sudo mv helmizer /usr/local/bin/ && \
 rm helmizer.tar.gz && \
@@ -192,14 +206,33 @@ sudo chmod +x /usr/local/bin/helmizer
 
 ### Docker
 
+Two Dockerfiles are available:
+
+- `Dockerfile`: minimal scratch image with just `helmizer`.
+- `Dockerfile.helm`: scratch image with `helmizer` plus the Helm binary copied from `ghcr.io/helm/helm:v4.0.5`.
+
 #### In your Docker Image
+
+Minimal:
 
 ```dockerfile
 # Builder stage
-FROM ghcr.io/DaemonDude23/helmizer:v0.17.0 AS builder
+FROM ghcr.io/daemondude23/helmizer/helmizer:v0.18.0 AS builder
 
 # Final minimal stage
 FROM scratch
+COPY --from=builder /usr/local/bin/helmizer /usr/local/bin/helmizer
+```
+
+With Helm:
+
+```dockerfile
+# Builder stage
+FROM ghcr.io/daemondude23/helmizer/helmizer-helm:v0.18.0 AS builder
+
+# Final minimal stage
+FROM scratch
+COPY --from=builder /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=builder /usr/local/bin/helmizer /usr/local/bin/helmizer
 ```
 
@@ -228,7 +261,7 @@ helmizer:
         - --include-crds
         - --skip-tests
         - --version
-        - 1.14.3
+        - 1.19.2
         - jetstack/cert-manager
 kustomize:
   namespace: cert-manager
@@ -272,22 +305,27 @@ resources:
 _With [vscode](https://code.visualstudio.com/) you can utilize the included [launch.json](.vscode/launch.json) to test these more quickly, or reference for your configuration._
 The `cert-manager` **Helm** chart is used for examples for its small scope. Here's another.
 
+- [buildMetadata](examples/buildMetadata/)
 - [commonAnnotations](examples/commonAnnotations/)
 - [commonLabels](examples/commonLabels/)
 - [configMapGenerator](examples/configMapGenerator/)
 - [crds](examples/crds/)
 - [generatorOptions](examples/generatorOptions/)
+- [helmCharts](examples/helmCharts/)
 - [images](examples/images/)
+- [labels](examples/labels/)
 - [namePrefix](examples/namePrefix/)
 - [namespace](examples/namespace/)
 - [nameSuffix](examples/nameSuffix/)
 - [openapi](examples/openapi/)
 - [patches](examples/patches/)
 - [patchesJson6902](examples/patchesJson6902/)
-- [patchStrategicMerge](examples/patchesStrategicMerge/)
+- [patchesStrategicMerge](examples/patchesStrategicMerge/)
 - [replacements](examples/replacements/)
+- [replicas](examples/replicas/)
 - [resources](examples/resources/)
 - [secretGenerator](examples/secretGenerator/)
+- [sortOptions](examples/sortOptions/)
 - [vars](examples/vars/)
 
 ---
@@ -309,7 +347,7 @@ helmizer:
         - --skip-tests
         - --validate
         - --version
-        - '1.14.3'
+        - '1.19.2'
         - --values
         - 'values.yaml'
         - jetstack/cert-manager

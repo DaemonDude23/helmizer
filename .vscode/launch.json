@@ -36,6 +36,16 @@
         {
             "args": [
                 "--log-level=INFO",
+                "../examples/buildMetadata/helmizer.yaml",
+            ],
+            "name": "buildMetadata",
+            "program": "${workspaceFolder}/src/",
+            "request": "launch",
+            "type": "go"
+        },
+        {
+            "args": [
+                "--log-level=INFO",
                 "../examples/commonAnnotations/helmizer.yaml",
             ],
             "name": "commonAnnotations",
@@ -86,9 +96,29 @@
         {
             "args": [
                 "--log-level=INFO",
+                "../examples/helmCharts/helmizer.yaml",
+            ],
+            "name": "helmCharts",
+            "program": "${workspaceFolder}/src/",
+            "request": "launch",
+            "type": "go"
+        },
+        {
+            "args": [
+                "--log-level=INFO",
                 "../examples/images/helmizer.yaml",
             ],
             "name": "images",
+            "program": "${workspaceFolder}/src/",
+            "request": "launch",
+            "type": "go"
+        },
+        {
+            "args": [
+                "--log-level=INFO",
+                "../examples/labels/helmizer.yaml",
+            ],
+            "name": "labels",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
             "type": "go"

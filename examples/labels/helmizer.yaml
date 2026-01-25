@@ -1,0 +1,10 @@
+kustomize:
+  namespace: cert-manager
+  labels:
+    - pairs:
+        app.kubernetes.io/managed-by: helmizer
+        app.kubernetes.io/part-of: cert-manager
+      includeSelectors: true
+      includeTemplates: true
+  resources:
+    - cert-manager/

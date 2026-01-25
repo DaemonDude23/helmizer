@@ -17,7 +17,7 @@ helm -n cert-manager template \
   --output-dir . \
   --include-crds \
   --skip-tests \
-  --version 1.14.3 \
+  --version 1.19.2 \
   jetstack/cert-manager
 ```
 
@@ -28,11 +28,11 @@ _These assumes you're in the root directory of this repository_
 ## Raw Python
 
 ```bash
-helmizer ./examples/patchStrategicMerge/helmizer.yaml
+helmizer ./examples/patchesStrategicMerge/helmizer.yaml
 ```
 
 # Validate
 
 ```bash
-kubectl kustomize ./examples/patchStrategicMerge/
+kubectl kustomize ./examples/patchesStrategicMerge/
 ```

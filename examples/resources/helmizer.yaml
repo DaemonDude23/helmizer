@@ -13,7 +13,7 @@ helmizer:
         - --include-crds
         - --skip-tests
         - --version
-        - 1.14.3
+        - 1.19.2
         - jetstack/cert-manager
   postCommands:
     - command: echo

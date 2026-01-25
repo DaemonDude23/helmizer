@@ -26,7 +26,7 @@ repos:
       - id: check-ast
   # Go specific hooks
   - repo: https://github.com/tekwizely/pre-commit-golang
-    rev: v1.0.0-rc.2
+    rev: v1.0.0-rc.4
     hooks:
       - id: go-build-mod
       # - id: go-mod-tidy
@@ -42,7 +42,7 @@ repos:
       - id: reorder-python-imports
         args: [--application-directories, '.:src', --py312-plus]
   - repo: https://github.com/psf/black
-    rev: 25.9.0
+    rev: 26.1.0
     hooks:
       - id: black
         language_version: python3.12
@@ -50,7 +50,7 @@ repos:
           - --line-length
           - "140"
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
+    rev: v1.19.1
     hooks:
       - id: mypy
         args:

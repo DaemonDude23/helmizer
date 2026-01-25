@@ -19,6 +19,24 @@ type Config struct {
 	Kustomize Kustomize `yaml:"kustomize"`
 }
 
+type HelmChart struct {
+	Name         string                 `yaml:"name"`
+	Repo         string                 `yaml:"repo,omitempty"`
+	Version      string                 `yaml:"version,omitempty"`
+	ReleaseName  string                 `yaml:"releaseName,omitempty"`
+	Namespace    string                 `yaml:"namespace,omitempty"`
+	ValuesFile   string                 `yaml:"valuesFile,omitempty"`
+	ValuesInline map[string]interface{} `yaml:"valuesInline,omitempty"`
+	ValuesMerge  string                 `yaml:"valuesMerge,omitempty"`
+	IncludeCRDs  bool                   `yaml:"includeCRDs,omitempty"`
+}
+
+type Label struct {
+	Pairs            map[string]string `yaml:"pairs,omitempty"`
+	IncludeSelectors bool              `yaml:"includeSelectors,omitempty"`
+	IncludeTemplates bool              `yaml:"includeTemplates,omitempty"`
+}
+
 // Contains the subset of the Helmizer config file relating to be kustomized
 type Kustomize struct {
 	ApiVersion string `yaml:"apiVersion"`
@@ -31,7 +49,9 @@ type Kustomize struct {
 	ConfigMapGenerator    []interface{}          `yaml:"configMapGenerator"`
 	Crds                  []string               `yaml:"crds"`
 	GeneratorOptions      map[string]interface{} `yaml:"generatorOptions"`
+	HelmCharts            []HelmChart            `yaml:"helmCharts"`
 	Images                []interface{}          `yaml:"images"`
+	Labels                []Label                `yaml:"labels"`
 	NamePrefix            string                 `yaml:"namePrefix"`
 	NameSuffix            string                 `yaml:"nameSuffix"`
 	OpenAPI               map[string]interface{} `yaml:"openapi"`
@@ -58,7 +78,9 @@ type Kustomization struct {
 	ConfigMapGenerator    []interface{}          `yaml:"configMapGenerator,omitempty"`
 	Crds                  []string               `yaml:"crds,omitempty"`
 	GeneratorOptions      map[string]interface{} `yaml:"generatorOptions,omitempty"`
+	HelmCharts            []HelmChart            `yaml:"helmCharts,omitempty"`
 	Images                []interface{}          `yaml:"images,omitempty"`
+	Labels                []Label                `yaml:"labels,omitempty"`
 	NamePrefix            string                 `yaml:"namePrefix,omitempty"`
 	NameSuffix            string                 `yaml:"nameSuffix,omitempty"`
 	OpenAPI               map[string]interface{} `yaml:"openapi,omitempty"`
@@ -94,7 +116,7 @@ type Helmizer struct {
 	ApiVersion        string   `yaml:"apiVersion"`
 	DryRun            bool     `yaml:"dryRun"`
 	Ignore            []string `yaml:"ignore"`
-	KustomizationPath string   `yaml:"KustomizationPath"`
+	KustomizationPath string   `yaml:"kustomizationPath"`
 	QuietCommands     bool     `yaml:"quietCommands"`
 	SkipAllCommands   bool     `yaml:"skipAllCommands"`
 	SkipPostCommands  bool     `yaml:"skipPostCommands"`
