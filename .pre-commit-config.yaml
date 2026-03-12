@@ -42,7 +42,7 @@ repos:
       - id: reorder-python-imports
         args: [--application-directories, '.:src', --py312-plus]
   - repo: https://github.com/psf/black
-    rev: 26.1.0
+    rev: 26.3.1
     hooks:
       - id: black
         language_version: python3.12
