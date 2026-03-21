@@ -10,7 +10,7 @@ COPY ./src/ ./
 RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o helmizer .
 
 # Helm stage
-FROM docker.io/alpine/helm:4.1.0 AS helm
+FROM docker.io/alpine/helm:4.1.3 AS helm
 
 # Final stage
 FROM scratch AS final
