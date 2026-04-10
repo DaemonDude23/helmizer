@@ -15,7 +15,7 @@ import (
 )
 
 func (CLIArgs) Version() string {
-	return "helmizer 0.19.0"
+	return "helmizer 0.19.1"
 }
 
 // Compares two lists and removes any elements from list2 that are present in list1.

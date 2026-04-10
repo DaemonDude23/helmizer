@@ -13,7 +13,7 @@
 
         helmizer = pkgs.buildGoModule {
           pname = "helmizer";
-          version = "0.19.0";
+          version = "0.19.1";
           src = ./src;
           vendorHash = "sha256-8s2Yu22vj+zphtWWebBdSGNpPHzT/Qayu6Sje8yIve8=";
         };

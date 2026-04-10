@@ -48,8 +48,8 @@ find . -type f -name kustomization.yaml -exec rm -f '{}' \;
 
 ```bash
 git fetch --prune --prune-tags
-git tag v0.19.0
-git push origin refs/tags/v0.19.0
+git tag v0.19.1
+git push origin refs/tags/v0.19.1
 ```
 
 ## Nix
