@@ -1,0 +1,18 @@
+name: Helmizer
+description: Run helmizer to generate kustomization.yaml (and run optional pre/post commands such as helm).
+inputs:
+  config:
+    description: Path to helmizer config file, relative to the workspace.
+    required: false
+    default: helmizer.yaml
+  config_glob:
+    description: Glob pattern(s) for helmizer config files (supports ** and commas).
+    required: false
+    default: ""
+runs:
+  using: docker
+  image: Dockerfile.helm
+  args:
+    - --config-glob
+    - ${{ inputs.config_glob }}
+    - ${{ inputs.config }}
