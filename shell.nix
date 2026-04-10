@@ -4,7 +4,7 @@
 
 pkgs.mkShell {
   buildInputs = [
-    pkgs.go_1_25  # this was the latest available version at the time of writing
+    pkgs.go_1_26  # this was the latest available version at the time of writing
     # for diagrams
     pkgs.graphviz
     pkgs.python313

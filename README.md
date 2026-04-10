@@ -11,6 +11,13 @@
     - [Windows](#windows)
   - [Run](#run)
   - [Examples](#examples)
+- [GitHub Action](#github-action)
+  - [Action Inputs](#action-inputs)
+  - [Basic Usage](#basic-usage)
+  - [Automated PR Regeneration with Renovate or Dependabot](#automated-pr-regeneration-with-renovate-or-dependabot)
+- [GitLab CI](#gitlab-ci)
+  - [Basic GitLab Usage](#basic-gitlab-usage)
+  - [Automated MR Regeneration with Renovate](#automated-mr-regeneration-with-renovate)
 - [Kustomize Options](#kustomize-options)
 
 ---
@@ -197,11 +204,35 @@ kustomize:  # this is essentially an overlay for your eventual kustomization.yam
 ### Linux
 
 ```bash
-curl -L "https://github.com/DaemonDude23/helmizer/releases/download/v0.18.0/helmizer_0.18.0_linux_amd64.tar.gz" -o helmizer.tar.gz && \
+curl -L "https://github.com/DaemonDude23/helmizer/releases/download/v0.19.0/helmizer_0.19.0_linux_amd64.tar.gz" -o helmizer.tar.gz && \
 tar -xzf helmizer.tar.gz helmizer && \
 sudo mv helmizer /usr/local/bin/ && \
 rm helmizer.tar.gz && \
 sudo chmod +x /usr/local/bin/helmizer
+```
+
+### Nix / NixOS
+
+Using the included flake:
+
+```bash
+# Run without installing
+nix run github:daemondude23/helmizer -- helmizer.yaml
+
+# Install to your user profile
+nix profile install github:daemondude23/helmizer
+```
+
+To add to a NixOS or home-manager flake configuration:
+
+```nix
+# flake.nix inputs
+inputs.helmizer.url = "github:daemondude23/helmizer";
+
+# In your configuration (NixOS or home-manager)
+environment.systemPackages = [
+  inputs.helmizer.packages.${system}.default
+];
 ```
 
 ### Docker
@@ -209,7 +240,7 @@ sudo chmod +x /usr/local/bin/helmizer
 Two Dockerfiles are available:
 
 - `Dockerfile`: minimal scratch image with just `helmizer`.
-- `Dockerfile.helm`: scratch image with `helmizer` plus the Helm binary copied from `ghcr.io/helm/helm:v4.0.5`.
+- `Dockerfile.helm`: alpine image with `helmizer` plus the Helm binary copied from `docker.io/alpine/helm:4.1.4`.
 
 #### In your Docker Image
 
@@ -217,7 +248,7 @@ Minimal:
 
 ```dockerfile
 # Builder stage
-FROM ghcr.io/daemondude23/helmizer/helmizer:v0.18.0 AS builder
+FROM ghcr.io/daemondude23/helmizer/helmizer:v0.19.0 AS builder
 
 # Final minimal stage
 FROM scratch
@@ -228,7 +259,7 @@ With Helm:
 
 ```dockerfile
 # Builder stage
-FROM ghcr.io/daemondude23/helmizer/helmizer-helm:v0.18.0 AS builder
+FROM ghcr.io/daemondude23/helmizer/helmizer-helm:v0.19.0 AS builder
 
 # Final minimal stage
 FROM scratch
@@ -381,6 +412,300 @@ resources:
   - cert-manager/webhook-serviceaccount.yaml
   - cert-manager/webhook-validating-webhook.yaml
 ```
+
+# GitHub Action
+
+Helmizer is available as a GitHub Action. It uses the `Dockerfile.helm` image, which includes both `helmizer` and `helm`, so pre-commands that call `helm template` work out of the box.
+
+## Action Inputs
+
+| Input         | Required | Default          | Description                                                                          |
+|---------------|----------|------------------|--------------------------------------------------------------------------------------|
+| `config`      | No       | `helmizer.yaml`  | Path to a single helmizer config file, relative to the workspace.                    |
+| `config_glob` | No       | `""`             | Glob pattern(s) for helmizer config files. Supports `**` and comma-separated values. |
+
+When `config_glob` is set, the `config` positional argument is optional — if the default `helmizer.yaml` doesn't exist at the repo root, it is silently skipped.
+
+## Basic Usage
+
+Run helmizer against a single config:
+
+```yaml
+- uses: daemondude23/helmizer@v0.19.0
+  with:
+    config: path/to/helmizer.yaml
+```
+
+Run helmizer against all configs in the repo:
+
+```yaml
+- uses: daemondude23/helmizer@v0.19.0
+  with:
+    config_glob: "**/helmizer.yaml"
+```
+
+## Automated PR Regeneration with Renovate or Dependabot
+
+A common pattern: use [Renovate](https://docs.renovatebot.com/) or [Dependabot](https://docs.github.com/en/code-security/dependabot) to automatically open PRs that bump helm chart versions or container image tags in your `helmizer.yaml` files, then run helmizer as a second step in that PR to regenerate `kustomization.yaml` with the updated versions.
+
+### The Workflow
+
+Add this workflow to your **GitOps/manifests repo** (the repo that contains your `helmizer.yaml` files):
+
+```yaml
+# .github/workflows/helmizer.yaml
+name: Regenerate Kustomizations
+
+on:
+  pull_request:
+    paths:
+      - "**/helmizer.yaml"
+      - "**/values.yaml"
+      - "**/Chart.yaml"
+
+jobs:
+  helmizer:
+    runs-on: ubuntu-latest
+    # Only run on Renovate or Dependabot PRs
+    if: >-
+      github.actor == 'renovate[bot]' ||
+      github.actor == 'dependabot[bot]'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Find affected helmizer configs
+        id: find-configs
+        run: |
+          # Get files changed in this PR
+          changed_files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+
+          # For each changed file, walk up to find the nearest helmizer.yaml
+          configs=""
+          for file in $changed_files; do
+            dir=$(dirname "$file")
+            while [ "$dir" != "." ] && [ "$dir" != "/" ]; do
+              if [ -f "$dir/helmizer.yaml" ]; then
+                configs="$configs $dir/helmizer.yaml"
+                break
+              fi
+              dir=$(dirname "$dir")
+            done
+            # Also check repo root
+            if [ -f "helmizer.yaml" ] && [ "$dir" = "." ]; then
+              configs="$configs helmizer.yaml"
+            fi
+          done
+
+          # Deduplicate
+          configs=$(echo "$configs" | tr ' ' '\n' | sort -u | tr '\n' ',' | sed 's/,$//')
+          echo "configs=$configs" >> "$GITHUB_OUTPUT"
+          echo "Found helmizer configs: $configs"
+
+      - name: Run Helmizer
+        if: steps.find-configs.outputs.configs != ''
+        uses: daemondude23/helmizer@v0.19.0
+        with:
+          config_glob: ${{ steps.find-configs.outputs.configs }}
+
+      # Optional: run pre-commit hooks on regenerated files
+      # Uncomment the following step if your repo uses pre-commit
+      # - name: Run pre-commit hooks
+      #   if: steps.find-configs.outputs.configs != ''
+      #   uses: pre-commit/action@v3.0.1
+
+      - name: Commit regenerated kustomization files
+        if: steps.find-configs.outputs.configs != ''
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A "**/kustomization.yaml"
+          git diff --staged --quiet || git commit -m "chore: regenerate kustomization files"
+          git push
+```
+
+### How It Works
+
+1. **Renovate/Dependabot opens a PR** bumping a helm chart version or container image tag in a `helmizer.yaml` (or `values.yaml`, etc.)
+2. **This workflow triggers** on that PR because a helmizer-related file changed
+3. **The workflow finds the nearest `helmizer.yaml`** by walking up the directory tree from each changed file — only the affected chart directories are processed, not the entire repo
+4. **Helmizer runs** against only those configs — executing pre-commands (e.g. `helm template`) and regenerating `kustomization.yaml` files
+5. **(Optional) Pre-commit hooks run** to lint/format the regenerated files
+6. **The updated kustomization files are committed** back to the PR branch
+
+### Renovate Setup
+
+Renovate can detect version bumps in the `kustomization.yaml` files that helmizer generates (e.g. `helmCharts` versions, `images` tags). When it finds a newer version, it opens a PR updating those fields. The helmizer workflow then re-runs to regenerate the kustomization consistently.
+
+For repos that also use `Chart.yaml` or `values.yaml`, Renovate can detect helm chart versions there too.
+
+Example `.github/renovate.json` for your GitOps repo:
+
+```json
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
+  "docker": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "enabled": true,
+      "managers": ["helm-requirements", "helm-values"],
+      "matchFiles": ["**/Chart.yaml"]
+    },
+    {
+      "enabled": true,
+      "managers": ["kustomize"],
+      "matchFiles": ["**/kustomization.yaml"]
+    }
+  ]
+}
+```
+
+### Dependabot Setup
+
+Dependabot does not natively parse `kustomization.yaml` for helm chart versions, but it can detect Docker image tags in Dockerfiles and GitHub Actions versions. For helm chart version bumps specifically, Renovate is the better choice as it has native support for helm and kustomize version detection.
+
+Example `.github/dependabot.yml`:
+
+```yaml
+version: 2
+updates:
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+```
+
+### Removing the Actor Filter
+
+The example workflow above restricts runs to Renovate and Dependabot PRs via the `if` condition. To run helmizer on _all_ PRs that touch helmizer-related files (including manual PRs), remove the `if` block:
+
+```yaml
+jobs:
+  helmizer:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # ... same steps as above
+```
+
+# GitLab CI
+
+In GitLab, there is no `action.yml` equivalent — instead, use the helmizer Docker image directly in your `.gitlab-ci.yml` pipeline.
+
+## Basic GitLab Usage
+
+```yaml
+# .gitlab-ci.yml
+helmizer:
+  image: ghcr.io/daemondude23/helmizer/helmizer:v0.19.0
+  script:
+    - helmizer --config-glob "**/helmizer.yaml"
+```
+
+If your helmizer configs use `helm template` in pre-commands, use the `helmizer-helm` image which bundles helm:
+
+```yaml
+helmizer:
+  image: ghcr.io/daemondude23/helmizer/helmizer-helm:v0.19.0
+  script:
+    - helmizer --config-glob "**/helmizer.yaml"
+```
+
+## Automated MR Regeneration with Renovate
+
+The same pattern as GitHub — Renovate opens a merge request bumping versions, then a pipeline job runs helmizer and commits the regenerated files back to that MR branch.
+
+### The Pipeline
+
+Add this to your **GitOps/manifests repo**:
+
+```yaml
+# .gitlab-ci.yml
+stages:
+  - regenerate
+
+helmizer:
+  stage: regenerate
+  image: ghcr.io/daemondude23/helmizer/helmizer-helm:v0.19.0
+  rules:
+    # Only run on Renovate MR branches
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^renovate\//
+      changes:
+        - "**/helmizer.yaml"
+        - "**/values.yaml"
+        - "**/Chart.yaml"
+  before_script:
+    - git config user.name "gitlab-ci"
+    - git config user.email "gitlab-ci@${CI_SERVER_HOST}"
+    - git remote set-url origin "https://gitlab-ci-token:${HELMIZER_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+    - git fetch origin "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
+    - git checkout "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
+  script:
+    - |
+      # Find helmizer configs affected by this MR
+      changed_files=$(git diff --name-only "origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}...HEAD")
+      configs=""
+      for file in $changed_files; do
+        dir=$(dirname "$file")
+        while [ "$dir" != "." ] && [ "$dir" != "/" ]; do
+          if [ -f "$dir/helmizer.yaml" ]; then
+            configs="$configs $dir/helmizer.yaml"
+            break
+          fi
+          dir=$(dirname "$dir")
+        done
+        if [ -f "helmizer.yaml" ] && [ "$dir" = "." ]; then
+          configs="$configs helmizer.yaml"
+        fi
+      done
+      configs=$(echo "$configs" | tr ' ' '\n' | sort -u | tr '\n' ',' | sed 's/,$//')
+      echo "Found helmizer configs: $configs"
+      if [ -n "$configs" ]; then
+        helmizer --config-glob "$configs"
+
+        # Optional: run pre-commit hooks on regenerated files
+        # Uncomment the following lines if your repo uses pre-commit
+        # pip install pre-commit
+        # pre-commit run --all-files || true
+
+        git add -A "**/kustomization.yaml"
+        git diff --staged --quiet || git commit -m "chore: regenerate kustomization files"
+        git push origin "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
+      fi
+```
+
+### GitLab Setup Notes
+
+- **`HELMIZER_TOKEN`**: Create a [project or group access token](https://docs.gitlab.com/ee/user/project/settings/project_access_tokens.html) with `write_repository` scope. Add it as a CI/CD variable. The default `CI_JOB_TOKEN` typically cannot push to protected branches.
+- **Branch protection**: Ensure the `renovate/*` branch pattern is not protected, or allow the token to push to it.
+- **Renovate on GitLab**: Renovate supports GitLab natively. You can run it as a [scheduled pipeline](https://docs.renovatebot.com/modules/platform/gitlab/) or use the Mend-hosted Renovate app. The same `renovate.json` config from the [Renovate Setup](#renovate-setup) section works on both GitHub and GitLab.
+
+### Triggering on All MRs
+
+To run on all merge requests (not just Renovate), simplify the rules:
+
+```yaml
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "**/helmizer.yaml"
+        - "**/values.yaml"
+        - "**/Chart.yaml"
+  ```
 
 # Kustomize Options
 

@@ -9,6 +9,7 @@
 
 1. Create a virtual environment:
 ```bash
+rm -rf ./venv/
 python -m venv ./venv/
 ```
 2. Activate the virtual environment:

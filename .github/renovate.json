@@ -69,6 +69,7 @@
   "pre-commit": {
     "enabled": true
   },
+  "automerge": false,
   "rangeStrategy": "replace",
   "timezone": "America/Los_Angeles"
 }

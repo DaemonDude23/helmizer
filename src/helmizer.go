@@ -282,6 +282,7 @@ func RenameHelmizerKeys(filePath string) error {
 	helmizer, ok := config["helmizer"].(map[string]interface{})
 	if !ok {
 		log.Debug("No 'helmizer' key found in the YAML file")
+		return nil
 	}
 
 	// Loop through the Helmizer keys and print logs based on the key names
@@ -337,10 +338,6 @@ func ReconcileHelmizerConfig(args CLIArgs, config Config) Config {
 
 	if args.SkipAllCommands {
 		config.Helmizer.SkipAllCommands = true
-	}
-
-	if args.SkipPostCommands {
-		config.Helmizer.SkipPostCommands = true
 	}
 
 	if args.SkipPostCommands {

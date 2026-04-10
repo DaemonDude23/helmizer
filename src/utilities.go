@@ -15,7 +15,7 @@ import (
 )
 
 func (CLIArgs) Version() string {
-	return "helmizer 0.18.0"
+	return "helmizer 0.19.0"
 }
 
 // Compares two lists and removes any elements from list2 that are present in list1.
@@ -77,7 +77,7 @@ func ReadYamlFile(args CLIArgs) Config {
 	// Marshal the struct into YAML format
 	_, marshallErr := yaml.Marshal(&config)
 	if marshallErr != nil {
-		log.Fatalf("error: %v", err)
+		log.Fatalf("error: %v", marshallErr)
 		os.Exit(1)
 	}
 
@@ -107,8 +107,19 @@ func ConstructPaths(d string, f string) (string, string) {
 func ResolveConfigPaths(args CLIArgs) ([]string, error) {
 	var patterns []string
 
-	if strings.TrimSpace(args.ConfigFilePath) != "" {
-		patterns = append(patterns, strings.TrimSpace(args.ConfigFilePath))
+	hasGlob := strings.TrimSpace(args.ConfigGlob) != ""
+	configPath := strings.TrimSpace(args.ConfigFilePath)
+
+	if configPath != "" {
+		if hasGlob {
+			// When --config-glob is set, the positional arg is optional;
+			// only include it if the file actually exists
+			if _, err := os.Stat(configPath); err == nil {
+				patterns = append(patterns, configPath)
+			}
+		} else {
+			patterns = append(patterns, configPath)
+		}
 	}
 	patterns = append(patterns, splitConfigPatterns(args.ConfigGlob)...)
 

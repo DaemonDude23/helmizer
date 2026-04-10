@@ -61,7 +61,7 @@ func SetupLogging(args CLIArgs) bool {
 	if strings.EqualFold(args.LogFormat, "JSON") {
 		log.SetFormatter(&log.JSONFormatter{})
 		log.Debugf("Log format set to JSON")
-	} else if !strings.EqualFold(args.LogLevel, "TRACE") && !strings.EqualFold(args.LogLevel, "DEBUG") {
+	} else {
 		log.SetFormatter(&log.TextFormatter{ForceColors: args.LogColors, FullTimestamp: false})
 		log.Debugf("Log format set to stylized TextFormatter (default)")
 	}

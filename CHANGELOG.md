@@ -1,6 +1,7 @@
 **Changelog**
 
 - [2026](#2026)
+  - [v0.19.0](#v0190)
   - [v0.18.0](#v0180)
 - [2025](#2025)
   - [v0.17.0](#v0170)
@@ -11,6 +12,25 @@
 ---
 
 # 2026
+
+## v0.19.0
+
+April 9 2026
+
+**Dependencies**
+
+- Go 1.26.2, `golang.org/x/sys` v0.43.0, `alpine/helm` 4.1.4.
+
+**Fixes**
+
+- Fixed duplicate `SkipPostCommands` reconcile block, nil pointer dereference in `RenameHelmizerKeys`, wrong error variable in `ReadYamlFile`, and `TextFormatter` not applied at TRACE/DEBUG log levels.
+
+**Docs/Misc**
+
+- Added Nix flake for installing via `nix profile install` or NixOS configuration.
+- Fixed `Dockerfile.helm` source image reference in README.
+
+---
 
 ## [v0.18.0](https://github.com/DaemonDude23/helmizer/releases/tag/v0.18.0)
 
@@ -32,7 +52,7 @@ January 20 2025
 
 **Housekeeping**
 
-- Updated CI tooling (checkout `v6`), Go versions (Docker builder + CI to `1.25.6`, module `go` to `1.25`), and release CI now publishes the `helmizer-helm` image.
+- Updated CI tooling (checkout `v6`), Go versions (Docker builder + CI to `1.26.1`, module `go` to `1.25`), and release CI now publishes the `helmizer-helm` image.
 - Updated pre-commit `mypy` to `v1.19.1` and `diagrams` to `0.25.1`.
 - Added VS Code launch entries for `buildMetadata`, `helmCharts`, and `labels` examples.
 - Updated examples with latest `cert-manager` chart version.
