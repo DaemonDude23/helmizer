@@ -77,7 +77,7 @@ jobs:
             -t ghcr.io/daemondude23/helmizer/helmizer:${{ github.ref_name }} \
             -t ghcr.io/daemondude23/helmizer/helmizer:latest \
             --push .
-          docker buildx build --platform linux/amd64,linux/arm64,linux/386 \
+          docker buildx build --platform linux/amd64,linux/arm64 \
             -f Dockerfile.helm \
             -t ghcr.io/daemondude23/helmizer/helmizer-helm:${{ github.ref_name }} \
             -t ghcr.io/daemondude23/helmizer/helmizer-helm:latest \
