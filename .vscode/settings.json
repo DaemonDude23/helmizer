@@ -2,4 +2,5 @@
   "go.useLanguageServer": true,
   "go.buildOnSave": "package",
   "go.testOnSave": true,
+  "nixEnvSelector.nixFile": "${workspaceFolder}/shell.nix",
 }

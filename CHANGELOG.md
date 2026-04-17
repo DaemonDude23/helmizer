@@ -1,7 +1,8 @@
 **Changelog**
 
 - [2026](#2026)
-  - [v0.20.0](#v0200)
+  - [v0.19.2](#v0192)
+  - [v0.19.1](#v0191)
   - [v0.19.0](#v0190)
   - [v0.18.0](#v0180)
 - [2025](#2025)
@@ -14,9 +15,30 @@
 
 # 2026
 
-## v0.20.0
+## v0.19.2
 
-***Fixes*
+April 17 2026
+
+**Fixes**
+
+- Made release versioning consistent across `helmizer --version`, GoReleaser archives, Docker images, and the Nix flake by stamping builds with `main.version`.
+- Committed `flake.lock`, updated the flake to build from the repo root with `modRoot = "src"`, and ignored the local Nix `result` symlink.
+
+**Dependencies**
+
+- Kept the module `go` directive aligned with the Go toolchain currently available in `nixpkgs` (`1.26.1`) while CI and Docker release builds stay on `1.26.2`.
+- Verified the direct Go dependencies are already current for this release.
+
+**Docs/Tests**
+
+- Updated README install snippets, container tags, GitHub Action refs, GitLab CI examples, and developer docs for `v0.19.2`.
+- Added tests covering version output and `--config-glob` path resolution behavior.
+
+## v0.19.1
+
+April 9 2026
+
+**Fixes**
 
 - Relaxed go.mod so the Nix Flake would function.
 

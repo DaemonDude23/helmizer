@@ -204,7 +204,7 @@ kustomize:  # this is essentially an overlay for your eventual kustomization.yam
 ### Linux
 
 ```bash
-curl -L "https://github.com/DaemonDude23/helmizer/releases/download/v0.19.1/helmizer_0.19.1_linux_amd64.tar.gz" -o helmizer.tar.gz && \
+curl -L "https://github.com/DaemonDude23/helmizer/releases/download/v0.19.2/helmizer_0.19.2_linux_amd64.tar.gz" -o helmizer.tar.gz && \
 tar -xzf helmizer.tar.gz helmizer && \
 sudo mv helmizer /usr/local/bin/ && \
 rm helmizer.tar.gz && \
@@ -216,11 +216,19 @@ sudo chmod +x /usr/local/bin/helmizer
 Using the included flake:
 
 ```bash
+# Build from the checked-out repo
+mkdir -p ./build/nix
+nix build .#default --out-link ./build/nix/helmizer
+./build/nix/helmizer/bin/helmizer --version
+
 # Run without installing
 nix run github:daemondude23/helmizer -- helmizer.yaml
 
 # Install to your user profile
 nix profile install github:daemondude23/helmizer
+
+# Drop into a dev shell
+nix develop
 ```
 
 To add to a NixOS or home-manager flake configuration:
@@ -248,7 +256,7 @@ Minimal:
 
 ```dockerfile
 # Builder stage
-FROM ghcr.io/daemondude23/helmizer/helmizer:v0.19.1 AS builder
+FROM ghcr.io/daemondude23/helmizer/helmizer:v0.19.2 AS builder
 
 # Final minimal stage
 FROM scratch
@@ -259,7 +267,7 @@ With Helm:
 
 ```dockerfile
 # Builder stage
-FROM ghcr.io/daemondude23/helmizer/helmizer-helm:v0.19.1 AS builder
+FROM ghcr.io/daemondude23/helmizer/helmizer-helm:v0.19.2 AS builder
 
 # Final minimal stage
 FROM scratch
@@ -274,7 +282,7 @@ COPY --from=builder /usr/local/bin/helmizer /usr/local/bin/helmizer
 
 ## Run
 
-**For greater detail on running from examples (they assumes you've ran [helm template](https://helm.sh/docs/helm/helm_template/), see the [resource example](examples/resources/README.md))**
+**For greater detail on running the examples (they assume you've already run [helm template](https://helm.sh/docs/helm/helm_template/)), see the [resource example](examples/resources/README.md)**
 
 Input file:
 
@@ -431,7 +439,7 @@ When `config_glob` is set, the `config` positional argument is optional — if t
 Run helmizer against a single config:
 
 ```yaml
-- uses: daemondude23/helmizer@v0.19.1
+- uses: daemondude23/helmizer@v0.19.2
   with:
     config: path/to/helmizer.yaml
 ```
@@ -439,7 +447,7 @@ Run helmizer against a single config:
 Run helmizer against all configs in the repo:
 
 ```yaml
-- uses: daemondude23/helmizer@v0.19.1
+- uses: daemondude23/helmizer@v0.19.2
   with:
     config_glob: "**/helmizer.yaml"
 ```
@@ -510,7 +518,7 @@ jobs:
 
       - name: Run Helmizer
         if: steps.find-configs.outputs.configs != ''
-        uses: daemondude23/helmizer@v0.19.1
+        uses: daemondude23/helmizer@v0.19.2
         with:
           config_glob: ${{ steps.find-configs.outputs.configs }}
 
@@ -611,7 +619,7 @@ In GitLab, there is no `action.yml` equivalent — instead, use the helmizer Doc
 ```yaml
 # .gitlab-ci.yml
 helmizer:
-  image: ghcr.io/daemondude23/helmizer/helmizer:v0.19.1
+  image: ghcr.io/daemondude23/helmizer/helmizer:v0.19.2
   script:
     - helmizer --config-glob "**/helmizer.yaml"
 ```
@@ -620,7 +628,7 @@ If your helmizer configs use `helm template` in pre-commands, use the `helmizer-
 
 ```yaml
 helmizer:
-  image: ghcr.io/daemondude23/helmizer/helmizer-helm:v0.19.1
+  image: ghcr.io/daemondude23/helmizer/helmizer-helm:v0.19.2
   script:
     - helmizer --config-glob "**/helmizer.yaml"
 ```
@@ -640,7 +648,7 @@ stages:
 
 helmizer:
   stage: regenerate
-  image: ghcr.io/daemondude23/helmizer/helmizer-helm:v0.19.1
+  image: ghcr.io/daemondude23/helmizer/helmizer-helm:v0.19.2
   rules:
     # Only run on Renovate MR branches
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^renovate\//

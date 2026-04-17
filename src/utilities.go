@@ -14,8 +14,12 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
+// version is stamped by release tooling. The source default should match the
+// next local release so ad-hoc builds still report a sensible version.
+var version = "0.19.2"
+
 func (CLIArgs) Version() string {
-	return "helmizer 0.19.1"
+	return "helmizer " + version
 }
 
 // Compares two lists and removes any elements from list2 that are present in list1.

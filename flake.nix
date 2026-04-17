@@ -10,12 +10,27 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
+        version = "0.19.2";
 
         helmizer = pkgs.buildGoModule {
           pname = "helmizer";
-          version = "0.19.1";
-          src = ./src;
+          inherit version;
+          src = ./.;
+          modRoot = "src";
+          subPackages = [ "." ];
           vendorHash = "sha256-8s2Yu22vj+zphtWWebBdSGNpPHzT/Qayu6Sje8yIve8=";
+          ldflags = [
+            "-s"
+            "-w"
+            "-X main.version=${version}"
+          ];
+
+          meta = with pkgs.lib; {
+            description = "Generate kustomization.yaml files with optional pre/post command execution";
+            homepage = "https://github.com/DaemonDude23/helmizer";
+            license = licenses.asl20;
+            mainProgram = "helmizer";
+          };
         };
       in {
         packages.default = helmizer;
@@ -25,7 +40,7 @@
         };
 
         devShells.default = pkgs.mkShell {
-          buildInputs = [ pkgs.go_1_26 pkgs.gopls pkgs.gotools ];
+          packages = [ pkgs.go_1_26 pkgs.gopls pkgs.gotools ];
         };
       });
 }

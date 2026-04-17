@@ -13,10 +13,11 @@ src/                    # All Go source code
   helmizer.go           # Core logic: Config/Kustomization structs, command execution,
                         #   config reconciliation, file walking, kustomization writing
   utilities.go          # Helpers: YAML reading, path construction, glob/doublestar matching,
-                        #   config path resolution
-  go.mod                # Module: daemondude23/helmizer/m, Go 1.25
+                        #   config path resolution, and the source-default version string
+  utilities_test.go     # Basic tests for version output and config-glob resolution
+  go.mod                # Module: daemondude23/helmizer, Go 1.26.1 for Nix compatibility
 Dockerfile              # Minimal scratch image with just helmizer
-Dockerfile.helm         # Scratch image with helmizer + helm binary (from alpine/helm)
+Dockerfile.helm         # Alpine image with helmizer + helm binary (from alpine/helm)
 action.yml              # GitHub Action definition (docker-based, uses Dockerfile.helm)
 .goreleaser.yaml        # Cross-platform release builds (linux/darwin/windows, amd64/arm64/386)
 .github/
@@ -34,11 +35,14 @@ cd src && go build -o helmizer .
 # Run tests
 cd src && go test -v ./...
 
+# Build the flake package
+mkdir -p ./build/nix && nix build .#default --out-link ./build/nix/helmizer
+
 # Docker build (minimal)
-docker build -t helmizer .
+docker build --build-arg VERSION=0.19.2 -t helmizer .
 
 # Docker build (with helm)
-docker build -f Dockerfile.helm -t helmizer-helm .
+docker build --build-arg VERSION=0.19.2 -f Dockerfile.helm -t helmizer-helm .
 ```
 
 ## Key Dependencies
@@ -73,12 +77,12 @@ The `action.yml` defines a Docker-based action using `Dockerfile.helm`. Inputs:
 
 ## Version
 
-Current version: `0.18.0` (hardcoded in utilities.go:18 `Version()` method). Update there + Dockerfiles + README on release.
+Current source version: `0.19.2` in `src/utilities.go`. Release builds stamp `main.version` via the flake, Dockerfiles, and GoReleaser so packaged artifacts stay aligned.
 
 ## Conventions
 
-- No tests exist yet in the source (test step in CI runs `go test ./...` but no `_test.go` files)
-- Version string lives in `src/utilities.go` `Version()` method
+- Keep the `var version = "..."` in `src/utilities.go` aligned with the next local release; packaged builds override it with ldflags
+- There are a few basic `_test.go` files now, but test coverage is still intentionally light
 - Pre-commit hooks configured via `.pre-commit-config.yaml`
 - YAML indentation is normalized to 2 spaces via `FixYAMLIndentation`
 - Commands execute with working directory set to the helmizer config file's parent directory

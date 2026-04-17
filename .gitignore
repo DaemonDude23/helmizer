@@ -3,3 +3,5 @@
 */.go/
 build/
 venv/
+vendor/
+result
