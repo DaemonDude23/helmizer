@@ -3,6 +3,8 @@ builds:
     dir: ./src
     env:
       - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
     goarch:
       - amd64
       - arm64

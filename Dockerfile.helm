@@ -1,5 +1,6 @@
 # Builder stage
 FROM docker.io/library/golang:1.26.2 AS builder
+ARG VERSION=dev
 WORKDIR /build
 # Copy go mod files and download dependencies
 COPY ./src/go.mod ./src/go.sum ./
@@ -7,7 +8,7 @@ RUN go mod download
 # Copy the rest of the source code
 COPY ./src/ ./
 # Build the helmizer binary with CGO disabled for a fully static binary
-RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o helmizer .
+RUN CGO_ENABLED=0 go build -ldflags="-s -w -X main.version=${VERSION}" -o helmizer .
 
 # Helm stage
 FROM docker.io/alpine/helm:4.1.4 AS helm

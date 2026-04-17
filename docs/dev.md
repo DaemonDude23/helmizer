@@ -1,29 +1,42 @@
 # Developer Docs
 
-## Go init
+## Local Environment
 
-- Install Go dependencies
+Use the flake-based dev shell when possible:
+
+```bash
+nix develop
+```
+
+`nix-shell` still works via `shell.nix`, but `nix develop` is the primary path now that the repo ships a locked flake.
+
+## Go Module and Dependency Updates
 
 ```bash
 cd ./src/
-```
 
-```bash
-go mod init daemondude23/helmizer/m
-```
+# See available module updates without fighting the vendor directory
+go list -mod=mod -m -u all
 
-```bash
-# optionally download deps and update go.sum
-cd ./src/
+# Apply updates when needed
 go get -u ./...
 go mod tidy
 ```
 
-## Build Executable
+## Build and Test
 
 ```bash
 cd ./src/
-go build -o ../build/test/helmizer
+go test ./...
+go build -ldflags="-X main.version=0.19.2" -o ../build/test/helmizer .
+```
+
+Build the flake package exactly the way Nix users will consume it:
+
+```bash
+mkdir -p ./build/nix
+nix build .#default --out-link ./build/nix/helmizer
+./build/nix/helmizer/bin/helmizer --version
 ```
 
 If built on **NixOS**, you can override the interpreter so it'll work on a conventional Linux Distribution:
@@ -34,28 +47,30 @@ patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 ../build/test/helmizer
 
 ## Delete All Kustomization Files
 
-- Use when test if the file is being created
+Use this when testing regeneration across the examples:
 
 ```bash
 find . -type f -name kustomization.yaml -exec rm -f '{}' \;
-```
-
-```bash
 ./build/test/helmizer --config-glob "**/helmizer.yaml"
 ```
 
-## Trigger goreleaser
+## Release Flow
+
+Preferred:
 
 ```bash
-git fetch --prune --prune-tags
-git tag v0.19.1
-git push origin refs/tags/v0.19.1
+./scripts/release.sh 0.19.2
 ```
 
-## Nix
-
-- Installs some dependencies you can use to run **Helmizer**.
+Manual:
 
 ```bash
-nix-shell
+go test ./src/...
+mkdir -p ./build/nix
+nix build .#default --out-link ./build/nix/helmizer
+./build/nix/helmizer/bin/helmizer --version
+git fetch --prune --prune-tags
+git tag v0.19.2
+git push origin HEAD
+git push origin refs/tags/v0.19.2
 ```

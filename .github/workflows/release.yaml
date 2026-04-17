@@ -74,11 +74,13 @@ jobs:
       - name: Build and Push Docker Images
         run: |
           docker buildx build --platform linux/amd64,linux/arm64,linux/386 \
+            --build-arg VERSION=${{ github.ref_name }} \
             -t ghcr.io/daemondude23/helmizer/helmizer:${{ github.ref_name }} \
             -t ghcr.io/daemondude23/helmizer/helmizer:latest \
             --push .
           docker buildx build --platform linux/amd64,linux/arm64 \
             -f Dockerfile.helm \
+            --build-arg VERSION=${{ github.ref_name }} \
             -t ghcr.io/daemondude23/helmizer/helmizer-helm:${{ github.ref_name }} \
             -t ghcr.io/daemondude23/helmizer/helmizer-helm:latest \
             --push .
