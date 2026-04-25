@@ -86,3 +86,4 @@ Current source version: `0.19.2` in `src/utilities.go`. Release builds stamp `ma
 - Pre-commit hooks configured via `.pre-commit-config.yaml`
 - YAML indentation is normalized to 2 spaces via `FixYAMLIndentation`
 - Commands execute with working directory set to the helmizer config file's parent directory
+- Release flow is two-step by design: run `./scripts/release.sh prepare <version>` on a release branch, merge it, then run `./scripts/release.sh tag <version>` from `main`

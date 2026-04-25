@@ -6,6 +6,7 @@
 - [Configuration](#configuration)
   - [Installation](#installation)
     - [Linux](#linux)
+    - [Nix / NixOS](#nix--nixos)
     - [Docker](#docker)
       - [In your Docker Image](#in-your-docker-image)
     - [Windows](#windows)
@@ -15,9 +16,17 @@
   - [Action Inputs](#action-inputs)
   - [Basic Usage](#basic-usage)
   - [Automated PR Regeneration with Renovate or Dependabot](#automated-pr-regeneration-with-renovate-or-dependabot)
+    - [The Workflow](#the-workflow)
+    - [How It Works](#how-it-works)
+    - [Renovate Setup](#renovate-setup)
+    - [Dependabot Setup](#dependabot-setup)
+    - [Removing the Actor Filter](#removing-the-actor-filter)
 - [GitLab CI](#gitlab-ci)
   - [Basic GitLab Usage](#basic-gitlab-usage)
   - [Automated MR Regeneration with Renovate](#automated-mr-regeneration-with-renovate)
+    - [The Pipeline](#the-pipeline)
+    - [GitLab Setup Notes](#gitlab-setup-notes)
+    - [Triggering on All MRs](#triggering-on-all-mrs)
 - [Kustomize Options](#kustomize-options)
 
 ---
@@ -225,7 +234,7 @@ nix build .#default --out-link ./build/nix/helmizer
 nix run github:daemondude23/helmizer -- helmizer.yaml
 
 # Install to your user profile
-nix profile install github:daemondude23/helmizer
+nix profile add github:daemondude23/helmizer
 
 # Drop into a dev shell
 nix develop
