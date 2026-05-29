@@ -29,6 +29,26 @@ type CLIArgs struct {
 	ConfigFilePath string `arg:"positional" help:"Path to Helmizer config file (optional if --config-glob is set)"`
 }
 
+// Contains CLI arguments for subcommands. go-arg does not allow positional
+// arguments and subcommands in the same parser, so charts has a separate entry.
+type ChartsCLIArgs struct {
+	Charts *ChartsArgs `arg:"subcommand:charts" help:"Review Helm chart updates from Helmfile state"`
+
+	LogFormat     string `arg:"--log-format" default:"plain" help:"Set log format: plain or JSON"`
+	LogLevel      string `arg:"-l, --log-level" default:"INFO" help:"Set log level: INFO, DEBUG, ERROR, WARNING"`
+	LogColors     bool   `arg:"--log-colors" default:"true" help:"Enables color in the log output"`
+	QuietHelmizer bool   `arg:"--quiet-helmizer" default:"false" help:"Don't output logs"`
+}
+
+func (args ChartsCLIArgs) LoggingArgs() CLIArgs {
+	return CLIArgs{
+		LogFormat:     args.LogFormat,
+		LogLevel:      args.LogLevel,
+		LogColors:     args.LogColors,
+		QuietHelmizer: args.QuietHelmizer,
+	}
+}
+
 // Checks the CLI arguments and sets up logging
 func SetupLogging(args CLIArgs) bool {
 	// Setup logging defaults

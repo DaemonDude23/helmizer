@@ -22,6 +22,14 @@ func (CLIArgs) Version() string {
 	return "helmizer " + version
 }
 
+func (CLIArgs) Epilogue() string {
+	return "Chart update helpers: helmizer charts --help"
+}
+
+func (ChartsCLIArgs) Version() string {
+	return (CLIArgs{}).Version()
+}
+
 // Compares two lists and removes any elements from list2 that are present in list1.
 func CompareAndStrip(ignoreList, finalList []string) []string {
 	var result []string

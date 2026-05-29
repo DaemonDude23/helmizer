@@ -4,12 +4,20 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/alexflint/go-arg"
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
+	if isChartsCommand(os.Args[1:]) {
+		var args ChartsCLIArgs
+		arg.MustParse(&args)
+		SetupLogging(args.LoggingArgs())
+		os.Exit(RunCharts(*args.Charts))
+	}
+
 	// Parse CLI arguments
 	var args CLIArgs
 	arg.MustParse(&args)
@@ -29,6 +37,29 @@ func main() {
 		RunHelmizer(runArgs)
 	}
 	os.Exit(0)
+}
+
+func isChartsCommand(argv []string) bool {
+	for i := 0; i < len(argv); i++ {
+		arg := argv[i]
+		if arg == "--" {
+			return false
+		}
+		if arg == "charts" {
+			return true
+		}
+		if !strings.HasPrefix(arg, "-") {
+			return false
+		}
+		if strings.Contains(arg, "=") {
+			continue
+		}
+		switch arg {
+		case "--log-format", "--log-level", "-l", "--api-version", "--kustomization-path", "--config-glob":
+			i++
+		}
+	}
+	return false
 }
 
 func RunHelmizer(args CLIArgs) {

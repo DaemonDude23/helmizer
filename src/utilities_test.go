@@ -10,6 +10,15 @@ func TestVersionString(t *testing.T) {
 	if got, want := (CLIArgs{}).Version(), "helmizer "+version; got != want {
 		t.Fatalf("Version() = %q, want %q", got, want)
 	}
+	if got, want := (ChartsCLIArgs{}).Version(), "helmizer "+version; got != want {
+		t.Fatalf("ChartsCLIArgs.Version() = %q, want %q", got, want)
+	}
+}
+
+func TestCLIHelpEpilogueMentionsCharts(t *testing.T) {
+	if got, want := (CLIArgs{}).Epilogue(), "Chart update helpers: helmizer charts --help"; got != want {
+		t.Fatalf("Epilogue() = %q, want %q", got, want)
+	}
 }
 
 func TestResolveConfigPathsAllowsMissingDefaultWhenGlobMatches(t *testing.T) {

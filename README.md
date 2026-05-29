@@ -3,6 +3,7 @@
 - [About](#about)
 - [Usage](#usage)
   - [CLI](#cli)
+    - [Helm Chart Update Review](#helm-chart-update-review)
 - [Configuration](#configuration)
   - [Installation](#installation)
     - [Linux](#linux)
@@ -89,6 +90,46 @@ helmizer --config-glob "**/helmizer.yaml"
 ```
 
 You can also pass comma-separated patterns, for example: `--config-glob "apps/**/helmizer.yaml,clusters/**/helmizer.yaml"`.
+
+### Helm Chart Update Review
+
+`helmizer charts` helps review Helm chart updates when a Helmfile already contains the chart repository, release name, and pinned version. It starts from `helmfile build`, so templated Helmfile state is evaluated before chart metadata is read.
+
+Check chart versions for one config:
+
+```bash
+helmizer charts check apps/cert-manager/helmizer.yaml
+```
+
+Check chart versions across multiple configs:
+
+```bash
+helmizer charts check --config-glob "apps/**/helmizer.yaml"
+```
+
+The `check` table includes a simple update risk score: major chart version changes are high risk, minor changes are medium risk, and patch changes are low risk. Use `--output json` or `--output yaml` if you want those fields in automation.
+
+Diff default chart values for a release against the latest allowed version:
+
+```bash
+helmizer charts diff --kind values --release cert-manager apps/cert-manager/helmizer.yaml
+```
+
+By default, values diffs are shown as changed YAML value paths, which filters out comments and most formatting churn. The path view groups changes by risk so security, networking, storage, scheduling, resource, replica, and runtime settings appear first; metadata-only changes are marked low risk. Use `--values-mode text` to see a raw unified diff of the chart values files.
+
+```bash
+helmizer charts diff --kind values --values-mode text --release cert-manager apps/cert-manager/helmizer.yaml
+```
+
+Interactively review new or changed chart value clauses and accept them into a local values file:
+
+```bash
+helmizer charts review --release cert-manager --values-file values.yaml apps/cert-manager/helmizer.yaml
+```
+
+The review screen shows the current local file value on the left, the target chart value on the right, a risk note for the value path, and an inline diff of the actual values file if that change is accepted. Higher-risk candidates are shown first. Use `a` to accept, `d` or enter to discard, and `q` to stop. If the Helmfile release has exactly one file entry in `values:`, `--values-file` can be omitted.
+
+The first implementation supports HTTP(S) chart repositories referenced by Helmfile repository aliases, for example `jetstack/cert-manager`. OCI charts, direct chart URLs, and local chart paths are skipped for now.
 
 ![docs/diagrams/outputs/helmizer.png](docs/diagrams/outputs/helmizer.png)
 

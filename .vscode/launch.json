@@ -6,252 +6,572 @@
             "name": "Diagrams",
             "program": "${workspaceFolder}/docs/diagrams/main.py",
             "request": "launch",
-            "type": "debugpy"
+            "type": "debugpy",
+            "presentation": {
+                "group": "1-meta",
+                "order": 1
+            }
         },
         {
             "args": [
                 "--help",
             ],
-            "name": "Help",
+            "name": "helmizer: --help",
             "type": "go",
             "request": "launch",
-            "program": "${workspaceFolder}/src/"
+            "program": "${workspaceFolder}/src/",
+            "presentation": {
+                "group": "1-meta",
+                "order": 2
+            }
         },
         {
             "args": [
                 "--version",
             ],
-            "name": "Version",
+            "name": "helmizer: --version",
             "type": "go",
             "request": "launch",
-            "program": "${workspaceFolder}/src/"
+            "program": "${workspaceFolder}/src/",
+            "presentation": {
+                "group": "1-meta",
+                "order": 3
+            }
         },
         {
             "mode": "test",
-            "name": "Run tests",
+            "name": "helmizer: go test ./...",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "1-meta",
+                "order": 4
+            }
+        },
+        {
+            "args": [
+                "charts",
+                "--help",
+            ],
+            "name": "charts: --help",
+            "type": "go",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/",
+            "cwd": "${workspaceFolder}/src/",
+            "env": {
+                "CGO_ENABLED": "0"
+            },
+            "presentation": {
+                "group": "2-charts",
+                "order": 1
+            }
+        },
+        {
+            "args": [
+                "charts",
+                "check",
+                "../examples/commonLabels/helmizer.yaml",
+            ],
+            "name": "charts check (default policy)",
+            "type": "go",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/",
+            "cwd": "${workspaceFolder}/src/",
+            "console": "integratedTerminal",
+            "env": {
+                "CGO_ENABLED": "0"
+            },
+            "presentation": {
+                "group": "2-charts",
+                "order": 2
+            }
+        },
+        {
+            "args": [
+                "charts",
+                "check",
+                "--policy",
+                "all",
+                "--output",
+                "yaml",
+                "../examples/commonLabels/helmizer.yaml",
+            ],
+            "name": "charts check (--policy all, yaml)",
+            "type": "go",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/",
+            "cwd": "${workspaceFolder}/src/",
+            "console": "integratedTerminal",
+            "env": {
+                "CGO_ENABLED": "0"
+            },
+            "presentation": {
+                "group": "2-charts",
+                "order": 3
+            }
+        },
+        {
+            "args": [
+                "charts",
+                "diff",
+                "--kind",
+                "values",
+                "--release",
+                "cert-manager",
+                "../examples/commonLabels/helmizer.yaml",
+            ],
+            "cwd": "${workspaceFolder}/src/",
+            "console": "integratedTerminal",
+            "env": {
+                "CGO_ENABLED": "0"
+            },
+            "name": "charts diff (values, paths)",
+            "program": "${workspaceFolder}/src/",
+            "request": "launch",
+            "type": "go",
+            "presentation": {
+                "group": "2-charts",
+                "order": 4
+            }
+        },
+        {
+            "args": [
+                "charts",
+                "diff",
+                "--kind",
+                "values",
+                "--values-mode",
+                "text",
+                "--release",
+                "cert-manager",
+                "../examples/commonLabels/helmizer.yaml",
+            ],
+            "cwd": "${workspaceFolder}/src/",
+            "console": "integratedTerminal",
+            "env": {
+                "CGO_ENABLED": "0"
+            },
+            "name": "charts diff (values, text)",
+            "program": "${workspaceFolder}/src/",
+            "request": "launch",
+            "type": "go",
+            "presentation": {
+                "group": "2-charts",
+                "order": 5
+            }
+        },
+        {
+            "args": [
+                "charts",
+                "diff",
+                "--kind",
+                "manifests",
+                "--release",
+                "cert-manager",
+                "../examples/commonLabels/helmizer.yaml",
+            ],
+            "cwd": "${workspaceFolder}/src/",
+            "console": "integratedTerminal",
+            "env": {
+                "CGO_ENABLED": "0"
+            },
+            "name": "charts diff (manifests)",
+            "program": "${workspaceFolder}/src/",
+            "request": "launch",
+            "type": "go",
+            "presentation": {
+                "group": "2-charts",
+                "order": 6
+            }
+        },
+        {
+            "args": [
+                "charts",
+                "review",
+                "--dry-run",
+                "--values-file",
+                "helmizer.yaml",
+                "--release",
+                "cert-manager",
+                "../examples/commonLabels/helmizer.yaml",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/src/",
+            "env": {
+                "CGO_ENABLED": "0"
+            },
+            "name": "charts review (dry-run, no debug, TUI works)",
+            "program": "${workspaceFolder}/src/",
+            "request": "launch",
+            "type": "go",
+            "noDebug": true,
+            "presentation": {
+                "group": "2-charts",
+                "order": 7
+            }
+        },
+        {
+            "args": [
+                "charts",
+                "review",
+                "--values-file",
+                "helmizer.yaml",
+                "--release",
+                "cert-manager",
+                "../examples/commonLabels/helmizer.yaml",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/src/",
+            "env": {
+                "CGO_ENABLED": "0"
+            },
+            "name": "charts review (writes file, no debug, TUI works)",
+            "program": "${workspaceFolder}/src/",
+            "request": "launch",
+            "type": "go",
+            "noDebug": true,
+            "presentation": {
+                "group": "2-charts",
+                "order": 8
+            }
+        },
+        {
+            "args": [
+                "charts",
+                "diff",
+                "--kind",
+                "values",
+                "--release",
+                "cert-manager",
+                "../examples/commonLabels/helmizer.yaml",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/src/",
+            "env": {
+                "CGO_ENABLED": "0"
+            },
+            "name": "charts: values diff",
+            "program": "${workspaceFolder}/src/",
+            "request": "launch",
+            "type": "go",
+            "presentation": {
+                "group": "9-debug",
+                "order": 1,
+                "hidden": true
+            }
+        },
+        {
+            "args": [
+                "charts",
+                "review",
+                "--dry-run",
+                "--values-file",
+                "helmizer.yaml",
+                "--release",
+                "cert-manager",
+                "../examples/commonLabels/helmizer.yaml",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/src/",
+            "env": {
+                "CGO_ENABLED": "0"
+            },
+            "name": "charts: review values dry-run",
+            "program": "${workspaceFolder}/src/",
+            "request": "launch",
+            "type": "go",
+            "presentation": {
+                "group": "9-debug",
+                "order": 2,
+                "hidden": true
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/buildMetadata/helmizer.yaml",
             ],
-            "name": "buildMetadata",
+            "name": "example: buildMetadata",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/commonAnnotations/helmizer.yaml",
             ],
-            "name": "commonAnnotations",
+            "name": "example: commonAnnotations",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/commonLabels/helmizer.yaml",
             ],
-            "name": "commonLabels",
+            "name": "example: commonLabels",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/configMapGenerator/helmizer.yaml",
             ],
-            "name": "configMapGenerator",
+            "name": "example: configMapGenerator",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/crds/helmizer.yaml",
             ],
-            "name": "crds",
+            "name": "example: crds",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/generatorOptions/helmizer.yaml",
             ],
-            "name": "generatorOptions",
+            "name": "example: generatorOptions",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/helmCharts/helmizer.yaml",
             ],
-            "name": "helmCharts",
+            "name": "example: helmCharts",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/images/helmizer.yaml",
             ],
-            "name": "images",
+            "name": "example: images",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/labels/helmizer.yaml",
             ],
-            "name": "labels",
+            "name": "example: labels",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/namePrefix/helmizer.yaml",
             ],
-            "name": "namePrefix",
+            "name": "example: namePrefix",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/namespace/helmizer.yaml",
             ],
-            "name": "namespace",
+            "name": "example: namespace",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/nameSuffix/helmizer.yaml",
             ],
-            "name": "nameSuffix",
+            "name": "example: nameSuffix",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/openapi/helmizer.yaml",
             ],
-            "name": "openapi",
+            "name": "example: openapi",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/patches/helmizer.yaml",
             ],
-            "name": "patches",
+            "name": "example: patches",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/patchesJson6902/helmizer.yaml",
             ],
-            "name": "patchesJson6902",
+            "name": "example: patchesJson6902",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/patchesStrategicMerge/helmizer.yaml",
             ],
-            "name": "patchesStrategicMerge",
+            "name": "example: patchesStrategicMerge",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/replacements/helmizer.yaml",
             ],
-            "name": "replacements",
+            "name": "example: replacements",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/replicas/helmizer.yaml",
             ],
-            "name": "replicas",
+            "name": "example: replicas",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--stop-on-error=false",
                 "../examples/resources/helmizer.yaml",
             ],
-            "name": "resources",
+            "name": "example: resources",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/secretGenerator/helmizer.yaml",
             ],
-            "name": "secretGenerator",
+            "name": "example: secretGenerator",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/sortOptions/helmizer.yaml",
             ],
-            "name": "sortOptions",
+            "name": "example: sortOptions",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
         {
             "args": [
                 "--log-level=INFO",
                 "../examples/vars/helmizer.yaml",
             ],
-            "name": "vars",
+            "name": "example: vars",
             "program": "${workspaceFolder}/src/",
             "request": "launch",
-            "type": "go"
+            "type": "go",
+            "presentation": {
+                "group": "3-examples"
+            }
         },
     ],
     "version": "0.2.0"

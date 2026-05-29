@@ -1,0 +1,143 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "charts: --help",
+            "type": "shell",
+            "command": "go run . charts --help",
+            "options": {
+                "cwd": "${workspaceFolder}/src",
+                "env": {
+                    "CGO_ENABLED": "0"
+                }
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "charts check (default policy)",
+            "type": "shell",
+            "command": "go run . charts check ../examples/commonLabels/helmizer.yaml",
+            "options": {
+                "cwd": "${workspaceFolder}/src",
+                "env": {
+                    "CGO_ENABLED": "0"
+                }
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "charts check (--policy all, yaml)",
+            "type": "shell",
+            "command": "go run . charts check --policy all --output yaml ../examples/commonLabels/helmizer.yaml",
+            "options": {
+                "cwd": "${workspaceFolder}/src",
+                "env": {
+                    "CGO_ENABLED": "0"
+                }
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "charts diff (values, paths)",
+            "type": "shell",
+            "command": "go run . charts diff --kind values --release cert-manager ../examples/commonLabels/helmizer.yaml",
+            "options": {
+                "cwd": "${workspaceFolder}/src",
+                "env": {
+                    "CGO_ENABLED": "0"
+                }
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "charts diff (values, text)",
+            "type": "shell",
+            "command": "go run . charts diff --kind values --values-mode text --release cert-manager ../examples/commonLabels/helmizer.yaml",
+            "options": {
+                "cwd": "${workspaceFolder}/src",
+                "env": {
+                    "CGO_ENABLED": "0"
+                }
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "charts diff (manifests)",
+            "type": "shell",
+            "command": "go run . charts diff --kind manifests --release cert-manager ../examples/commonLabels/helmizer.yaml",
+            "options": {
+                "cwd": "${workspaceFolder}/src",
+                "env": {
+                    "CGO_ENABLED": "0"
+                }
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "charts review (dry-run, TUI)",
+            "type": "shell",
+            "command": "go run . charts review --dry-run --values-file helmizer.yaml --release cert-manager ../examples/commonLabels/helmizer.yaml",
+            "options": {
+                "cwd": "${workspaceFolder}/src",
+                "env": {
+                    "CGO_ENABLED": "0"
+                }
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true,
+                "focus": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "charts review (writes file, TUI)",
+            "type": "shell",
+            "command": "go run . charts review --values-file helmizer.yaml --release cert-manager ../examples/commonLabels/helmizer.yaml",
+            "options": {
+                "cwd": "${workspaceFolder}/src",
+                "env": {
+                    "CGO_ENABLED": "0"
+                }
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true,
+                "focus": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}
