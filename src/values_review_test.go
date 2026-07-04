@@ -17,7 +17,7 @@ func TestResolveReleaseValuesFileInfersSingleFile(t *testing.T) {
 
 	got, err := ResolveReleaseValuesFile(HelmfileRelease{
 		Name:   "demo",
-		Values: []interface{}{"values.yaml"},
+		Values: []any{"values.yaml"},
 	}, tmpDir, "")
 	if err != nil {
 		t.Fatalf("ResolveReleaseValuesFile() error = %v", err)
@@ -30,8 +30,8 @@ func TestResolveReleaseValuesFileInfersSingleFile(t *testing.T) {
 func TestResolveReleaseValuesFileRequiresOverrideForInlineValues(t *testing.T) {
 	_, err := ResolveReleaseValuesFile(HelmfileRelease{
 		Name: "demo",
-		Values: []interface{}{
-			map[string]interface{}{"replicas": 1},
+		Values: []any{
+			map[string]any{"replicas": 1},
 		},
 	}, t.TempDir(), "")
 	if err == nil || !strings.Contains(err.Error(), "pass --values-file") {

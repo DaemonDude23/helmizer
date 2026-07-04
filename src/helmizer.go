@@ -20,15 +20,15 @@ type Config struct {
 }
 
 type HelmChart struct {
-	Name         string                 `yaml:"name"`
-	Repo         string                 `yaml:"repo,omitempty"`
-	Version      string                 `yaml:"version,omitempty"`
-	ReleaseName  string                 `yaml:"releaseName,omitempty"`
-	Namespace    string                 `yaml:"namespace,omitempty"`
-	ValuesFile   string                 `yaml:"valuesFile,omitempty"`
-	ValuesInline map[string]interface{} `yaml:"valuesInline,omitempty"`
-	ValuesMerge  string                 `yaml:"valuesMerge,omitempty"`
-	IncludeCRDs  bool                   `yaml:"includeCRDs,omitempty"`
+	Name         string         `yaml:"name"`
+	Repo         string         `yaml:"repo,omitempty"`
+	Version      string         `yaml:"version,omitempty"`
+	ReleaseName  string         `yaml:"releaseName,omitempty"`
+	Namespace    string         `yaml:"namespace,omitempty"`
+	ValuesFile   string         `yaml:"valuesFile,omitempty"`
+	ValuesInline map[string]any `yaml:"valuesInline,omitempty"`
+	ValuesMerge  string         `yaml:"valuesMerge,omitempty"`
+	IncludeCRDs  bool           `yaml:"includeCRDs,omitempty"`
 }
 
 type Label struct {
@@ -43,27 +43,27 @@ type Kustomize struct {
 	Kind       string `yaml:"kind"`
 	Namespace  string `yaml:"namespace"`
 
-	BuildMetadata         []string               `yaml:"buildMetadata"`
-	CommonAnnotations     map[string]string      `yaml:"commonAnnotations"`
-	CommonLabels          map[string]string      `yaml:"commonLabels"`
-	ConfigMapGenerator    []interface{}          `yaml:"configMapGenerator"`
-	Crds                  []string               `yaml:"crds"`
-	GeneratorOptions      map[string]interface{} `yaml:"generatorOptions"`
-	HelmCharts            []HelmChart            `yaml:"helmCharts"`
-	Images                []interface{}          `yaml:"images"`
-	Labels                []Label                `yaml:"labels"`
-	NamePrefix            string                 `yaml:"namePrefix"`
-	NameSuffix            string                 `yaml:"nameSuffix"`
-	OpenAPI               map[string]interface{} `yaml:"openapi"`
-	Patches               []interface{}          `yaml:"patches"`
-	PatchesJson6902       []interface{}          `yaml:"patchesJson6902"`
-	PatchesStrategicMerge []string               `yaml:"patchesStrategicMerge"`
-	Replacements          []interface{}          `yaml:"replacements"`
-	Replicas              []interface{}          `yaml:"replicas"`
-	Resources             []string               `yaml:"resources"`
-	SecretGenerator       []interface{}          `yaml:"secretGenerator"`
-	SortOptions           map[string]interface{} `yaml:"sortOptions"`
-	Vars                  []interface{}          `yaml:"vars"`
+	BuildMetadata         []string          `yaml:"buildMetadata"`
+	CommonAnnotations     map[string]string `yaml:"commonAnnotations"`
+	CommonLabels          map[string]string `yaml:"commonLabels"`
+	ConfigMapGenerator    []any             `yaml:"configMapGenerator"`
+	Crds                  []string          `yaml:"crds"`
+	GeneratorOptions      map[string]any    `yaml:"generatorOptions"`
+	HelmCharts            []HelmChart       `yaml:"helmCharts"`
+	Images                []any             `yaml:"images"`
+	Labels                []Label           `yaml:"labels"`
+	NamePrefix            string            `yaml:"namePrefix"`
+	NameSuffix            string            `yaml:"nameSuffix"`
+	OpenAPI               map[string]any    `yaml:"openapi"`
+	Patches               []any             `yaml:"patches"`
+	PatchesJson6902       []any             `yaml:"patchesJson6902"`
+	PatchesStrategicMerge []string          `yaml:"patchesStrategicMerge"`
+	Replacements          []any             `yaml:"replacements"`
+	Replicas              []any             `yaml:"replicas"`
+	Resources             []string          `yaml:"resources"`
+	SecretGenerator       []any             `yaml:"secretGenerator"`
+	SortOptions           map[string]any    `yaml:"sortOptions"`
+	Vars                  []any             `yaml:"vars"`
 }
 
 // Contains the final data structure that will be marshalled to YAML for the kustomization.yaml file
@@ -72,27 +72,27 @@ type Kustomization struct {
 	Kind       string `yaml:"kind"`
 	Namespace  string `yaml:"namespace,omitempty"`
 
-	BuildMetadata         []string               `yaml:"buildMetadata,omitempty"`
-	CommonAnnotations     map[string]string      `yaml:"commonAnnotations,omitempty"`
-	CommonLabels          map[string]string      `yaml:"commonLabels,omitempty"`
-	ConfigMapGenerator    []interface{}          `yaml:"configMapGenerator,omitempty"`
-	Crds                  []string               `yaml:"crds,omitempty"`
-	GeneratorOptions      map[string]interface{} `yaml:"generatorOptions,omitempty"`
-	HelmCharts            []HelmChart            `yaml:"helmCharts,omitempty"`
-	Images                []interface{}          `yaml:"images,omitempty"`
-	Labels                []Label                `yaml:"labels,omitempty"`
-	NamePrefix            string                 `yaml:"namePrefix,omitempty"`
-	NameSuffix            string                 `yaml:"nameSuffix,omitempty"`
-	OpenAPI               map[string]interface{} `yaml:"openapi,omitempty"`
-	Patches               []interface{}          `yaml:"patches,omitempty"`
-	PatchesJson6902       []interface{}          `yaml:"patchesJson6902,omitempty"`
-	PatchesStrategicMerge []string               `yaml:"patchesStrategicMerge,omitempty"`
-	Replacements          []interface{}          `yaml:"replacements,omitempty"`
-	Replicas              []interface{}          `yaml:"replicas,omitempty"`
-	Resources             []string               `yaml:"resources,omitempty"`
-	SecretGenerator       []interface{}          `yaml:"secretGenerator,omitempty"`
-	SortOptions           map[string]interface{} `yaml:"sortOptions,omitempty"`
-	Vars                  []interface{}          `yaml:"vars,omitempty"`
+	BuildMetadata         []string          `yaml:"buildMetadata,omitempty"`
+	CommonAnnotations     map[string]string `yaml:"commonAnnotations,omitempty"`
+	CommonLabels          map[string]string `yaml:"commonLabels,omitempty"`
+	ConfigMapGenerator    []any             `yaml:"configMapGenerator,omitempty"`
+	Crds                  []string          `yaml:"crds,omitempty"`
+	GeneratorOptions      map[string]any    `yaml:"generatorOptions,omitempty"`
+	HelmCharts            []HelmChart       `yaml:"helmCharts,omitempty"`
+	Images                []any             `yaml:"images,omitempty"`
+	Labels                []Label           `yaml:"labels,omitempty"`
+	NamePrefix            string            `yaml:"namePrefix,omitempty"`
+	NameSuffix            string            `yaml:"nameSuffix,omitempty"`
+	OpenAPI               map[string]any    `yaml:"openapi,omitempty"`
+	Patches               []any             `yaml:"patches,omitempty"`
+	PatchesJson6902       []any             `yaml:"patchesJson6902,omitempty"`
+	PatchesStrategicMerge []string          `yaml:"patchesStrategicMerge,omitempty"`
+	Replacements          []any             `yaml:"replacements,omitempty"`
+	Replicas              []any             `yaml:"replicas,omitempty"`
+	Resources             []string          `yaml:"resources,omitempty"`
+	SecretGenerator       []any             `yaml:"secretGenerator,omitempty"`
+	SortOptions           map[string]any    `yaml:"sortOptions,omitempty"`
+	Vars                  []any             `yaml:"vars,omitempty"`
 }
 
 // Contains the subset of the Helmizer config file relating to either command sequence
@@ -271,7 +271,7 @@ func RenameHelmizerKeys(filePath string) error {
 	}
 
 	// Unmarshal the YAML data into a map
-	var config map[string]interface{}
+	var config map[string]any
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
 		log.Error(err)
@@ -279,7 +279,7 @@ func RenameHelmizerKeys(filePath string) error {
 	}
 
 	// Get the Helmizer keys
-	helmizer, ok := config["helmizer"].(map[string]interface{})
+	helmizer, ok := config["helmizer"].(map[string]any)
 	if !ok {
 		log.Debug("No 'helmizer' key found in the YAML file")
 		return nil

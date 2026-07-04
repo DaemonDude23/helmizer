@@ -449,10 +449,7 @@ func currentLocalNode(candidate ValuesReviewCandidate, currentData []byte) *yaml
 func formatSideBySide(left string, right string, width int) string {
 	leftLines := strings.Split(strings.TrimRight(left, "\n"), "\n")
 	rightLines := strings.Split(strings.TrimRight(right, "\n"), "\n")
-	maxLines := len(leftLines)
-	if len(rightLines) > maxLines {
-		maxLines = len(rightLines)
-	}
+	maxLines := max(len(rightLines), len(leftLines))
 	var out strings.Builder
 	for i := 0; i < maxLines; i++ {
 		leftLine := ""
@@ -566,18 +563,12 @@ func renderValuesReviewScreen(session *valuesReviewSession, rows int, cols int) 
 	if cols < 80 {
 		cols = 80
 	}
-	listWidth := cols / 3
-	if listWidth < 26 {
-		listWidth = 26
-	}
+	listWidth := max(cols/3, 26)
 	if listWidth > 46 {
 		listWidth = 46
 	}
 	bodyRows := rows - 2
-	rightWidth := cols - listWidth - 3
-	if rightWidth < 30 {
-		rightWidth = 30
-	}
+	rightWidth := max(cols-listWidth-3, 30)
 
 	header := fmt.Sprintf(" Helmizer Values Review  %s  %s -> %s  accepted:%d/%d ",
 		session.options.ReleaseName,
@@ -601,7 +592,7 @@ func renderValuesReviewScreen(session *valuesReviewSession, rows int, cols int) 
 	out.WriteString(inverseLine(header, cols))
 	out.WriteString("\n")
 	listStart := reviewListStart(session.index, len(session.candidates), bodyRows)
-	for row := 0; row < bodyRows; row++ {
+	for row := range bodyRows {
 		left := session.renderListLine(listStart+row, listWidth)
 		right := ""
 		rightIndex := session.scroll + row
@@ -835,7 +826,7 @@ func documentRoot(doc *yaml.Node) *yaml.Node {
 
 func getYAMLNodeAtPath(root *yaml.Node, path string) (*yaml.Node, bool) {
 	node := root
-	for _, part := range strings.Split(path, ".") {
+	for part := range strings.SplitSeq(path, ".") {
 		if node == nil || node.Kind != yaml.MappingNode {
 			return nil, false
 		}

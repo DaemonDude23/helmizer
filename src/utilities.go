@@ -286,11 +286,11 @@ func matchGlob(pattern string, target string) bool {
 		target = filepath.ToSlash(absTarget)
 	}
 
-	if strings.HasPrefix(pattern, "/") {
-		pattern = strings.TrimPrefix(pattern, "/")
+	if after, ok := strings.CutPrefix(pattern, "/"); ok {
+		pattern = after
 	}
-	if strings.HasPrefix(target, "/") {
-		target = strings.TrimPrefix(target, "/")
+	if after, ok := strings.CutPrefix(target, "/"); ok {
+		target = after
 	}
 
 	patternParts := strings.Split(pattern, "/")
@@ -307,7 +307,7 @@ func matchSegments(patternParts []string, targetParts []string) bool {
 		if matchSegments(patternParts[1:], targetParts) {
 			return true
 		}
-		for i := 0; i < len(targetParts); i++ {
+		for i := range targetParts {
 			if matchSegments(patternParts[1:], targetParts[i+1:]) {
 				return true
 			}

@@ -156,10 +156,7 @@ func diffLines(oldLines, newLines []string) []diffEdit {
 
 func positionalDiff(oldLines, newLines []string) []diffEdit {
 	var edits []diffEdit
-	maxLen := len(oldLines)
-	if len(newLines) > maxLen {
-		maxLen = len(newLines)
-	}
+	maxLen := max(len(newLines), len(oldLines))
 	for i := 0; i < maxLen; i++ {
 		switch {
 		case i >= len(oldLines):

@@ -40,14 +40,14 @@ type HelmfileRepository struct {
 }
 
 type HelmfileRelease struct {
-	Chart     string                 `yaml:"chart" json:"chart"`
-	Version   string                 `yaml:"version" json:"version"`
-	Name      string                 `yaml:"name" json:"name"`
-	Namespace string                 `yaml:"namespace" json:"namespace"`
-	Installed *bool                  `yaml:"installed,omitempty" json:"installed,omitempty"`
-	Labels    map[string]string      `yaml:"labels,omitempty" json:"labels,omitempty"`
-	Values    []interface{}          `yaml:"values,omitempty" json:"values,omitempty"`
-	Raw       map[string]interface{} `yaml:",inline" json:"-"`
+	Chart     string            `yaml:"chart" json:"chart"`
+	Version   string            `yaml:"version" json:"version"`
+	Name      string            `yaml:"name" json:"name"`
+	Namespace string            `yaml:"namespace" json:"namespace"`
+	Installed *bool             `yaml:"installed,omitempty" json:"installed,omitempty"`
+	Labels    map[string]string `yaml:"labels,omitempty" json:"labels,omitempty"`
+	Values    []any             `yaml:"values,omitempty" json:"values,omitempty"`
+	Raw       map[string]any    `yaml:",inline" json:"-"`
 }
 
 type ResolvedChart struct {
