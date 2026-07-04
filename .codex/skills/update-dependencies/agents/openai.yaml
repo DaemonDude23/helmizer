@@ -1,0 +1,8 @@
+interface:
+  display_name: "Update Dependencies"
+  short_description: "Refresh helmizer dependencies locally"
+  default_prompt: "Use $update-dependencies to update helmizer dependency pins locally without committing or pushing."
+
+policy:
+  allow_implicit_invocation: true
+

@@ -1,0 +1,8 @@
+interface:
+  display_name: "Prepare Local Release"
+  short_description: "Align helmizer release files locally"
+  default_prompt: "Use $prepare-local-release to align helmizer release files for a target version without committing or publishing."
+
+policy:
+  allow_implicit_invocation: true
+

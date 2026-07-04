@@ -79,6 +79,12 @@ The `action.yml` defines a Docker-based action using `Dockerfile.helm`. Inputs:
 
 Current source version: `0.19.2` in `src/utilities.go`. Release builds stamp `main.version` via the flake, Dockerfiles, and GoReleaser so packaged artifacts stay aligned.
 
+## Local Claude Skills
+
+- `/update-dependencies` loads `.claude/skills/update-dependencies/SKILL.md` for local dependency and tooling refreshes.
+- `/prepare-local-release` loads `.claude/skills/prepare-local-release/SKILL.md` for local version/release-file alignment.
+- These skills are local-only workflows. Do not create commits, tags, pushes, pull requests, or releases when using them.
+
 ## Conventions
 
 - Keep the `var version = "..."` in `src/utilities.go` aligned with the next local release; packaged builds override it with ldflags
