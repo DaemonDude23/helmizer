@@ -3,7 +3,7 @@
 - [About](#about)
 - [Usage](#usage)
   - [CLI](#cli)
-    - [Helm Chart Update Review](#helm-chart-update-review)
+    - [Helm Chart Update Checks](#helm-chart-update-checks)
 - [Configuration](#configuration)
   - [Installation](#installation)
     - [Linux](#linux)
@@ -91,9 +91,9 @@ helmizer --config-glob "**/helmizer.yaml"
 
 You can also pass comma-separated patterns, for example: `--config-glob "apps/**/helmizer.yaml,clusters/**/helmizer.yaml"`.
 
-### Helm Chart Update Review
+### Helm Chart Update Checks
 
-`helmizer charts` helps review Helm chart updates when a Helmfile already contains the chart repository, release name, and pinned version. It starts from `helmfile build`, so templated Helmfile state is evaluated before chart metadata is read.
+`helmizer charts check` reports available Helm chart updates when a Helmfile already contains the chart repository, release name, and pinned version. It starts from `helmfile build`, so templated Helmfile state is evaluated before chart metadata is read.
 
 Check chart versions for one config:
 
@@ -107,27 +107,9 @@ Check chart versions across multiple configs:
 helmizer charts check --config-glob "apps/**/helmizer.yaml"
 ```
 
-The `check` table includes a simple update risk score: major chart version changes are high risk, minor changes are medium risk, and patch changes are low risk. Use `--output json` or `--output yaml` if you want those fields in automation.
+The `check` table includes a simple update risk score: major chart version changes are high risk, minor changes are medium risk, and patch changes are low risk. Use `--output json` or `--output yaml` if you want those fields in automation, and `--fail-on-update` to exit with status 10 when an allowed update is available (useful in CI).
 
-Diff default chart values for a release against the latest allowed version:
-
-```bash
-helmizer charts diff --kind values --release cert-manager apps/cert-manager/helmizer.yaml
-```
-
-By default, values diffs are shown as changed YAML value paths, which filters out comments and most formatting churn. The path view groups changes by risk so security, networking, storage, scheduling, resource, replica, and runtime settings appear first; metadata-only changes are marked low risk. Use `--values-mode text` to see a raw unified diff of the chart values files.
-
-```bash
-helmizer charts diff --kind values --values-mode text --release cert-manager apps/cert-manager/helmizer.yaml
-```
-
-Interactively review new or changed chart value clauses and accept them into a local values file:
-
-```bash
-helmizer charts review --release cert-manager --values-file values.yaml apps/cert-manager/helmizer.yaml
-```
-
-The review screen shows the current local file value on the left, the target chart value on the right, a risk note for the value path, and an inline diff of the actual values file if that change is accepted. Higher-risk candidates are shown first. Use `a` to accept, `d` or enter to discard, and `q` to stop. If the Helmfile release has exactly one file entry in `values:`, `--values-file` can be omitted.
+To inspect what an update actually changes, use Helm and Helmfile directly — for example `helm show values <chart> --repo <url> --version <version>` to compare chart defaults, or `helmfile diff` after bumping the version. Helmizer intentionally stops at surfacing which updates exist.
 
 The first implementation supports HTTP(S) chart repositories referenced by Helmfile repository aliases, for example `jetstack/cert-manager`. OCI charts, direct chart URLs, and local chart paths are skipped for now.
 
@@ -254,7 +236,7 @@ kustomize:  # this is essentially an overlay for your eventual kustomization.yam
 ### Linux
 
 ```bash
-curl -L "https://github.com/DaemonDude23/helmizer/releases/download/v0.19.2/helmizer_0.19.2_linux_amd64.tar.gz" -o helmizer.tar.gz && \
+curl -L "https://github.com/DaemonDude23/helmizer/releases/download/v0.20.0/helmizer_0.20.0_linux_amd64.tar.gz" -o helmizer.tar.gz && \
 tar -xzf helmizer.tar.gz helmizer && \
 sudo mv helmizer /usr/local/bin/ && \
 rm helmizer.tar.gz && \
@@ -306,7 +288,7 @@ Minimal:
 
 ```dockerfile
 # Builder stage
-FROM ghcr.io/daemondude23/helmizer/helmizer:v0.19.2 AS builder
+FROM ghcr.io/daemondude23/helmizer/helmizer:v0.20.0 AS builder
 
 # Final minimal stage
 FROM scratch
@@ -317,7 +299,7 @@ With Helm:
 
 ```dockerfile
 # Builder stage
-FROM ghcr.io/daemondude23/helmizer/helmizer-helm:v0.19.2 AS builder
+FROM ghcr.io/daemondude23/helmizer/helmizer-helm:v0.20.0 AS builder
 
 # Final minimal stage
 FROM scratch
@@ -489,7 +471,7 @@ When `config_glob` is set, the `config` positional argument is optional — if t
 Run helmizer against a single config:
 
 ```yaml
-- uses: daemondude23/helmizer@v0.19.2
+- uses: daemondude23/helmizer@v0.20.0
   with:
     config: path/to/helmizer.yaml
 ```
@@ -497,7 +479,7 @@ Run helmizer against a single config:
 Run helmizer against all configs in the repo:
 
 ```yaml
-- uses: daemondude23/helmizer@v0.19.2
+- uses: daemondude23/helmizer@v0.20.0
   with:
     config_glob: "**/helmizer.yaml"
 ```
@@ -568,7 +550,7 @@ jobs:
 
       - name: Run Helmizer
         if: steps.find-configs.outputs.configs != ''
-        uses: daemondude23/helmizer@v0.19.2
+        uses: daemondude23/helmizer@v0.20.0
         with:
           config_glob: ${{ steps.find-configs.outputs.configs }}
 
@@ -669,7 +651,7 @@ In GitLab, there is no `action.yml` equivalent — instead, use the helmizer Doc
 ```yaml
 # .gitlab-ci.yml
 helmizer:
-  image: ghcr.io/daemondude23/helmizer/helmizer:v0.19.2
+  image: ghcr.io/daemondude23/helmizer/helmizer:v0.20.0
   script:
     - helmizer --config-glob "**/helmizer.yaml"
 ```
@@ -678,7 +660,7 @@ If your helmizer configs use `helm template` in pre-commands, use the `helmizer-
 
 ```yaml
 helmizer:
-  image: ghcr.io/daemondude23/helmizer/helmizer-helm:v0.19.2
+  image: ghcr.io/daemondude23/helmizer/helmizer-helm:v0.20.0
   script:
     - helmizer --config-glob "**/helmizer.yaml"
 ```
@@ -698,7 +680,7 @@ stages:
 
 helmizer:
   stage: regenerate
-  image: ghcr.io/daemondude23/helmizer/helmizer-helm:v0.19.2
+  image: ghcr.io/daemondude23/helmizer/helmizer-helm:v0.20.0
   rules:
     # Only run on Renovate MR branches
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^renovate\//

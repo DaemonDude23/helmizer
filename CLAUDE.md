@@ -14,6 +14,11 @@ src/                    # All Go source code
                         #   config reconciliation, file walking, kustomization writing
   utilities.go          # Helpers: YAML reading, path construction, glob/doublestar matching,
                         #   config path resolution, and the source-default version string
+  charts.go             # `helmizer charts check` subcommand: reports available chart updates
+                        #   for Helmfile releases with a version policy and risk score
+  helmfile.go           # Helmfile state loading (`helmfile build`) and release/repo parsing
+  chart_repo.go         # Helm HTTP(S) repository index fetching and chart version listing
+  semver.go             # SemVer parsing, comparison, and version policy/constraint matching
   utilities_test.go     # Basic tests for version output and config-glob resolution
   go.mod                # Module: daemondude23/helmizer, Go 1.26.1 for Nix compatibility
 Dockerfile              # Minimal scratch image with just helmizer
@@ -39,10 +44,10 @@ cd src && go test -v ./...
 mkdir -p ./build/nix && nix build .#default --out-link ./build/nix/helmizer
 
 # Docker build (minimal)
-docker build --build-arg VERSION=0.19.2 -t helmizer .
+docker build --build-arg VERSION=0.20.0 -t helmizer .
 
 # Docker build (with helm)
-docker build --build-arg VERSION=0.19.2 -f Dockerfile.helm -t helmizer-helm .
+docker build --build-arg VERSION=0.20.0 -f Dockerfile.helm -t helmizer-helm .
 ```
 
 ## Key Dependencies
@@ -77,7 +82,7 @@ The `action.yml` defines a Docker-based action using `Dockerfile.helm`. Inputs:
 
 ## Version
 
-Current source version: `0.19.2` in `src/utilities.go`. Release builds stamp `main.version` via the flake, Dockerfiles, and GoReleaser so packaged artifacts stay aligned.
+Current source version: `0.20.0` in `src/utilities.go`. Release builds stamp `main.version` via the flake, Dockerfiles, and GoReleaser so packaged artifacts stay aligned.
 
 ## Local Claude Skills
 

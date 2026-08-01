@@ -17,9 +17,7 @@ import (
 const exitUpdatesFound = 10
 
 type ChartsArgs struct {
-	Check  *ChartsCheckArgs  `arg:"subcommand:check" help:"Check Helmfile chart versions"`
-	Diff   *ChartsDiffArgs   `arg:"subcommand:diff" help:"Diff Helmfile chart values or rendered manifests"`
-	Review *ChartsReviewArgs `arg:"subcommand:review" help:"Interactively review chart value changes into a values file"`
+	Check *ChartsCheckArgs `arg:"subcommand:check" help:"Check Helmfile chart versions"`
 }
 
 type ChartsCheckArgs struct {
@@ -35,42 +33,6 @@ type ChartsCheckArgs struct {
 	IncludePreRelease    bool     `arg:"--include-prerelease" help:"Include prerelease chart versions"`
 	Output               string   `arg:"--output" default:"table" help:"Output format: table, markdown, json, or yaml"`
 	FailOnUpdate         bool     `arg:"--fail-on-update" help:"Exit with status 10 when an allowed update is available"`
-	ConfigFilePath       string   `arg:"positional" help:"Path to Helmizer config file"`
-}
-
-type ChartsDiffArgs struct {
-	ConfigGlob           string   `arg:"--config-glob" help:"Glob pattern(s) for Helmizer config files; supports ** and comma-separated values"`
-	HelmfilePath         string   `arg:"--helmfile-path" help:"Path to helmfile.yaml, helmfile.yaml.gotmpl, or helmfile.d; defaults to a sibling of the Helmizer config"`
-	HelmfileEnvironment  string   `arg:"--helmfile-environment" help:"Helmfile environment to evaluate"`
-	HelmfileSelector     []string `arg:"--helmfile-selector" help:"Helmfile selector to apply while building state; can be repeated"`
-	StateValuesFile      []string `arg:"--state-values-file" help:"Helmfile state values file; can be repeated"`
-	StateValuesSet       []string `arg:"--state-values-set" help:"Helmfile state value override; can be repeated"`
-	StateValuesSetString []string `arg:"--state-values-set-string" help:"Helmfile state string value override; can be repeated"`
-	Policy               string   `arg:"--policy" default:"same-major" help:"Version policy used when --to latest is set: same-major, same-minor, all, or constraint"`
-	Constraint           string   `arg:"--constraint" help:"Version constraint used when --policy constraint is set"`
-	IncludePreRelease    bool     `arg:"--include-prerelease" help:"Include prerelease chart versions when --to latest is set"`
-	Release              string   `arg:"--release,required" help:"Helmfile release name to diff"`
-	To                   string   `arg:"--to" default:"latest" help:"Target chart version or latest"`
-	Kind                 string   `arg:"--kind" default:"both" help:"Diff kind: values, manifests, or both"`
-	ValuesMode           string   `arg:"--values-mode" default:"paths" help:"Values diff mode: paths or text"`
-	ConfigFilePath       string   `arg:"positional" help:"Path to Helmizer config file"`
-}
-
-type ChartsReviewArgs struct {
-	ConfigGlob           string   `arg:"--config-glob" help:"Glob pattern(s) for Helmizer config files; supports ** and comma-separated values"`
-	HelmfilePath         string   `arg:"--helmfile-path" help:"Path to helmfile.yaml, helmfile.yaml.gotmpl, or helmfile.d; defaults to a sibling of the Helmizer config"`
-	HelmfileEnvironment  string   `arg:"--helmfile-environment" help:"Helmfile environment to evaluate"`
-	HelmfileSelector     []string `arg:"--helmfile-selector" help:"Helmfile selector to apply while building state; can be repeated"`
-	StateValuesFile      []string `arg:"--state-values-file" help:"Helmfile state values file; can be repeated"`
-	StateValuesSet       []string `arg:"--state-values-set" help:"Helmfile state value override; can be repeated"`
-	StateValuesSetString []string `arg:"--state-values-set-string" help:"Helmfile state string value override; can be repeated"`
-	Policy               string   `arg:"--policy" default:"same-major" help:"Version policy used when --to latest is set: same-major, same-minor, all, or constraint"`
-	Constraint           string   `arg:"--constraint" help:"Version constraint used when --policy constraint is set"`
-	IncludePreRelease    bool     `arg:"--include-prerelease" help:"Include prerelease chart versions when --to latest is set"`
-	Release              string   `arg:"--release,required" help:"Helmfile release name to review"`
-	To                   string   `arg:"--to" default:"latest" help:"Target chart version or latest"`
-	ValuesFile           string   `arg:"--values-file" help:"Local Helm values file to update; defaults to the release's single values file entry"`
-	DryRun               bool     `arg:"--dry-run" help:"Review changes without writing the values file"`
 	ConfigFilePath       string   `arg:"positional" help:"Path to Helmizer config file"`
 }
 
@@ -98,12 +60,8 @@ func RunCharts(args ChartsArgs) int {
 	switch {
 	case args.Check != nil:
 		return RunChartsCheck(*args.Check)
-	case args.Diff != nil:
-		return RunChartsDiff(*args.Diff)
-	case args.Review != nil:
-		return RunChartsReview(*args.Review)
 	default:
-		log.Error("missing charts subcommand: use check, diff, or review")
+		log.Error("missing charts subcommand: use check")
 		return 1
 	}
 }
@@ -131,123 +89,7 @@ func RunChartsCheck(args ChartsCheckArgs) int {
 	return 0
 }
 
-func RunChartsDiff(args ChartsDiffArgs) int {
-	targets, err := ResolveChartTargets(args.ConfigFilePath, args.ConfigGlob, args.HelmfilePath)
-	if err != nil {
-		log.Error(err)
-		return 1
-	}
-
-	kind := strings.ToLower(strings.TrimSpace(args.Kind))
-	if kind == "" {
-		kind = "both"
-	}
-	if kind != "both" && kind != "values" && kind != "manifests" {
-		log.Errorf("invalid --kind %q; expected values, manifests, or both", args.Kind)
-		return 1
-	}
-	valuesMode := strings.ToLower(strings.TrimSpace(args.ValuesMode))
-	if valuesMode == "" {
-		valuesMode = "paths"
-	}
-	if valuesMode != "paths" && valuesMode != "text" {
-		log.Errorf("invalid --values-mode %q; expected paths or text", args.ValuesMode)
-		return 1
-	}
-
-	options := chartDiffHelmfileOptions(args)
-	repoCache := map[string]HelmRepositoryIndex{}
-	client := &http.Client{Timeout: 30 * time.Second}
-	hadDiff := false
-
-	for _, target := range targets {
-		state, buildOutput, err := LoadHelmfileState(target, options)
-		if err != nil {
-			log.Error(err)
-			return 1
-		}
-
-		release, found := findHelmfileRelease(state.Releases, args.Release)
-		if !found {
-			log.Errorf("release %q was not found in %s", args.Release, target.HelmfilePath)
-			return 1
-		}
-
-		resolved, reason := ResolveHelmfileReleaseChart(release, state.Repositories, target.BaseDir)
-		if reason != "" {
-			log.Errorf("release %q cannot be diffed: %s", release.Name, reason)
-			return 1
-		}
-
-		targetVersion := strings.TrimSpace(args.To)
-		if targetVersion == "" || strings.EqualFold(targetVersion, "latest") {
-			targetVersion, err = resolveLatestTargetVersion(repoCache, client, resolved, release.Version, args.Policy, args.Constraint, args.IncludePreRelease)
-			if err != nil {
-				log.Error(err)
-				return 1
-			}
-		}
-
-		if len(targets) > 1 {
-			fmt.Printf("## %s (%s)\n", target.ConfigPath, target.HelmfilePath)
-		}
-
-		if kind == "both" || kind == "values" {
-			diff, err := DiffChartValues(target, resolved, release.Version, targetVersion, valuesMode)
-			if err != nil {
-				log.Error(err)
-				return 1
-			}
-			if diff != "" {
-				fmt.Print(diff)
-				hadDiff = true
-			} else {
-				fmt.Printf("No values changes for %s from %s to %s\n", release.Name, release.Version, targetVersion)
-			}
-		}
-
-		if kind == "both" || kind == "manifests" {
-			diff, err := DiffHelmfileManifests(target, options, buildOutput, release.Name, release.Version, targetVersion)
-			if err != nil {
-				log.Error(err)
-				return 1
-			}
-			if diff != "" {
-				fmt.Print(diff)
-				hadDiff = true
-			} else {
-				fmt.Printf("No manifest changes for %s from %s to %s\n", release.Name, release.Version, targetVersion)
-			}
-		}
-	}
-
-	if !hadDiff {
-		return 0
-	}
-	return 0
-}
-
 func chartCheckHelmfileOptions(args ChartsCheckArgs) HelmfileCommandOptions {
-	return HelmfileCommandOptions{
-		HelmfileEnvironment:  args.HelmfileEnvironment,
-		HelmfileSelectors:    args.HelmfileSelector,
-		StateValuesFiles:     args.StateValuesFile,
-		StateValuesSet:       args.StateValuesSet,
-		StateValuesSetString: args.StateValuesSetString,
-	}
-}
-
-func chartDiffHelmfileOptions(args ChartsDiffArgs) HelmfileCommandOptions {
-	return HelmfileCommandOptions{
-		HelmfileEnvironment:  args.HelmfileEnvironment,
-		HelmfileSelectors:    args.HelmfileSelector,
-		StateValuesFiles:     args.StateValuesFile,
-		StateValuesSet:       args.StateValuesSet,
-		StateValuesSetString: args.StateValuesSetString,
-	}
-}
-
-func chartReviewHelmfileOptions(args ChartsReviewArgs) HelmfileCommandOptions {
 	return HelmfileCommandOptions{
 		HelmfileEnvironment:  args.HelmfileEnvironment,
 		HelmfileSelectors:    args.HelmfileSelector,
@@ -553,129 +395,4 @@ func chartResultsHaveUpdates(results []ChartCheckResult) bool {
 		}
 	}
 	return false
-}
-
-func findHelmfileRelease(releases []HelmfileRelease, name string) (HelmfileRelease, bool) {
-	for _, release := range releases {
-		if release.Name == name {
-			return release, true
-		}
-	}
-	return HelmfileRelease{}, false
-}
-
-func resolveLatestTargetVersion(cache map[string]HelmRepositoryIndex, client *http.Client, resolved ResolvedChart, currentVersion string, policy string, constraint string, includePreRelease bool) (string, error) {
-	index, err := cachedRepositoryIndex(cache, client, resolved.RepositoryURL)
-	if err != nil {
-		return "", err
-	}
-	versions := index.Entries[resolved.ChartName]
-	if len(versions) == 0 {
-		return "", fmt.Errorf("chart %q was not found in repository index", resolved.ChartName)
-	}
-	selection, err := SelectChartVersion(versions, currentVersion, policy, constraint, includePreRelease)
-	if err != nil {
-		return "", err
-	}
-	if selection.LatestAllowed == "" {
-		if selection.LatestSkipped != "" {
-			return "", fmt.Errorf("%s is already at the latest version allowed by policy %q (newer %s exists outside policy)", currentVersion, policy, selection.LatestSkipped)
-		}
-		return "", fmt.Errorf("%s is already at the latest version", currentVersion)
-	}
-	return selection.LatestAllowed, nil
-}
-
-func DiffChartValues(target ChartTarget, resolved ResolvedChart, currentVersion string, targetVersion string, valuesMode string) (string, error) {
-	currentValues, err := runHelmShowValues(target.BaseDir, resolved, currentVersion)
-	if err != nil {
-		return "", err
-	}
-	targetValues, err := runHelmShowValues(target.BaseDir, resolved, targetVersion)
-	if err != nil {
-		return "", err
-	}
-	if valuesMode == "paths" {
-		return DiffYAMLValuePaths(
-			fmt.Sprintf("%s values %s", resolved.ChartName, currentVersion),
-			currentValues,
-			fmt.Sprintf("%s values %s", resolved.ChartName, targetVersion),
-			targetValues,
-		)
-	}
-	return UnifiedDiff(
-		fmt.Sprintf("%s values %s", resolved.ChartName, currentVersion),
-		string(currentValues),
-		fmt.Sprintf("%s values %s", resolved.ChartName, targetVersion),
-		string(targetValues),
-	), nil
-}
-
-func runHelmShowValues(workDir string, resolved ResolvedChart, version string) ([]byte, error) {
-	args := []string{"show", "values", resolved.ChartName, "--repo", resolved.RepositoryURL, "--version", version}
-	// Run outside the Helmfile directory so generated chart output directories
-	// cannot shadow the remote chart name.
-	helmWorkDir := os.TempDir()
-	if helmWorkDir == "" {
-		helmWorkDir = workDir
-	}
-	stdout, stderr, err := runCommand(helmWorkDir, "helm", args...)
-	if err != nil {
-		return nil, fmt.Errorf("helm show values failed for %s %s: %w\n%s", resolved.ChartName, version, err, strings.TrimSpace(stderr))
-	}
-	return stdout, nil
-}
-
-func DiffHelmfileManifests(target ChartTarget, options HelmfileCommandOptions, buildOutput []byte, releaseName string, currentVersion string, targetVersion string) (string, error) {
-	currentManifest, err := runHelmfileTemplate(target, options, releaseName)
-	if err != nil {
-		return "", err
-	}
-
-	targetState, err := ReplaceReleaseVersionInHelmfileState(buildOutput, releaseName, targetVersion)
-	if err != nil {
-		return "", err
-	}
-
-	tmpFile, err := os.CreateTemp(target.BaseDir, ".helmizer-chart-diff-*.yaml")
-	if err != nil {
-		return "", err
-	}
-	tmpPath := tmpFile.Name()
-	defer func() {
-		_ = os.Remove(tmpPath)
-	}()
-	if _, err := tmpFile.Write(targetState); err != nil {
-		_ = tmpFile.Close()
-		return "", err
-	}
-	if err := tmpFile.Close(); err != nil {
-		return "", err
-	}
-
-	targetManifest, err := runHelmfileTemplate(ChartTarget{
-		BaseDir:      target.BaseDir,
-		HelmfilePath: tmpPath,
-	}, options, releaseName)
-	if err != nil {
-		return "", err
-	}
-
-	return UnifiedDiff(
-		fmt.Sprintf("%s manifests %s", releaseName, currentVersion),
-		string(currentManifest),
-		fmt.Sprintf("%s manifests %s", releaseName, targetVersion),
-		string(targetManifest),
-	), nil
-}
-
-func runHelmfileTemplate(target ChartTarget, options HelmfileCommandOptions, releaseName string) ([]byte, error) {
-	args := helmfileGlobalArgs(target.HelmfilePath, options, []string{"name=" + releaseName})
-	args = append(args, "template")
-	args = append(args, options.AdditionalTemplateArgs...)
-	stdout, stderr, err := runCommand(target.BaseDir, "helmfile", args...)
-	if err != nil {
-		return nil, fmt.Errorf("helmfile template failed for %s release %s: %w\n%s", target.HelmfilePath, releaseName, err, strings.TrimSpace(stderr))
-	}
-	return stdout, nil
 }

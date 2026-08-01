@@ -16,7 +16,7 @@ import (
 
 // version is stamped by release tooling. The source default should match the
 // next local release so ad-hoc builds still report a sensible version.
-var version = "0.19.2"
+var version = "0.20.0"
 
 func (CLIArgs) Version() string {
 	return "helmizer " + version

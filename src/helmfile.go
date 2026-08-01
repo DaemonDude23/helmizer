@@ -18,14 +18,12 @@ type ChartTarget struct {
 }
 
 type HelmfileCommandOptions struct {
-	HelmfileEnvironment     string
-	HelmfileSelectors       []string
-	StateValuesFiles        []string
-	StateValuesSet          []string
-	StateValuesSetString    []string
-	AdditionalHelmfileArgs  []string
-	AdditionalTemplateArgs  []string
-	AdditionalHelmArguments []string
+	HelmfileEnvironment    string
+	HelmfileSelectors      []string
+	StateValuesFiles       []string
+	StateValuesSet         []string
+	StateValuesSetString   []string
+	AdditionalHelmfileArgs []string
 }
 
 type HelmfileState struct {
@@ -256,64 +254,4 @@ func runCommand(workDir string, name string, args ...string) ([]byte, string, er
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	return stdout.Bytes(), stderr.String(), err
-}
-
-func ReplaceReleaseVersionInHelmfileState(data []byte, releaseName string, version string) ([]byte, error) {
-	var node yaml.Node
-	if err := yaml.Unmarshal(data, &node); err != nil {
-		return nil, err
-	}
-	if len(node.Content) == 0 || node.Content[0].Kind != yaml.MappingNode {
-		return nil, fmt.Errorf("helmfile build output is not a mapping")
-	}
-
-	releases := mappingValue(*node.Content[0], "releases")
-	if releases == nil || releases.Kind != yaml.SequenceNode {
-		return nil, fmt.Errorf("helmfile build output has no releases sequence")
-	}
-
-	for _, releaseNode := range releases.Content {
-		if releaseNode.Kind != yaml.MappingNode {
-			continue
-		}
-		nameNode := mappingValue(*releaseNode, "name")
-		if nameNode == nil || nameNode.Value != releaseName {
-			continue
-		}
-		setMappingScalar(releaseNode, "version", version)
-		var out bytes.Buffer
-		encoder := yaml.NewEncoder(&out)
-		encoder.SetIndent(2)
-		if err := encoder.Encode(&node); err != nil {
-			return nil, err
-		}
-		_ = encoder.Close()
-		return out.Bytes(), nil
-	}
-
-	return nil, fmt.Errorf("release %q not found in helmfile build output", releaseName)
-}
-
-func mappingValue(node yaml.Node, key string) *yaml.Node {
-	for i := 0; i+1 < len(node.Content); i += 2 {
-		if node.Content[i].Value == key {
-			return node.Content[i+1]
-		}
-	}
-	return nil
-}
-
-func setMappingScalar(node *yaml.Node, key string, value string) {
-	for i := 0; i+1 < len(node.Content); i += 2 {
-		if node.Content[i].Value == key {
-			node.Content[i+1].Kind = yaml.ScalarNode
-			node.Content[i+1].Tag = "!!str"
-			node.Content[i+1].Value = value
-			return
-		}
-	}
-	node.Content = append(node.Content,
-		&yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: key},
-		&yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: value},
-	)
 }

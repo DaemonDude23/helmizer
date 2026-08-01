@@ -44,4 +44,3 @@ Use this skill to update helmizer dependency pins and tooling locally while pres
    - `nix build .#default` when Nix inputs, Go dependencies, or `flake.nix` changed.
    - `pre-commit run --all-files` when pre-commit hooks or formatting-sensitive files changed.
 8. Summarize changed files, important version movements, and any validation that could not run.
-

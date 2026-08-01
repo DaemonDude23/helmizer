@@ -113,46 +113,6 @@ func TestResolveHelmfileReleaseChart(t *testing.T) {
 	}
 }
 
-func TestReplaceReleaseVersionInHelmfileState(t *testing.T) {
-	input := []byte(`
-repositories:
-  - name: jetstack
-    url: https://charts.jetstack.io
-releases:
-  - chart: jetstack/cert-manager
-    name: cert-manager
-    version: 1.19.2
-  - chart: jetstack/trust-manager
-    name: trust-manager
-    version: 0.19.0
-`)
-
-	output, err := ReplaceReleaseVersionInHelmfileState(input, "cert-manager", "1.20.0")
-	if err != nil {
-		t.Fatalf("ReplaceReleaseVersionInHelmfileState() error = %v", err)
-	}
-	state, err := ParseHelmfileState(output)
-	if err != nil {
-		t.Fatalf("ParseHelmfileState() error = %v", err)
-	}
-
-	release, found := findHelmfileRelease(state.Releases, "cert-manager")
-	if !found {
-		t.Fatal("cert-manager release was not found")
-	}
-	if release.Version != "1.20.0" {
-		t.Fatalf("cert-manager version = %q, want %q", release.Version, "1.20.0")
-	}
-
-	otherRelease, found := findHelmfileRelease(state.Releases, "trust-manager")
-	if !found {
-		t.Fatal("trust-manager release was not found")
-	}
-	if otherRelease.Version != "0.19.0" {
-		t.Fatalf("trust-manager version = %q, want %q", otherRelease.Version, "0.19.0")
-	}
-}
-
 func TestChartVersionUpdateRisk(t *testing.T) {
 	tests := []struct {
 		name    string

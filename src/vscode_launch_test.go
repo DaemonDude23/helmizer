@@ -26,9 +26,9 @@ type launchConfiguration struct {
 	Env     map[string]string `json:"env"`
 }
 
-func TestVSCodeChartsValuesDiffLaunchConfig(t *testing.T) {
+func TestVSCodeChartsCheckLaunchConfig(t *testing.T) {
 	config := readLaunchFile(t)
-	launch := findLaunchConfig(t, config, "charts: values diff")
+	launch := findLaunchConfig(t, config, "charts check (default policy)")
 
 	if launch.Type != "go" {
 		t.Fatalf("launch type = %q, want %q", launch.Type, "go")
@@ -50,76 +50,33 @@ func TestVSCodeChartsValuesDiffLaunchConfig(t *testing.T) {
 	}
 }
 
-func TestVSCodeChartsValuesDiffArgsParse(t *testing.T) {
+func TestVSCodeChartsCheckArgsParse(t *testing.T) {
 	config := readLaunchFile(t)
-	launch := findLaunchConfig(t, config, "charts: values diff")
+	launch := findLaunchConfig(t, config, "charts check (default policy)")
 
 	args := parseChartsLaunchArgs(t, launch)
-	if args.Charts == nil || args.Charts.Diff == nil {
-		t.Fatalf("charts diff args were not parsed: %+v", args)
+	if args.Charts == nil || args.Charts.Check == nil {
+		t.Fatalf("charts check args were not parsed: %+v", args)
 	}
-	diffArgs := args.Charts.Diff
-	if diffArgs.Kind != "values" {
-		t.Fatalf("Kind = %q, want %q", diffArgs.Kind, "values")
+	checkArgs := args.Charts.Check
+	if checkArgs.ConfigFilePath != "../examples/commonLabels/helmizer.yaml" {
+		t.Fatalf("ConfigFilePath = %q, want example config", checkArgs.ConfigFilePath)
 	}
-	if diffArgs.Release != "cert-manager" {
-		t.Fatalf("Release = %q, want %q", diffArgs.Release, "cert-manager")
-	}
-	if diffArgs.ConfigFilePath != "../examples/commonLabels/helmizer.yaml" {
-		t.Fatalf("ConfigFilePath = %q, want example config", diffArgs.ConfigFilePath)
-	}
-	if diffArgs.ValuesMode != "paths" {
-		t.Fatalf("ValuesMode = %q, want default %q", diffArgs.ValuesMode, "paths")
+	if checkArgs.Policy != "same-major" {
+		t.Fatalf("Policy = %q, want default %q", checkArgs.Policy, "same-major")
 	}
 }
 
-func TestVSCodeChartsReviewLaunchConfig(t *testing.T) {
+func TestVSCodeChartsLaunchConfigsParse(t *testing.T) {
 	config := readLaunchFile(t)
-	launch := findLaunchConfig(t, config, "charts: review values dry-run")
-
-	if launch.Type != "go" {
-		t.Fatalf("launch type = %q, want %q", launch.Type, "go")
-	}
-	if launch.Request != "launch" {
-		t.Fatalf("launch request = %q, want %q", launch.Request, "launch")
-	}
-	if launch.Program != "${workspaceFolder}/src/" {
-		t.Fatalf("launch program = %q, want %q", launch.Program, "${workspaceFolder}/src/")
-	}
-	if launch.Cwd != "${workspaceFolder}/src/" {
-		t.Fatalf("launch cwd = %q, want %q", launch.Cwd, "${workspaceFolder}/src/")
-	}
-	if launch.Console != "integratedTerminal" {
-		t.Fatalf("launch console = %q, want %q", launch.Console, "integratedTerminal")
-	}
-	if got := launch.Env["CGO_ENABLED"]; got != "0" {
-		t.Fatalf("CGO_ENABLED = %q, want %q", got, "0")
-	}
-	if !isChartsCommand(launch.Args) {
-		t.Fatalf("isChartsCommand(%v) = false, want true", launch.Args)
-	}
-}
-
-func TestVSCodeChartsReviewArgsParse(t *testing.T) {
-	config := readLaunchFile(t)
-	launch := findLaunchConfig(t, config, "charts: review values dry-run")
-
-	args := parseChartsLaunchArgs(t, launch)
-	if args.Charts == nil || args.Charts.Review == nil {
-		t.Fatalf("charts review args were not parsed: %+v", args)
-	}
-	reviewArgs := args.Charts.Review
-	if !reviewArgs.DryRun {
-		t.Fatal("DryRun = false, want true for launch safety")
-	}
-	if reviewArgs.ValuesFile != "helmizer.yaml" {
-		t.Fatalf("ValuesFile = %q, want %q", reviewArgs.ValuesFile, "helmizer.yaml")
-	}
-	if reviewArgs.Release != "cert-manager" {
-		t.Fatalf("Release = %q, want %q", reviewArgs.Release, "cert-manager")
-	}
-	if reviewArgs.ConfigFilePath != "../examples/commonLabels/helmizer.yaml" {
-		t.Fatalf("ConfigFilePath = %q, want example config", reviewArgs.ConfigFilePath)
+	for _, launch := range config.Configurations {
+		if len(launch.Args) == 0 || !isChartsCommand(launch.Args) {
+			continue
+		}
+		if launch.Args[len(launch.Args)-1] == "--help" {
+			continue
+		}
+		parseChartsLaunchArgs(t, launch)
 	}
 }
 

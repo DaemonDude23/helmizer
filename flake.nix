@@ -10,7 +10,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        version = "0.19.2";
+        version = "0.20.0";
 
         helmizer = pkgs.buildGoModule {
           pname = "helmizer";
@@ -18,7 +18,7 @@
           src = ./.;
           modRoot = "src";
           subPackages = [ "." ];
-          vendorHash = "sha256-8s2Yu22vj+zphtWWebBdSGNpPHzT/Qayu6Sje8yIve8=";
+          vendorHash = "sha256-N6oCBFIRpIwTHuGT0BEQqRyor7YBTdw7s2m3WbxStsg=";
           ldflags = [
             "-s"
             "-w"

@@ -1,6 +1,7 @@
 **Changelog**
 
 - [2026](#2026)
+  - [v0.20.0](#v0200)
   - [v0.19.2](#v0192)
   - [v0.19.1](#v0191)
   - [v0.19.0](#v0190)
@@ -14,6 +15,23 @@
 ---
 
 # 2026
+
+## v0.20.0
+
+August 1 2026
+
+**Features**
+
+- Added the `helmizer charts check` subcommand: reads Helmfile state via `helmfile build`, resolves HTTP(S) chart repositories, and reports available chart updates per release with a version policy (`same-major`, `same-minor`, `all`, or `constraint`), a simple risk score, and `table`/`markdown`/`json`/`yaml` output. `--fail-on-update` exits with status 10 for CI gating.
+- The earlier experimental `charts diff` and `charts review` subcommands were dropped before release; Helm and Helmfile already cover value/manifest comparison (`helm show values`, `helmfile diff`), so Helmizer stops at surfacing which updates exist.
+
+**Dependencies**
+
+- Updated Go module dependencies, the Nix flake inputs and `vendorHash`, pre-commit hook revisions, Docker base images (`golang` 1.26.5, `alpine` 3.24.1, `alpine/helm` 4.2.3), and GitHub Actions (`actions/checkout@v7`, `actions/setup-go@v7`).
+
+**Docs/Tests**
+
+- Documented `charts check` in the README, refreshed VSCode launch/tasks entries, and added tests for chart version selection, policy constraints, Helmfile chart resolution, and the `charts check` launch configuration.
 
 ## v0.19.2
 

@@ -32,7 +32,7 @@ type CLIArgs struct {
 // Contains CLI arguments for subcommands. go-arg does not allow positional
 // arguments and subcommands in the same parser, so charts has a separate entry.
 type ChartsCLIArgs struct {
-	Charts *ChartsArgs `arg:"subcommand:charts" help:"Review Helm chart updates from Helmfile state"`
+	Charts *ChartsArgs `arg:"subcommand:charts" help:"Check Helm chart updates from Helmfile state"`
 
 	LogFormat     string `arg:"--log-format" default:"plain" help:"Set log format: plain or JSON"`
 	LogLevel      string `arg:"-l, --log-level" default:"INFO" help:"Set log level: INFO, DEBUG, ERROR, WARNING"`

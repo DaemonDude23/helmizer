@@ -1,5 +1,5 @@
 # Builder stage
-FROM docker.io/library/golang:1.26.2 AS builder
+FROM docker.io/library/golang:1.26.5 AS builder
 ARG VERSION=dev
 WORKDIR /build
 # Copy go mod files and download dependencies
@@ -11,10 +11,10 @@ COPY ./src/ ./
 RUN CGO_ENABLED=0 go build -ldflags="-s -w -X main.version=${VERSION}" -o helmizer .
 
 # Helm stage
-FROM docker.io/alpine/helm:4.1.4 AS helm
+FROM docker.io/alpine/helm:4.2.3 AS helm
 
 # Final stage - alpine instead of scratch so we have a shell (needed for GitHub Actions and CI)
-FROM docker.io/library/alpine:3.23.3 AS final
+FROM docker.io/library/alpine:3.24.1 AS final
 RUN apk add --no-cache ca-certificates git
 # Copy the helm binary and helmizer binary to a known location
 COPY --from=helm /usr/bin/helm /usr/local/bin/helm

@@ -40,4 +40,3 @@ Use this skill to update release-related files for helmizer without performing a
    - Target version.
    - Validation results.
    - Any manual release note gaps.
-
