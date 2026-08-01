@@ -118,7 +118,7 @@ recompute_vendor_hash() {
 
 verify_builds() {
   echo "--> Verifying Go and Nix builds"
-  go test ./src/...
+  (cd src && go test ./...)
   mkdir -p ./build/nix
   rm -f "${NIX_OUT_LINK}"
   nix build .#default --out-link "${NIX_OUT_LINK}"

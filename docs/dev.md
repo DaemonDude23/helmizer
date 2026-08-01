@@ -81,7 +81,7 @@ Manual equivalent:
 
 ```bash
 git checkout -b release/v0.20.0
-go test ./src/...
+(cd src && go test ./...)
 mkdir -p ./build/nix
 nix build .#default --out-link ./build/nix/helmizer
 ./build/nix/helmizer/bin/helmizer --version
@@ -93,7 +93,7 @@ git push -u origin HEAD
 
 git checkout main
 git pull --ff-only
-go test ./src/...
+(cd src && go test ./...)
 nix build .#default --out-link ./build/nix/helmizer
 ./build/nix/helmizer/bin/helmizer --version
 git push origin HEAD
