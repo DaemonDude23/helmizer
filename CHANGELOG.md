@@ -37,6 +37,7 @@ August 1 2026
 
 - Reworked `scripts/release.sh` into two explicit modes: `prepare <version>` on a release branch and `tag <version>` from `main`.
 - Fixed the build verification step, which ran `go test ./src/...` from the repo root and always failed because the Go module lives in `src/` with no root `go.mod`. It now runs `(cd src && go test ./...)`; the same correction was applied to the manual steps in `docs/dev.md`.
+- Gated the `goreleaser` and `docker` release jobs on a `v*` tag ref. A manual `workflow_dispatch` previously failed GoReleaser (which needs a tag to derive the version) while still pushing Docker images tagged from the branch name and overwriting `latest`. Manual dispatch now runs the test job only.
 
 ## v0.19.2
 

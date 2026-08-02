@@ -26,6 +26,9 @@ jobs:
 
   goreleaser:
     needs: test
+    # GoReleaser derives the version from the tag, so it can only run on a tag
+    # push. A manual dispatch reaches the tests and stops there.
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -54,6 +57,9 @@ jobs:
 
   docker:
     needs: test
+    # Image tags come from github.ref_name, which is only a release version on a
+    # tag push; on a branch it would publish mislabelled images and clobber latest.
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
