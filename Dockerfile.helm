@@ -11,7 +11,7 @@ COPY ./src/ ./
 RUN CGO_ENABLED=0 go build -ldflags="-s -w -X main.version=${VERSION}" -o helmizer .
 
 # Helm stage
-FROM docker.io/alpine/helm:4.2.3 AS helm
+FROM docker.io/alpine/helm:4.2.4 AS helm
 
 # Final stage - alpine instead of scratch so we have a shell (needed for GitHub Actions and CI)
 FROM docker.io/library/alpine:3.24.1 AS final
