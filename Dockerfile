@@ -1,5 +1,5 @@
 # Builder stage
-FROM docker.io/library/golang:1.26.5 AS builder
+FROM docker.io/library/golang:1.27.1 AS builder
 ARG VERSION=dev
 WORKDIR /build
 # Copy go mod files and download dependencies
