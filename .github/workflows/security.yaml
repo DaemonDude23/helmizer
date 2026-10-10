@@ -1,0 +1,115 @@
+name: Security
+
+# Vulnerability scanning. Separate from CI so a slow or noisy scanner never
+# blocks the test signal. The weekly schedule matters: a new CVE lands against
+# an unchanged dependency tree, and only a scheduled run notices.
+on:
+  pull_request:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Bumped by Renovate (see the customManagers entry in renovate.json).
+  # renovate: datasource=go depName=golang.org/x/vuln
+  GOVULNCHECK_VERSION: v1.1.4
+  # renovate: datasource=go depName=github.com/securego/gosec/v2
+  GOSEC_VERSION: v2.29.0
+  # renovate: datasource=docker depName=docker.io/aquasec/trivy
+  TRIVY_IMAGE: docker.io/aquasec/trivy:0.75.0@sha256:af6acf9a6b85dfe389a1941505c0ce9efef52a4719635e1a962f022a3d855daa
+
+jobs:
+  govulncheck:
+    if: github.event_name != 'pull_request'
+    name: govulncheck
+    # Reachability-aware: fails only when a vulnerable symbol is actually
+    # called, not merely because a vulnerable module is in go.sum.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
+        with:
+          go-version: '1.26.x'
+          check-latest: true
+          cache-dependency-path: src/go.sum
+
+      - name: govulncheck
+        working-directory: src
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@"${GOVULNCHECK_VERSION}"
+          govulncheck ./...
+
+  gosec:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
+        with:
+          go-version: '1.26.x'
+          check-latest: true
+          cache-dependency-path: src/go.sum
+
+      - name: gosec
+        working-directory: src
+        # Findings at medium severity and confidence or above fail the job.
+        # Suppress a reviewed false positive inline with `// #nosec G### -- why`.
+        run: |
+          bash ../scripts/install-gosec.sh "$RUNNER_TEMP/scanners"
+          "$RUNNER_TEMP/scanners/gosec" -severity medium -confidence medium -exclude-generated ./...
+
+  trivy:
+    if: github.event_name != 'pull_request'
+    # Filesystem scan: dependency CVEs across every lockfile, committed
+    # secrets, and Dockerfile misconfigurations. Run from the pinned image
+    # rather than a third-party action.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: trivy fs
+        run: |
+          mkdir -p "$RUNNER_TEMP/trivy-cache"
+          docker run --rm --user "$(id -u):$(id -g)" \
+            -v "$PWD:/src:ro" -w /src \
+            -v "$RUNNER_TEMP/trivy-cache:/cache" \
+            -e TRIVY_CACHE_DIR=/cache \
+            "${TRIVY_IMAGE}" \
+            fs --scanners vuln,secret,misconfig --ignorefile .trivyignore.yaml \
+               --severity HIGH,CRITICAL --ignore-unfixed \
+               --skip-dirs .trivycache --exit-code 1 .
+
+  dependency-review:
+    name: Dependency review
+    # New or bumped dependencies in a PR, checked against the advisory
+    # database before they merge. Needs the dependency graph enabled.
+    if: github.event_name == 'pull_request' && github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Dependency review
+        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4
+        with:
+          fail-on-severity: high

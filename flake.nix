@@ -10,7 +10,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        version = "0.20.0";
+        version = builtins.replaceStrings [ "\n" ] [ "" ] (builtins.readFile ./src/VERSION);
 
         helmizer = pkgs.buildGoModule {
           pname = "helmizer";

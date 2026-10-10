@@ -1,0 +1,8 @@
+**
+!Dockerfile
+!Dockerfile.helm
+!src/
+!src/**
+src/vendor/
+src/helmizer
+src/.go/

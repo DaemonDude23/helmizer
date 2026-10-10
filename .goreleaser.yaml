@@ -1,3 +1,4 @@
+version: 2
 builds:
   - binary: helmizer
     dir: ./src
@@ -13,8 +14,15 @@ builds:
       - linux
       - darwin
       - windows
+    ignore:
+      - goos: darwin
+        goarch: '386'
     id: helmizer
 checksum:
   name_template: checksums.txt
 release:
   draft: true
+  use_existing_draft: true
+  replace_existing_artifacts: true
+changelog:
+  use: github-native

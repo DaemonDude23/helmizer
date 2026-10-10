@@ -20,8 +20,7 @@ Use this skill to update release-related files for helmizer without performing a
    - Accept plain semantic versions like `0.20.0`.
    - Use `vX.Y.Z` only for tag strings and documentation references that include tags.
 2. Update version-bearing files:
-   - `src/utilities.go`: `var version = "X.Y.Z"`
-   - `flake.nix`: `version = "X.Y.Z";`
+   - `src/VERSION`: `X.Y.Z` (single source; embedded by Go and read by `flake.nix`)
    - `README.md`: release URLs, image tags, and GitHub Action examples that reference `vX.Y.Z`
    - `docs/dev.md`: release command examples and tag/push examples
    - `CHANGELOG.md`: ensure a `## vX.Y.Z` section exists; add a minimal placeholder only when asked or when the user has not provided release notes.

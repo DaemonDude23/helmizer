@@ -1,0 +1,113 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  # renovate: datasource=go depName=github.com/rhysd/actionlint
+  ACTIONLINT_VERSION: v1.7.11
+  # renovate: datasource=go depName=golang.org/x/vuln
+  GOVULNCHECK_VERSION: v1.1.4
+jobs:
+  check:
+    name: Go checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 2
+      - name: Select checks for this change
+        id: scope
+        env:
+          CI_EVENT_NAME: ${{ github.event_name }}
+        run: |
+          go=true
+          nix=true
+          workflow=true
+          docker=true
+          # Required checks must still report success on documentation-only
+          # PRs. Scope steps inside the job, never the workflow trigger.
+          if [[ "$CI_EVENT_NAME" = pull_request ]] && git diff --name-only -z HEAD^ HEAD > "$RUNNER_TEMP/ci-paths"; then
+            go=false
+            nix=false
+            workflow=false
+            docker=false
+            while IFS= read -r -d '' path; do
+              case "$path" in
+                src/*|.vscode/*|.github/workflows/ci.yaml) go=true ;;
+              esac
+              case "$path" in
+                src/go.mod|src/go.sum|flake.nix|flake.lock|.github/workflows/ci.yaml) nix=true; go=true ;;
+              esac
+              case "$path" in
+                .github/workflows/*|scripts/*|action.yml) workflow=true ;;
+              esac
+              case "$path" in
+                Dockerfile|Dockerfile.*|.dockerignore|src/go.mod|src/go.sum|.github/workflows/ci.yaml) docker=true ;;
+              esac
+            done < "$RUNNER_TEMP/ci-paths"
+          fi
+          printf 'go=%s\nnix=%s\nworkflow=%s\ndocker=%s\n' "$go" "$nix" "$workflow" "$docker" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
+        if: steps.scope.outputs.go == 'true' || steps.scope.outputs.workflow == 'true'
+        with:
+          go-version: '1.26.x'
+          check-latest: true
+          cache-dependency-path: src/go.sum
+      - name: Format, vet, race tests, modules, and cross builds
+        if: steps.scope.outputs.go == 'true'
+        working-directory: src
+        run: |
+          test -z "$(gofmt -l ./*.go)"
+          go mod verify
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
+          go vet ./...
+          go test -race -cover ./...
+          for target in linux/amd64 linux/arm64 linux/386 darwin/amd64 darwin/arm64 windows/amd64 windows/arm64 windows/386; do
+            GOOS=${target%/*} GOARCH=${target#*/} CGO_ENABLED=0 go build -o /tmp/helmizer-check .
+          done
+      - name: Go vulnerability check
+        if: steps.scope.outputs.go == 'true'
+        working-directory: src
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@"${GOVULNCHECK_VERSION}"
+          govulncheck ./...
+      - name: Release automation tests
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
+      - name: Workflow and shell syntax
+        if: steps.scope.outputs.workflow == 'true'
+        run: |
+          go install github.com/rhysd/actionlint/cmd/actionlint@"${ACTIONLINT_VERSION}"
+          actionlint
+          shellcheck scripts/*.sh
+      - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31
+        if: steps.scope.outputs.nix == 'true'
+      - name: Nix dependency consistency
+        if: steps.scope.outputs.nix == 'true'
+        # Expensive Nix builds are reserved for release runs. This catches Go
+        # updates that neglected the fixed-output dependency hash cheaply.
+        run: |
+          nix-instantiate --parse flake.nix >/dev/null
+          cd src
+          go mod vendor
+          cd ..
+          expected=$(sed -n 's/.*vendorHash = "\([^"]*\)";.*/\1/p' flake.nix)
+          actual=$(nix hash path src/vendor)
+          test "$actual" = "$expected" || { echo "Refresh flake.nix vendorHash: $actual"; exit 1; }
+      - name: Docker image builds
+        if: steps.scope.outputs.docker == 'true'
+        # Base image bumps auto-merge, so build both images (native arch only)
+        # before merge instead of first discovering a break in the release run.
+        run: |
+          docker build --build-arg VERSION=0.0.0-ci -t helmizer-ci .
+          docker build --build-arg VERSION=0.0.0-ci -f Dockerfile.helm -t helmizer-helm-ci .
+          test "$(docker run --rm helmizer-ci --version)" = "helmizer 0.0.0-ci"
+          docker run --rm --entrypoint helm helmizer-helm-ci version --short

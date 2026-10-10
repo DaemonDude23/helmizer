@@ -13,7 +13,8 @@ src/                    # All Go source code
   helmizer.go           # Core logic: Config/Kustomization structs, command execution,
                         #   config reconciliation, file walking, kustomization writing
   utilities.go          # Helpers: YAML reading, path construction, glob/doublestar matching,
-                        #   config path resolution, and the source-default version string
+                        #   config path resolution, and the embedded version fallback
+  VERSION               # Single version source: embedded via go:embed and read by flake.nix
   charts.go             # `helmizer charts check` subcommand: reports available chart updates
                         #   for Helmfile releases with a version policy and risk score
   helmfile.go           # Helmfile state loading (`helmfile build`) and release/repo parsing
@@ -26,7 +27,9 @@ Dockerfile.helm         # Alpine image with helmizer + helm binary (from alpine/
 action.yml              # GitHub Action definition (docker-based, uses Dockerfile.helm)
 .goreleaser.yaml        # Cross-platform release builds (linux/darwin/windows, amd64/arm64/386)
 .github/
-  workflows/release.yaml  # CI: test -> goreleaser + docker build on tag push
+  workflows/ci.yaml       # PR/main checks: fmt, vet, race tests, cross builds, govulncheck, actionlint, Nix vendorHash
+  workflows/security.yaml # Weekly govulncheck, gosec, Trivy fs; dependency review on PRs
+  workflows/release.yaml  # Monthly/dispatch/tag release: plan -> verify -> scan images -> goreleaser -> GHCR
   renovate.json           # Renovate config for Dockerfile, gomod, helm, kustomize, GH Actions
 examples/               # One subdirectory per kustomize feature, each with helmizer.yaml + expected output
 ```
@@ -44,10 +47,10 @@ cd src && go test -v ./...
 mkdir -p ./build/nix && nix build .#default --out-link ./build/nix/helmizer
 
 # Docker build (minimal)
-docker build --build-arg VERSION=0.20.0 -t helmizer .
+docker build --build-arg VERSION=0.21.0 -t helmizer .
 
 # Docker build (with helm)
-docker build --build-arg VERSION=0.20.0 -f Dockerfile.helm -t helmizer-helm .
+docker build --build-arg VERSION=0.21.0 -f Dockerfile.helm -t helmizer-helm .
 ```
 
 ## Key Dependencies
@@ -65,7 +68,7 @@ docker build --build-arg VERSION=0.20.0 -f Dockerfile.helm -t helmizer-helm .
    b. Reconcile CLI args with config (CLI overrides config)
    c. Run pre-commands (e.g. `helm template`) with working dir set to config file's directory
    d. Build `Kustomization` struct - for `resources`/`crds`/`patchesStrategicMerge`, walks directories recursively
-   e. Write `kustomization.yaml` only if content changed (MD5 comparison)
+   e. Write `kustomization.yaml` only if content changed (byte comparison)
    f. Run post-commands
 
 ## Config File Format
@@ -82,7 +85,7 @@ The `action.yml` defines a Docker-based action using `Dockerfile.helm`. Inputs:
 
 ## Version
 
-Current source version: `0.20.0` in `src/utilities.go`. Release builds stamp `main.version` via the flake, Dockerfiles, and GoReleaser so packaged artifacts stay aligned.
+Current source version: `0.21.0` in `src/VERSION` (the development baseline). Go embeds it as the fallback and `flake.nix` reads it; release builds stamp `main.version` via the flake, Dockerfiles, and GoReleaser. The Release workflow writes the exact tag version into `src/VERSION` in a version-only commit carried by the tag. See `docs/automation.md`.
 
 ## Local Claude Skills
 
@@ -92,9 +95,9 @@ Current source version: `0.20.0` in `src/utilities.go`. Release builds stamp `ma
 
 ## Conventions
 
-- Keep the `var version = "..."` in `src/utilities.go` aligned with the next local release; packaged builds override it with ldflags
+- Version lives only in `src/VERSION`; bump it explicitly to request a minor/major baseline. Don't reintroduce a hardcoded version in Go or Nix
 - There are a few basic `_test.go` files now, but test coverage is still intentionally light
 - Pre-commit hooks configured via `.pre-commit-config.yaml`
 - YAML indentation is normalized to 2 spaces via `FixYAMLIndentation`
 - Commands execute with working directory set to the helmizer config file's parent directory
-- Release flow is two-step by design: run `./scripts/release.sh prepare <version>` on a release branch, merge it, then run `./scripts/release.sh tag <version>` from `main`
+- Releases are automated by `.github/workflows/release.yaml` (monthly patch, or manual dispatch with a bump). For a feature/breaking release, raise `src/VERSION` and add a `CHANGELOG.md` entry in a PR before the run. `scripts/release.sh` is legacy and commits/pushes

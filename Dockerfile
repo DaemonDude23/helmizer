@@ -1,5 +1,7 @@
 # Builder stage
-FROM docker.io/library/golang:1.26.5 AS builder
+FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.26.9@sha256:f1f0bcc2c524a3ced375fcb4d1ecb7aa371aa7070e112599aaca45cc02d0101b AS builder
+ARG TARGETOS
+ARG TARGETARCH
 ARG VERSION=dev
 WORKDIR /build
 # Copy go mod files and download dependencies
@@ -8,7 +10,7 @@ RUN go mod download
 # Copy the rest of the source code
 COPY ./src/ ./
 # Build the helmizer binary with CGO disabled for a fully static binary
-RUN CGO_ENABLED=0 go build -ldflags="-s -w -X main.version=${VERSION}" -o helmizer .
+RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} go build -ldflags="-s -w -X main.version=${VERSION}" -o helmizer .
 
 # Final stage
 FROM scratch AS final
@@ -17,4 +19,5 @@ COPY --from=builder /build/helmizer /usr/local/bin/helmizer
 # Provide CA certificates for TLS
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 # By default, set the binary as the entry point in case you want to run it
+USER 65532:65532
 ENTRYPOINT ["/usr/local/bin/helmizer"]

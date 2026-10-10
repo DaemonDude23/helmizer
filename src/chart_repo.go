@@ -36,9 +36,14 @@ func FetchHelmRepositoryIndexWithClient(client *http.Client, repoURL string) (He
 		return HelmRepositoryIndex{}, fmt.Errorf("GET %s returned %s", indexURL, resp.Status)
 	}
 
-	body, err := io.ReadAll(resp.Body)
+	const maxIndexBytes = 32 << 20
+	body, err := io.ReadAll(io.LimitReader(resp.Body, maxIndexBytes+1))
 	if err != nil {
 		return HelmRepositoryIndex{}, err
+	}
+
+	if len(body) > maxIndexBytes {
+		return HelmRepositoryIndex{}, fmt.Errorf("Helm repository index exceeds %d bytes", maxIndexBytes)
 	}
 
 	var index HelmRepositoryIndex

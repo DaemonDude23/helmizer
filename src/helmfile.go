@@ -244,6 +244,7 @@ func helmfileGlobalArgs(helmfilePath string, options HelmfileCommandOptions, ext
 }
 
 func runCommand(workDir string, name string, args ...string) ([]byte, string, error) {
+	// #nosec G204 -- This CLI deliberately invokes local Helmfile with arguments from trusted user configuration, without a shell.
 	cmd := exec.Command(name, args...)
 	if workDir != "" {
 		cmd.Dir = workDir

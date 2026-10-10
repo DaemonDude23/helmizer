@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"crypto/md5"
 	"errors"
 	"os"
 	"os/exec"
@@ -137,6 +136,7 @@ func ExecuteCommands(stage string, args CLIArgs, helmizer Helmizer) ([]string, e
 	}
 
 	for _, command := range commands {
+		// #nosec G204 -- Executing user-selected commands is an explicit feature of trusted local configuration.
 		cmd := exec.Command(command.Command, command.Arguments...)
 
 		// Combine the command with its arguments
@@ -264,6 +264,7 @@ func GetFilesOrURLs(Type string, ConfigFilePath string, config Config) []string 
 // RenameHelmizerKeys reads the Helmizer configuration from a YAML file and renames the keys
 func RenameHelmizerKeys(filePath string) error {
 	// Read the file
+	// #nosec G304 -- The caller selects a local config path; this CLI intentionally accepts arbitrary workspace paths.
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		log.Error(err)
@@ -356,6 +357,7 @@ func WriteKustomizationFile(args CLIArgs, helmizer Config, kustomization Kustomi
 	kAbsPath, _ := filepath.Abs(kFilePath)
 
 	// Read the existing file
+	// #nosec G304 -- The output path is selected by the local user, not a remote request.
 	oldContent, err := os.ReadFile(kAbsPath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
@@ -371,9 +373,6 @@ func WriteKustomizationFile(args CLIArgs, helmizer Config, kustomization Kustomi
 	// Fix indentation of the old content
 	fixedOldContent := FixYAMLIndentation(oldContent)
 
-	// Calculate MD5 hash of the fixed old content
-	oldHash := md5.Sum(fixedOldContent)
-
 	// Marshal kustomization to YAML
 	kustomizationYAML, err := yaml.Marshal(&kustomization)
 	if err != nil {
@@ -383,12 +382,10 @@ func WriteKustomizationFile(args CLIArgs, helmizer Config, kustomization Kustomi
 	// Fix indentation of the new content
 	fixedNewContent := FixYAMLIndentation(kustomizationYAML)
 
-	// Calculate MD5 hash of the fixed new content
-	newHash := md5.Sum(fixedNewContent)
-
-	// Compare old hash with new hash
-	if oldHash != newHash {
+	// Compare normalized content directly
+	if !bytes.Equal(fixedOldContent, fixedNewContent) {
 		// Write new content to file
+		// #nosec G306 -- Generated Kubernetes manifests use conventional readable permissions; secret payloads require user-controlled file permissions.
 		err = os.WriteFile(kAbsPath, fixedNewContent, 0644)
 		if err != nil {
 			log.Fatal(err)
