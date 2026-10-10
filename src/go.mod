@@ -4,7 +4,7 @@ go 1.26.1
 
 require (
 	github.com/alexflint/go-arg v1.6.1
-	github.com/sirupsen/logrus v1.9.4
+	github.com/sirupsen/logrus v1.10.2
 	gopkg.in/yaml.v3 v3.0.1
 )
 
