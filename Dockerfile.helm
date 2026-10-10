@@ -12,8 +12,25 @@ COPY ./src/ ./
 # Build the helmizer binary with CGO disabled for a fully static binary
 RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} go build -ldflags="-s -w -X main.version=${VERSION}" -o helmizer .
 
-# Helm stage
-FROM docker.io/alpine/helm:4.3.0@sha256:a6cf54599ccb99d90cf0712b30f03fdb3cab062e6b94e0418cc4db7e8a1464b2 AS helm
+# Helm stage - built from a pinned source commit with the pinned Go toolchain so
+# toolchain and x/net security fixes don't wait for upstream Helm images
+FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.26.9@sha256:f1f0bcc2c524a3ced375fcb4d1ecb7aa371aa7070e112599aaca45cc02d0101b AS helm
+ARG TARGETOS
+ARG TARGETARCH
+# renovate: datasource=github-tags depName=helm/helm
+ARG HELM_VERSION=v4.3.0
+ARG HELM_COMMIT=bec5b06ed841fe5269972d864d5177944fd5970f
+# renovate: datasource=go depName=golang.org/x/net
+ARG X_NET_VERSION=v0.60.0
+WORKDIR /helm
+RUN git init -q . \
+    && git fetch -q --depth 1 https://github.com/helm/helm.git "refs/tags/${HELM_VERSION}" \
+    && git checkout -q FETCH_HEAD \
+    && test "$(git rev-parse HEAD)" = "${HELM_COMMIT}"
+RUN go get "golang.org/x/net@${X_NET_VERSION}" && go mod tidy
+RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} go build -trimpath \
+    -ldflags="-s -w -X helm.sh/helm/v4/internal/version.version=${HELM_VERSION} -X helm.sh/helm/v4/internal/version.gitCommit=${HELM_COMMIT} -X helm.sh/helm/v4/internal/version.gitTreeState=clean" \
+    -o /usr/bin/helm ./cmd/helm
 
 # Final stage - alpine instead of scratch so we have a shell (needed for GitHub Actions and CI)
 FROM docker.io/library/alpine:3.24.2@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6 AS final
