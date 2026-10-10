@@ -19,7 +19,7 @@
 
 ## v0.21.0
 
-Unreleased
+October 9 2026
 
 **Breaking**
 
@@ -28,7 +28,7 @@ Unreleased
 **Security**
 
 - Helm repository index downloads are capped at 32 MiB, so a hostile or broken repository can't exhaust memory during `charts check`.
-- Docker base images are pinned by digest and bumped to `golang` 1.26.7, `alpine` 3.24.2, and `alpine/helm` 4.3.0 to pick up fixed high-severity advisories. The Helm image also applies available Alpine package upgrades at build time.
+- Docker base images are pinned by digest and bumped to `golang` 1.26.9, `alpine` 3.24.2, and `alpine/helm` 4.3.0 to pick up fixed high-severity advisories. The Helm image also applies available Alpine package upgrades at build time.
 - Docker builds cross-compile natively on the build platform, and a `.dockerignore` limits the build context to the Dockerfiles and `src/`.
 
 **Release Tooling**

@@ -59,6 +59,7 @@ jobs:
         if: steps.scope.outputs.go == 'true' || steps.scope.outputs.workflow == 'true'
         with:
           go-version: '1.26.x'
+          check-latest: true
           cache-dependency-path: src/go.sum
       - name: Format, vet, race tests, modules, and cross builds
         if: steps.scope.outputs.go == 'true'

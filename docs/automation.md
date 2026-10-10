@@ -47,7 +47,7 @@ Helmizer configurations can run pre/post commands and Helmfile can execute templ
 
 Trivy exceptions in `.trivyignore.yaml` apply only to the root user required by the GitHub Docker action and a priority-class-only strategic merge patch. They do not suppress dependency CVEs or secret findings.
 
-Local image validation found fixed high-severity advisories in the previous Go 1.26.5 builder, Helm 4.2.3, and Alpine 3.24.1 packages. The pins were updated to Go 1.26.7, Helm 4.3.0, and Alpine 3.24.2; the Helm runtime also applies available Alpine package upgrades during its build. Image scan gates operate on dependency inventory and can flag vulnerable libraries even when govulncheck finds no reachable vulnerable symbols in Helmizer.
+Local image validation found fixed high-severity advisories in the previous Go 1.26.5 builder, Helm 4.2.3, and Alpine 3.24.1 packages. The pins were updated to Go 1.26.9 (standard library fixes), Helm 4.3.0, and Alpine 3.24.2; the Helm runtime also applies available Alpine package upgrades during its build. Image scan gates operate on dependency inventory and can flag vulnerable libraries even when govulncheck finds no reachable vulnerable symbols in Helmizer.
 
 ## Image publishing details
 
