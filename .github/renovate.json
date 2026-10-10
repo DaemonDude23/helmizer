@@ -122,6 +122,17 @@
         "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\n\\s+[A-Z_]+_VERSION: (?<currentValue>\\S+)",
         "# renovate: datasource=(?<datasource>docker) depName=(?<depName>\\S+)\\n\\s+[A-Z_]+_IMAGE: \\S+?:(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
       ]
+    },
+    {
+      "customType": "regex",
+      "description": "Helm source build and its dependency overrides in Dockerfile.helm",
+      "managerFilePatterns": [
+        "/(^|/)Dockerfile\\.helm$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>github-tags) depName=(?<depName>\\S+)\\nARG [A-Z_]+_VERSION=(?<currentValue>\\S+)\\nARG [A-Z_]+_COMMIT=(?<currentDigest>[a-f0-9]{40})",
+        "# renovate: datasource=(?<datasource>go) depName=(?<depName>\\S+)\\nARG [A-Z_]+_VERSION=(?<currentValue>\\S+)"
+      ]
     }
   ],
   "schedule": [

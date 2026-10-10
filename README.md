@@ -280,7 +280,7 @@ environment.systemPackages = [
 Two Dockerfiles are available:
 
 - `Dockerfile`: minimal scratch image with just `helmizer`.
-- `Dockerfile.helm`: alpine image with `helmizer` plus the Helm binary copied from `docker.io/alpine/helm:4.3.0`.
+- `Dockerfile.helm`: alpine image with `helmizer` plus Helm 4.3.0 built from source with the pinned Go toolchain.
 
 #### In your Docker Image
 
