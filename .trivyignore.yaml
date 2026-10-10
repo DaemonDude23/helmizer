@@ -1,0 +1,10 @@
+# Narrow exceptions for the Docker action and an intentionally partial patch.
+misconfigurations:
+  - id: AVD-DS-0002
+    paths:
+      - Dockerfile.helm
+    statement: GitHub Docker container actions require the default root user to access the mounted workspace. The standalone scratch image runs as non-root.
+  - id: AVD-KSV-0118
+    paths:
+      - examples/patchesStrategicMerge/extra/priority-class.yaml
+    statement: This is a strategic merge patch that changes priorityClassName only. Its security context is supplied by the base workload, not this partial patch.

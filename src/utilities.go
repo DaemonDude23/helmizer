@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	_ "embed"
 	"fmt"
 	"io/fs"
 	"os"
@@ -14,9 +15,18 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
-// version is stamped by release tooling. The source default should match the
-// next local release so ad-hoc builds still report a sensible version.
-var version = "0.20.0"
+// version is the development baseline; release builds stamp the exact tag.
+//
+//go:embed VERSION
+var sourceVersion string
+
+var version string
+
+func init() {
+	if version == "" {
+		version = strings.TrimSpace(sourceVersion)
+	}
+}
 
 func (CLIArgs) Version() string {
 	return "helmizer " + version

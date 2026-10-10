@@ -1,6 +1,7 @@
 **Changelog**
 
 - [2026](#2026)
+  - [v0.21.0](#v0210)
   - [v0.20.0](#v0200)
   - [v0.19.2](#v0192)
   - [v0.19.1](#v0191)
@@ -15,6 +16,40 @@
 ---
 
 # 2026
+
+## v0.21.0
+
+Unreleased
+
+**Breaking**
+
+- The minimal `helmizer` image (`Dockerfile`) now runs as non-root UID/GID `65532`. Mounted output directories must be writable by that UID, or pass `--user` to run as the owner. The `helmizer-helm` image and the GitHub Action are unchanged.
+
+**Security**
+
+- Helm repository index downloads are capped at 32 MiB, so a hostile or broken repository can't exhaust memory during `charts check`.
+- Docker base images are pinned by digest and bumped to `golang` 1.26.7, `alpine` 3.24.2, and `alpine/helm` 4.3.0 to pick up fixed high-severity advisories. The Helm image also applies available Alpine package upgrades at build time.
+- Docker builds cross-compile natively on the build platform, and a `.dockerignore` limits the build context to the Dockerfiles and `src/`.
+
+**Release Tooling**
+
+- `src/VERSION` is now the single version source: Go embeds it as the fallback version and `flake.nix` reads it. `scripts/release.sh` writes it instead of editing `src/utilities.go` and `flake.nix`.
+- The Release workflow plans versions automatically (`scripts/release-plan.py`). It runs monthly, on manual dispatch (patch/minor/major), or on a pushed `v*` tag, and skips when no source, dependency, or image inputs changed. Releases now publish automatically after validation instead of staying as drafts.
+- Before publishing, releases run `go vet`, race tests, govulncheck, and a Nix build. Every image architecture is built and Trivy-scanned once, then the exact scanned archives are pushed (`scripts/release-images.sh`), and `latest` is promoted only after the versioned images publish.
+- GoReleaser config moved to v2 and now uses GitHub-native release notes, reuses existing drafts on retry, and skips the unsupported `darwin/386` target.
+
+**CI**
+
+- Added a `CI` workflow for pull requests and `main`: gofmt, `go mod tidy` drift, vet, race tests with coverage, cross-builds, govulncheck, actionlint/shellcheck, and a Nix `vendorHash` consistency check. Steps are scoped to the files a PR changes, and the required check still reports on docs-only PRs.
+- Added a `Security` workflow: weekly govulncheck, gosec (checksum-verified release binary), and Trivy filesystem scans, plus dependency review on PRs.
+- All GitHub Actions are pinned to full commit SHAs.
+- Renovate config migrated to current option names, pins digests, groups and auto-merges routine minor/patch/digest updates, keeps major, Go module, and Nix input updates manual, raises vulnerability alerts immediately, and manages the pinned scanner versions in workflows.
+
+**Docs/Tests**
+
+- Added `docs/automation.md` covering CI, maintenance cadence, release behavior, and configuration trust.
+- Added Go tests for the index size cap, idempotent generation, dry runs, and stopping at the first failed command, plus Python tests for release planning and image publication.
+- Replaced the MD5 comparison in `kustomization.yaml` writes with a direct byte comparison.
 
 ## v0.20.0
 

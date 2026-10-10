@@ -1,69 +1,96 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "docker": {
-    "enabled": true
-  },
   "extends": [
-    "config:base"
+    "config:recommended",
+    ":pinDigests"
   ],
-  "golang": {
-    "enabled": true
-  },
   "packageRules": [
     {
       "enabled": true,
-      "managers": [
+      "matchManagers": [
         "dockerfile"
       ],
-      "matchFiles": [
-        "**/Dockerfile"
+      "matchFileNames": [
+        "**/Dockerfile",
+        "**/Dockerfile.*"
       ]
     },
     {
       "enabled": true,
-      "managers": [
+      "matchManagers": [
         "gomod"
       ],
-      "matchFiles": [
+      "matchFileNames": [
         "**/go.mod"
       ]
     },
     {
       "enabled": true,
-      "managers": [
+      "matchManagers": [
         "helm-requirements",
         "helm-values"
       ],
-      "matchFiles": [
+      "matchFileNames": [
         "**/Chart.yaml"
       ]
     },
     {
       "enabled": true,
-      "managers": [
+      "matchManagers": [
         "helmfile"
       ],
-      "matchFiles": [
+      "matchFileNames": [
         "**/helmfile.yaml"
       ]
     },
     {
       "enabled": true,
-      "managers": [
+      "matchManagers": [
         "kustomize"
       ],
-      "matchFiles": [
+      "matchFileNames": [
         "**/kustomization.yaml"
       ]
     },
     {
       "enabled": true,
-      "managers": [
+      "matchManagers": [
         "github-actions"
-      ],
-      "matchFiles": [
-        "**/.github/workflows/*.yml"
       ]
+    },
+    {
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "pin",
+        "pinDigest"
+      ],
+      "groupName": "routine maintenance",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    },
+    {
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false
+    },
+    {
+      "matchManagers": [
+        "gomod"
+      ],
+      "automerge": false,
+      "groupName": "Go module maintenance",
+      "description": "Go dependency changes need a reviewed Nix vendorHash refresh."
+    },
+    {
+      "matchManagers": [
+        "nix"
+      ],
+      "automerge": false,
+      "groupName": "Nix input maintenance"
     }
   ],
   "pre-commit": {
@@ -71,5 +98,46 @@
   },
   "automerge": false,
   "rangeStrategy": "replace",
-  "timezone": "America/Los_Angeles"
+  "timezone": "America/Los_Angeles",
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": [
+      "security"
+    ],
+    "schedule": [
+      "at any time"
+    ],
+    "automerge": false,
+    "groupName": null
+  },
+  "osvVulnerabilityAlerts": true,
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Pinned CI scanner and tool versions",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/.*\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\n\\s+[A-Z_]+_VERSION: (?<currentValue>\\S+)",
+        "# renovate: datasource=(?<datasource>docker) depName=(?<depName>\\S+)\\n\\s+[A-Z_]+_IMAGE: \\S+?:(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
+      ]
+    }
+  ],
+  "schedule": [
+    "before 6am on monday"
+  ],
+  "prConcurrentLimit": 3,
+  "nix": {
+    "enabled": true
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "before 6am on the first day of the month"
+    ]
+  },
+  "gomod": {
+    "enabled": true
+  }
 }

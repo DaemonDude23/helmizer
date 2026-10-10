@@ -38,6 +38,8 @@ Use this skill to update helmizer dependency pins and tooling locally while pres
    - Preserve local hook args and enabled/disabled hook choices.
 6. For Dockerfiles and GitHub Actions:
    - Update pinned versions conservatively.
+   - Keep pins fully resolved: Docker `FROM` images carry `tag@sha256:` digests and Actions use full commit SHAs with a `# vN` comment; refresh the digest/SHA together with the tag.
+   - Keep `# renovate:`-annotated `*_VERSION` / `*_IMAGE` env pins in workflows in their existing format so Renovate's custom manager still matches them.
    - Preserve image purpose: minimal scratch image in `Dockerfile`, Alpine/Helm image in `Dockerfile.helm`.
 7. Validate with the narrowest reliable set:
    - `cd src && go test ./...`

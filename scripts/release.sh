@@ -74,7 +74,7 @@ verify_changelog() {
   echo ""
   echo "## ${TAG}"
   echo ""
-  echo "$(date +'%B %-d %Y')"
+  date +'%B %-d %Y'
   echo ""
   echo "**Changes**"
   echo ""
@@ -84,11 +84,8 @@ verify_changelog() {
 }
 
 update_release_files() {
-  echo "--> Updating version string in src/utilities.go"
-  sed -i "s/var version = \"[0-9]*\.[0-9]*\.[0-9]*\"/var version = \"${VERSION}\"/" src/utilities.go
-
-  echo "--> Updating version in flake.nix"
-  sed -i "s/version = \"[0-9]*\.[0-9]*\.[0-9]*\";/version = \"${VERSION}\";/" flake.nix
+  echo "--> Updating development version in src/VERSION"
+  printf '%s\n' "${VERSION}" > src/VERSION
 
   echo "--> Updating release examples in docs/dev.md"
   sed -i "s/prepare v[0-9]*\.[0-9]*\.[0-9]*/prepare v${VERSION}/" docs/dev.md || true
@@ -140,7 +137,7 @@ prepare_release() {
   verify_changelog
 
   echo "--> Committing release prep if needed"
-  git add src/utilities.go src/utilities_test.go flake.nix flake.lock src/go.mod src/go.sum CHANGELOG.md docs/dev.md README.md scripts/release.sh
+  git add src/VERSION src/utilities.go src/utilities_test.go flake.nix flake.lock src/go.mod src/go.sum CHANGELOG.md docs/dev.md README.md scripts/release.sh
   if git diff --cached --quiet; then
     echo "    No tracked release changes to commit."
   else
@@ -191,8 +188,8 @@ tag_release() {
   git push origin "refs/tags/${TAG}"
 
   echo ""
-  echo "==> Tag pushed. GitHub Actions should create/update the draft release."
-  echo "Final manual step: open the draft release in GitHub, review it, and publish it."
+  echo "==> Tag pushed. GitHub Actions should validate and publish the release and images."
+  echo "Check the Release workflow for the publication result."
 }
 
 case "${MODE}" in
