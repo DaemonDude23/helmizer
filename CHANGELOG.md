@@ -24,7 +24,11 @@ October 21 2026
 
 **Security**
 
-- Moved CI, release, and Docker builds to Go 1.27.3 (`golang` image pinned by digest), picking up the Go standard library fix for GO-2026-6809 (`crypto/x509`) that govulncheck reported as reachable on Go 1.26.9.
+- Fixed [CVE-2026-111943](https://pkg.go.dev/vuln/GO-2026-6809) (GO-2026-6809, `crypto/x509`): Go's certificate verification now rejects known compromised intermediate certificates that system trust stores may still accept. The fix ships in Go 1.27.3 (and 1.26.10); `go 1.27.0`-`1.27.2` are affected. govulncheck reported it as reachable from helmizer on Go 1.26.9. The module `go` directive, CI, release and Docker builds (`golang` image pinned by digest) and the Nix build now use Go 1.27.3.
+
+**CI**
+
+- Bumped govulncheck from v1.1.4 to v1.9.0 in the CI, Security and Release workflows; v1.1.4 panics (`unexpected expr: *ast.KeyValueExpr`) when analysing code under Go 1.27.
 
 **Dependencies**
 
