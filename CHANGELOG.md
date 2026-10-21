@@ -29,7 +29,7 @@ October 21 2026
 **Dependencies**
 
 - Bumped `github.com/sirupsen/logrus` to v1.10.2 and `golang.org/x/sys` to v0.49.0.
-- Moved the module `go` directive to `1.27.0`, the language version supported by the Go toolchain in `nixpkgs` (`go_1_27`); the flake now builds with `buildGo127Module` and the dev shells use `go_1_27`. Refreshed the flake `vendorHash`.
+- Moved the module `go` directive to `1.27.3`, the Go release that fixes GO-2026-6809; the flake now builds with `buildGo127Module` and the dev shells use `go_1_27`. Updated the `nixpkgs` flake input to a revision that ships Go 1.27.3 and refreshed the flake `vendorHash`.
 - Bumped pre-commit hooks: `reorder_python_imports` v3.18.0, `black` 26.10.0, and `mirrors-mypy` v2.4.0.
 
 ## v0.21.0
