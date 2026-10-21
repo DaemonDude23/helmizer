@@ -13,7 +13,7 @@ env:
   # renovate: datasource=go depName=github.com/rhysd/actionlint
   ACTIONLINT_VERSION: v1.7.11
   # renovate: datasource=go depName=golang.org/x/vuln
-  GOVULNCHECK_VERSION: v1.1.4
+  GOVULNCHECK_VERSION: v1.9.0
 jobs:
   check:
     name: Go checks
