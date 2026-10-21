@@ -67,9 +67,8 @@
         "pinDigest"
       ],
       "groupName": "routine maintenance",
-      "automerge": true,
-      "automergeType": "pr",
-      "platformAutomerge": true
+      "automerge": false,
+      "platformAutomerge": false
     },
     {
       "matchUpdateTypes": [
@@ -97,6 +96,7 @@
     "enabled": true
   },
   "automerge": false,
+  "platformAutomerge": false,
   "rangeStrategy": "replace",
   "timezone": "America/Los_Angeles",
   "vulnerabilityAlerts": {
