@@ -12,13 +12,13 @@
         pkgs = nixpkgs.legacyPackages.${system};
         version = builtins.replaceStrings [ "\n" ] [ "" ] (builtins.readFile ./src/VERSION);
 
-        helmizer = pkgs.buildGoModule {
+        helmizer = pkgs.buildGo127Module {
           pname = "helmizer";
           inherit version;
           src = ./.;
           modRoot = "src";
           subPackages = [ "." ];
-          vendorHash = "sha256-N6oCBFIRpIwTHuGT0BEQqRyor7YBTdw7s2m3WbxStsg=";
+          vendorHash = "sha256-Q7kEPw7VwUJ9DgTSfxbN0yz+rEJyRs/i0BUQsvFsg7c=";
           ldflags = [
             "-s"
             "-w"
@@ -40,7 +40,7 @@
         };
 
         devShells.default = pkgs.mkShell {
-          packages = [ pkgs.go_1_26 pkgs.gopls pkgs.gotools ];
+          packages = [ pkgs.go_1_27 pkgs.gopls pkgs.gotools ];
         };
       });
 }
