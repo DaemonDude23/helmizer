@@ -1,6 +1,7 @@
 **Changelog**
 
 - [2026](#2026)
+  - [v0.21.1](#v0211)
   - [v0.21.0](#v0210)
   - [v0.20.0](#v0200)
   - [v0.19.2](#v0192)
@@ -16,6 +17,20 @@
 ---
 
 # 2026
+
+## v0.21.1
+
+October 21 2026
+
+**Security**
+
+- Moved CI, release, and Docker builds to Go 1.27.3 (`golang` image pinned by digest), picking up the Go standard library fix for GO-2026-6809 (`crypto/x509`) that govulncheck reported as reachable on Go 1.26.9.
+
+**Dependencies**
+
+- Bumped `github.com/sirupsen/logrus` to v1.10.2 and `golang.org/x/sys` to v0.49.0.
+- Moved the module `go` directive to `1.27.0`, the language version supported by the Go toolchain in `nixpkgs` (`go_1_27`); the flake now builds with `buildGo127Module` and the dev shells use `go_1_27`. Refreshed the flake `vendorHash`.
+- Bumped pre-commit hooks: `reorder_python_imports` v3.18.0, `black` 26.10.0, and `mirrors-mypy` v2.4.0.
 
 ## v0.21.0
 

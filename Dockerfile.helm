@@ -1,5 +1,5 @@
 # Builder stage
-FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.26.9@sha256:f1f0bcc2c524a3ced375fcb4d1ecb7aa371aa7070e112599aaca45cc02d0101b AS builder
+FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.27.3@sha256:f20d83a83e18dbd2a4714b8ffd4b30b287b6243962dd75608e86abcc63ba4efc AS builder
 ARG TARGETOS
 ARG TARGETARCH
 ARG VERSION=dev
@@ -14,7 +14,7 @@ RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} go build -
 
 # Helm stage - built from a pinned source commit with the pinned Go toolchain so
 # toolchain and x/net security fixes don't wait for upstream Helm images
-FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.26.9@sha256:f1f0bcc2c524a3ced375fcb4d1ecb7aa371aa7070e112599aaca45cc02d0101b AS helm
+FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.27.3@sha256:f20d83a83e18dbd2a4714b8ffd4b30b287b6243962dd75608e86abcc63ba4efc AS helm
 ARG TARGETOS
 ARG TARGETARCH
 # renovate: datasource=github-tags depName=helm/helm

@@ -21,7 +21,7 @@ src/                    # All Go source code
   chart_repo.go         # Helm HTTP(S) repository index fetching and chart version listing
   semver.go             # SemVer parsing, comparison, and version policy/constraint matching
   utilities_test.go     # Basic tests for version output and config-glob resolution
-  go.mod                # Module: daemondude23/helmizer, Go 1.26.1 for Nix compatibility
+  go.mod                # Module: daemondude23/helmizer, Go 1.27.0 language version for Nix compatibility
 Dockerfile              # Minimal scratch image with just helmizer
 Dockerfile.helm         # Alpine image with helmizer + helm (built from pinned source)
 action.yml              # GitHub Action definition (docker-based, uses Dockerfile.helm)
