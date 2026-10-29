@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 env:
   # renovate: datasource=go depName=github.com/rhysd/actionlint
-  ACTIONLINT_VERSION: v1.7.11
+  ACTIONLINT_VERSION: v1.7.12
   # renovate: datasource=go depName=golang.org/x/vuln
   GOVULNCHECK_VERSION: v1.9.0
 jobs:
@@ -88,7 +88,7 @@ jobs:
           go install github.com/rhysd/actionlint/cmd/actionlint@"${ACTIONLINT_VERSION}"
           actionlint
           shellcheck scripts/*.sh
-      - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31
+      - uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31
         if: steps.scope.outputs.nix == 'true'
       - name: Nix dependency consistency
         if: steps.scope.outputs.nix == 'true'
