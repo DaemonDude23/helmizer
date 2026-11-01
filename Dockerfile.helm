@@ -1,5 +1,5 @@
 # Builder stage
-FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.27.3@sha256:f20d83a83e18dbd2a4714b8ffd4b30b287b6243962dd75608e86abcc63ba4efc AS builder
+FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.27.3@sha256:2920bb124f1a2e12a1d39f0cab756ae0068441ee1da7655dec7f5e374944095b AS builder
 ARG TARGETOS
 ARG TARGETARCH
 ARG VERSION=dev
@@ -14,12 +14,12 @@ RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} go build -
 
 # Helm stage - built from a pinned source commit with the pinned Go toolchain so
 # toolchain and x/net security fixes don't wait for upstream Helm images
-FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.27.3@sha256:f20d83a83e18dbd2a4714b8ffd4b30b287b6243962dd75608e86abcc63ba4efc AS helm
+FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.27.3@sha256:2920bb124f1a2e12a1d39f0cab756ae0068441ee1da7655dec7f5e374944095b AS helm
 ARG TARGETOS
 ARG TARGETARCH
 # renovate: datasource=github-tags depName=helm/helm
-ARG HELM_VERSION=v4.3.0
-ARG HELM_COMMIT=bec5b06ed841fe5269972d864d5177944fd5970f
+ARG HELM_VERSION=v4.3.1
+ARG HELM_COMMIT=c0d08d0d6d9424d4a14febb5e8a3e51b0dd00dff
 # renovate: datasource=go depName=golang.org/x/net
 ARG X_NET_VERSION=v0.60.0
 WORKDIR /helm
@@ -33,7 +33,7 @@ RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} go build -
     -o /usr/bin/helm ./cmd/helm
 
 # Final stage - alpine instead of scratch so we have a shell (needed for GitHub Actions and CI)
-FROM docker.io/library/alpine:3.24.2@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6 AS final
+FROM docker.io/library/alpine:3.24.3@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a AS final
 RUN apk upgrade --no-cache && apk add --no-cache ca-certificates git
 # Copy the helm binary and helmizer binary to a known location
 COPY --from=helm /usr/bin/helm /usr/local/bin/helm

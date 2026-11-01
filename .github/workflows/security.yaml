@@ -21,9 +21,9 @@ env:
   # renovate: datasource=go depName=golang.org/x/vuln
   GOVULNCHECK_VERSION: v1.9.0
   # renovate: datasource=go depName=github.com/securego/gosec/v2
-  GOSEC_VERSION: v2.29.0
+  GOSEC_VERSION: v2.30.0
   # renovate: datasource=docker depName=docker.io/aquasec/trivy
-  TRIVY_IMAGE: docker.io/aquasec/trivy:0.75.0@sha256:af6acf9a6b85dfe389a1941505c0ce9efef52a4719635e1a962f022a3d855daa
+  TRIVY_IMAGE: docker.io/aquasec/trivy:0.76.1@sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c
 
 jobs:
   govulncheck:
