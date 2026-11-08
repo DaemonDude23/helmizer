@@ -1,0 +1,30 @@
+name: Bug report
+description: Something does not work as documented
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Commands, config, and input that trigger it. Redact secrets.
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `helmizer --version`, or the commit
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: OS and install method
+      placeholder: "NixOS 26.05, nix profile install"

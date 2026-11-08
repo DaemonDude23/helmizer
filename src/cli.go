@@ -60,20 +60,21 @@ func SetupLogging(args CLIArgs) bool {
 	}
 
 	// Set Log level from args
-	if strings.EqualFold(args.LogLevel, "TRACE") {
+	switch {
+	case strings.EqualFold(args.LogLevel, "TRACE"):
 		log.SetReportCaller(true)
 		log.SetLevel(log.TraceLevel)
 		log.Debugf("Log level set to TRACE")
-	} else if strings.EqualFold(args.LogLevel, "DEBUG") {
+	case strings.EqualFold(args.LogLevel, "DEBUG"):
 		log.SetLevel(log.DebugLevel)
 		log.Debugf("Log level set to DEBUG")
-	} else if strings.EqualFold(args.LogLevel, "ERROR") {
+	case strings.EqualFold(args.LogLevel, "ERROR"):
 		log.SetLevel(log.ErrorLevel)
 		log.Debugf("Log level set to ERROR")
-	} else if strings.EqualFold(args.LogLevel, "WARNING") {
+	case strings.EqualFold(args.LogLevel, "WARNING"):
 		log.SetLevel(log.WarnLevel)
 		log.Debugf("Log level set to WARNING")
-	} else {
+	default:
 		log.SetLevel(log.InfoLevel)
 	}
 

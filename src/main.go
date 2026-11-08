@@ -69,7 +69,8 @@ func RunHelmizer(args CLIArgs) {
 
 	// Run commands before constructing the kustomization file
 	if !reconciledHelmizerConfig.Helmizer.SkipAllCommands && !reconciledHelmizerConfig.Helmizer.SkipPreCommands {
-		ExecuteCommands("pre", args, reconciledHelmizerConfig.Helmizer)
+		// Failures are logged by ExecuteCommands; stopOnError decides whether helmizer exits.
+		_, _ = ExecuteCommands("pre", args, reconciledHelmizerConfig.Helmizer)
 	} else {
 		log.Info("Skipping pre-command sequence")
 	}
@@ -113,7 +114,8 @@ func RunHelmizer(args CLIArgs) {
 
 	// Run commands after constructing the kustomization file
 	if !reconciledHelmizerConfig.Helmizer.SkipAllCommands && !reconciledHelmizerConfig.Helmizer.SkipPostCommands {
-		ExecuteCommands("post", args, reconciledHelmizerConfig.Helmizer)
+		// Failures are logged by ExecuteCommands; stopOnError decides whether helmizer exits.
+		_, _ = ExecuteCommands("post", args, reconciledHelmizerConfig.Helmizer)
 	} else {
 		log.Info("Skipping post-command sequence")
 	}

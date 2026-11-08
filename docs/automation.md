@@ -1,31 +1,43 @@
 # CI, maintenance, and releases
 
-These files configure GitHub-hosted workflows and Renovate only; no runner, GitHub setting, or cloud resource is provisioned by them. Nix flakes only see Git-tracked files, so a new file such as `src/VERSION` must be committed or added with `git add --intent-to-add` before `nix build` can read it.
+helmizer follows the footprint standard (shared tooling across DaemonDude23 projects): every
+tool comes from the flake (`flake.lock`), CI only installs Nix, and `make check` runs the
+same checks locally. Nix flakes only see Git-tracked files, so a new file such as
+`src/VERSION` must be committed or added with `git add --intent-to-add` before
+`nix build` can read it.
 
-## Cost and cadence
+## Workflows
 
-Standard GitHub-hosted runners are free for public repositories. Private repositories consume the owner's included minutes. See [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions). This configuration uses Linux runners, bounded job timeouts, Go caches, and BuildKit reuse of intermediate layers within each release job. No routine artifact uploads are retained.
+- **CI** (`ci.yml`, PRs, `main`, merge queue): pre-commit on every file (formatting,
+  golangci-lint, `go mod tidy -diff`, vendorHash, actionlint, zizmor, shellcheck,
+  markdownlint, typos, gitleaks, tflint), `nix flake check` (build, unit tests, strict docs,
+  formatting), the Renovate config, `tofu validate`, race tests with short fuzzing, cross
+  builds for every goreleaser target, the release tooling tests, and both container images.
+  The single required check is `ci-ok`, which waits for all of them.
+- **Security** (`security.yml`, PRs, `main`, Mondays 06:17 UTC): gitleaks over the full
+  history, trivy fs (exceptions in `.trivyignore.yaml`), zizmor, govulncheck and gosec, and
+  dependency review on PRs. `codeql.yml` and `scorecard.yml` add CodeQL and OpenSSF
+  Scorecard.
+- **Pages** (`pages.yml`): this documentation, from `nix build .#docs`.
+- **Release** (`release.yaml`): see below.
 
-- CI: one job per PR update and main push. Go changes run formatting, module checks, vet, race tests, cross compilation, and govulncheck. Workflow/script changes run workflow and shell lint. Go module/Nix changes run Nix syntax and vendor hash checks. Dockerfile, `.dockerignore`, and Go module changes build both images for the runner's architecture, so auto-merged base image bumps are tested before merge. Documentation-only PRs keep the required check present and run the small release automation test suite, skipping Go tool setup, compilation, scanners, and Nix installation. Main pushes and manual runs execute the full suite. Superseded runs cancel.
-- Security: PR govulncheck is included in the Go checks job; govulncheck, gosec, and Trivy run weekly on Monday at 06:17 UTC or manually. Dependency review runs for public-repository PRs; private repository entitlement must be checked before enabling it there.
-- Renovate: routine updates before 06:00 Monday in America/Los_Angeles; at most three concurrent PRs. Vulnerability alerts bypass the schedule. Patch/minor/digest maintenance can auto-merge after required checks. Major, Go module, and Nix input updates require review.
-- Release: first day of each month at 10:43 UTC, or manual dispatch. Default patch increment, optional minor/major dispatch. Only source/dependency/image changes since the latest stable tag produce a release. Documentation-only changes do not. Schedules are best-effort and run from the default branch.
+## Renovate
 
-For budgeting, start with an illustrative estimate: 40 CI runs × 5 minutes + 4 weekly scan runs × 10 aggregate job minutes + one 30-minute release = 270 minutes/month. These are planning assumptions, not measured runtime; initial cache misses and multi-platform builds can cost more. Check actual usage after the first month. Other repositories share the private-repository allowance. Heavy scans also have explicit job timeouts.
+The Mend Renovate app with the footprint policy (`renovate.json`): a 3-day minimum release
+age (security updates skip it), grouped non-major updates, majors behind Dependency Dashboard
+approval, weekly `flake.lock` maintenance (which moves every tool at once), and no
+automerge. Renovate also tracks the Helm build in `Dockerfile.helm`.
 
-## Required repository settings
+Go module updates change `go.sum`, which invalidates `flake.nix`'s `vendorHash`. On
+Renovate's branches `vendor-hash.yml` recomputes it with `scripts/update-vendor-hash.sh`,
+pushes the fix, and re-runs CI. Locally: `make vendor-hash`.
 
-Before merging, install/enable Renovate and enable the dependency graph and vulnerability alerts. Protect main and require `Go checks` and `Dependency review` (public repositories). `Go checks` includes PR govulncheck; the standalone weekly govulncheck job is not a required PR check. Enable GitHub auto-merge if using Renovate platform auto-merge. Never enable `ignoreTests`. Review bot access and any branch rules requiring reviews: they can prevent automatic merges. Weekly scanner failures should be triaged before approving maintenance; scheduled jobs are not automatically PR required checks.
+## Repository settings
 
-Go module PRs remain reviewed because hosted Renovate cannot generally run arbitrary post-upgrade commands. Refresh the Nix hash locally:
-
-```bash
-(cd src && go mod tidy && go mod vendor)
-nix hash path src/vendor
-# Copy the result into flake.nix's vendorHash.
-rm -rf src/vendor
-nix build .#default --no-link
-```
+`infra/tofu/github` manages the repository: merge methods, the `default-branch` ruleset
+(PRs need `ci-ok` and `dependency review`, linear history, admins bypass), immutable `v*`
+tags, secret scanning, Actions SHA pinning, a read-only default token, and Pages.
+`make tofu-plan` shows pending changes. The owner applies them.
 
 ## Release behavior
 

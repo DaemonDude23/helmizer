@@ -1,4 +1,4 @@
-module daemondude23/helmizer
+module github.com/DaemonDude23/helmizer
 
 go 1.27.3
 

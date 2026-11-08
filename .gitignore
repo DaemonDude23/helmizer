@@ -1,10 +1,35 @@
-.mypy_cache/
-**.go/
-*/.go/
-build/
-venv/
-vendor/
-result
-src/helmizer
+# Nix
+/result
+/result-*
+.direnv/
 
+# Editors and OS
+.DS_Store
+*.swp
+*~
+.idea/
+
+# Local caches and scratch
+.cache/
+/tmp/
+*.local.md
+*.local.*
+
+# mkdocs build output (CI builds with nix build .#docs instead)
+/site/
+
+# Go
+/dist/
+/helmizer
+*.test
+*.out
+coverage.*
+/vendor/
+
+# helmizer
+/build/
+/src/helmizer
+.go/
+**/.go/
 __pycache__/
+.mypy_cache/

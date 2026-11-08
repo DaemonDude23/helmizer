@@ -7,7 +7,7 @@
 
 ---
 
-https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/sortOptions/
+<https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/sortOptions/>
 
 # Generating the Helm Template
 

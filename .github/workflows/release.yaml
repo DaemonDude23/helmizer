@@ -28,6 +28,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Require default branch history
         env:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
@@ -84,11 +85,13 @@ jobs:
         with:
           ref: ${{ needs.plan.outputs.sha }}
           fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
         with:
           go-version: '1.27.x'
           check-latest: true
-          cache-dependency-path: src/go.sum
+          # No dependency cache in the release job (cache poisoning).
+          cache: false
       - name: Prepare matching source version
         run: printf '%s\n' "${TAG#v}" > src/VERSION
       - name: Verify Go and vulnerability checks
@@ -128,7 +131,7 @@ jobs:
             fi
             git -c user.name=github-actions -c user.email=41898282+github-actions[bot]@users.noreply.github.com \
               tag -a "$TAG" -m "$TAG"
-            git push origin "refs/tags/$TAG"
+            git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "refs/tags/$TAG"
           fi
       - uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7
         with:

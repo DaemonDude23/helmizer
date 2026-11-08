@@ -1,0 +1,162 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "footprint standard Renovate policy (see .footprint.json for the blueprint).",
+  "extends": [
+    "config:recommended",
+    "docker:pinDigests",
+    "helpers:pinGitHubActionDigests",
+    ":rebaseStalePrs"
+  ],
+  "timezone": "America/Los_Angeles",
+  "dependencyDashboard": true,
+  "labels": [
+    "dependencies"
+  ],
+  "automerge": false,
+  "platformAutomerge": false,
+  "prConcurrentLimit": 10,
+  "prHourlyLimit": 4,
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
+  "separateMajorMinor": true,
+  "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": {
+    "labels": [
+      "security"
+    ],
+    "minimumReleaseAge": null
+  },
+  "nix": {
+    "enabled": true
+  },
+  "pre-commit": {
+    "enabled": true
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "before 6am on monday"
+    ],
+    "commitMessageAction": "Update",
+    "commitMessageTopic": "flake.lock (all tools)"
+  },
+  "packageRules": [
+    {
+      "description": "Dockerfile base images (both release images)",
+      "matchManagers": [
+        "dockerfile"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "pin",
+        "pinDigest"
+      ],
+      "groupName": "container base images (non-major)"
+    },
+    {
+      "description": "One MR for every non-major CI image and action bump",
+      "matchManagers": [
+        "gitlabci",
+        "github-actions"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "pin",
+        "pinDigest"
+      ],
+      "groupName": "CI (non-major)"
+    },
+    {
+      "description": "pre-commit hook revisions",
+      "matchManagers": [
+        "pre-commit"
+      ],
+      "groupName": "pre-commit hooks"
+    },
+    {
+      "description": "OpenTofu providers of the infra/tofu units",
+      "matchManagers": [
+        "terraform",
+        "terragrunt"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "tofu providers (non-major)"
+    },
+    {
+      "description": "Majors wait for approval on the Dependency Dashboard",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "dependencyDashboardApproval": true,
+      "addLabels": [
+        "major-update"
+      ]
+    },
+    {
+      "description": "Go modules; CI refreshes flake.nix vendorHash on these branches (vendor-hash job)",
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest"
+      ],
+      "groupName": "Go modules (non-major)"
+    },
+    {
+      "description": "The go directive tracks nixpkgs' go_1_27 (minor only); bump it with flake.nix by hand",
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchDepTypes": [
+        "golang",
+        "toolchain"
+      ],
+      "enabled": false
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Versions pinned with a `# renovate:` comment on the line above",
+      "managerFilePatterns": [
+        "/(^|/)\\.gitlab-ci\\.ya?ml$/",
+        "/^\\.github/workflows/.+\\.ya?ml$/",
+        "/(^|/)Makefile$/",
+        "/^scripts/.+\\.sh$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?\\n\\s*[A-Za-z_]+\\s*[:=]\\s*\"?(?<currentValue>[^\"@\\s]+)\"?(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
+      ]
+    },
+    {
+      "customType": "regex",
+      "description": "Helm source build and its dependency overrides in Dockerfile.helm",
+      "managerFilePatterns": [
+        "/(^|/)Dockerfile\\.helm$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>github-tags) depName=(?<depName>\\S+)\\nARG [A-Z_]+_VERSION=(?<currentValue>\\S+)\\nARG [A-Z_]+_COMMIT=(?<currentDigest>[a-f0-9]{40})",
+        "# renovate: datasource=(?<datasource>go) depName=(?<depName>\\S+)\\nARG [A-Z_]+_VERSION=(?<currentValue>\\S+)"
+      ]
+    }
+  ],
+  "postUpdateOptions": [
+    "gomodTidy"
+  ],
+  "gitIgnoredAuthors": [
+    "41898282+github-actions[bot]@users.noreply.github.com",
+    "footprint-bot@users.noreply.gitlab.com"
+  ],
+  "ignorePaths": [
+    "**/examples/**"
+  ]
+}

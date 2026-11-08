@@ -1,0 +1,50 @@
+# Renovate's Go updates change go.sum, which invalidates flake.nix's
+# vendorHash. On Renovate's own PR branches this workflow recomputes the hash,
+# pushes the fix, and re-runs CI on the new commit (pushes made with
+# GITHUB_TOKEN do not trigger workflows themselves). renovate.json lists the
+# bot in gitIgnoredAuthors, so Renovate keeps managing the branch.
+name: vendorHash
+
+on:
+  pull_request:
+    paths:
+      - "**/go.mod"
+      - "**/go.sum"
+
+permissions: {}
+
+concurrency:
+  group: vendor-hash-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    if: github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.head_ref, 'renovate/')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: false
+      - uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31.11.3
+      - name: Recompute vendorHash
+        run: nix develop --command scripts/update-vendor-hash.sh
+      - name: Push the fix and re-run CI
+        env:
+          BRANCH: ${{ github.head_ref }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          if git diff --quiet -- flake.nix; then
+            echo "vendorHash already current"
+            exit 0
+          fi
+          git -c user.name='github-actions[bot]' \
+            -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+            commit -m "Refresh Go vendorHash" -- flake.nix
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "HEAD:refs/heads/${BRANCH}"
+          gh workflow run ci.yml --repo "$REPO" --ref "$BRANCH"

@@ -54,7 +54,7 @@ I began transitioning my `helm` charts to local manifests via [`helm template`](
 
 ## CLI
 
-```
+```text
 Usage: helmizer [--log-format LOG-FORMAT] [--log-level LOG-LEVEL] [--log-colors] [--api-version API-VERSION] [--dry-run] [--kustomization-path KUSTOMIZATION-PATH] [--quiet-commands] [--quiet-helmizer] [--skip-commands] [--skip-postcommands] [--skip-precommands] [--stop-on-error] [--config-glob CONFIG-GLOB] [CONFIGFILEPATH]
 
 Positional arguments:
@@ -118,6 +118,7 @@ The first implementation supports HTTP(S) chart repositories referenced by Helmf
 # Configuration
 
 - Example `helmizer.yaml` config file. The `helm` command is invoked before the content for `kustomization.yaml` is generated. Any number of commands can be added here.
+
 ```yaml
 helmizer:
   apiVersion: "kustomize.config.k8s.io/v1beta1"
@@ -751,4 +752,4 @@ To run on all merge requests (not just Renovate), simplify the rules:
 
 - [Kustomize Docs](https://kubectl.docs.kubernetes.io/references/kustomize/)
 
-All `kustomize` configuration options which are not deprecated by `kustomize` are supported. See [here](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/) for reference.
+All `kustomize` configuration options which are not deprecated by `kustomize` are supported. See the [kustomization reference](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/).

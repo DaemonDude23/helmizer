@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Run a command with the flake devShell's tools: directly when already inside
+# it (direnv / nix develop), otherwise through `nix develop`. pre-commit's
+# local hooks use it, so commits work from any shell or editor.
+#
+#   scripts/devshell-run treefmt --fail-on-change
+set -euo pipefail
+
+if [ -n "${IN_NIX_SHELL:-}" ]; then
+  exec "$@"
+fi
+root=$(git rev-parse --show-toplevel)
+exec nix develop "$root" --quiet --command "$@"

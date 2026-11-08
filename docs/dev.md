@@ -8,7 +8,7 @@ Use the flake-based dev shell when possible:
 nix develop
 ```
 
-`nix-shell` still works via `shell.nix`, but `nix develop` is the primary path now that the repo ships a locked flake.
+With direnv, `direnv allow` once instead. Every tool (Go, linters, scanners, goreleaser, helm, tofu) comes from the flake; `make help` lists the tasks and `make check` runs what CI runs.
 
 ## Go Module and Dependency Updates
 

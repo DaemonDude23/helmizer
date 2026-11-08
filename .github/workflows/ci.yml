@@ -1,0 +1,156 @@
+# Continuous integration. Every tool comes from the flake (flake.lock); the
+# workflow only installs Nix. Actions are pinned to commit SHAs, which Renovate
+# keeps current. `ci-ok` is the single required status check (see
+# infra/tofu/github/rulesets.tf), so jobs can be added or renamed freely.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pre-commit:
+    name: pre-commit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31.11.3
+      - uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7
+        with:
+          primary-key: nix-devshell-${{ runner.os }}-${{ hashFiles('flake.nix', 'flake.lock') }}
+          restore-prefixes-first-match: nix-devshell-${{ runner.os }}-
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+      - name: pre-commit run --all-files
+        run: nix develop --command pre-commit run --all-files --show-diff-on-failure
+
+  flake:
+    name: nix flake check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31.11.3
+      - uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7
+        with:
+          primary-key: nix-flake-${{ runner.os }}-${{ hashFiles('**/*.nix', 'flake.lock', 'src/VERSION') }}
+          restore-prefixes-first-match: nix-flake-${{ runner.os }}-
+      - name: nix flake check
+        run: nix flake check --print-build-logs
+
+  renovate-config:
+    name: renovate config
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31.11.3
+      - name: renovate-config-validator --strict
+        run: nix shell --inputs-from . nixpkgs#renovate --command renovate-config-validator --strict renovate.json
+
+  infra:
+    name: tofu validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31.11.3
+      - name: tofu init -backend=false && tofu validate
+        run: nix develop --command make tofu-validate
+
+  go:
+    name: go test -race
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31.11.3
+      - uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7
+        with:
+          primary-key: nix-devshell-${{ runner.os }}-${{ hashFiles('flake.nix', 'flake.lock') }}
+          restore-prefixes-first-match: nix-devshell-${{ runner.os }}-
+      - name: go vet, race tests, short fuzz
+        run: nix develop --command make test fuzz FUZZTIME=10s
+      - name: vendorHash matches go.sum
+        run: nix develop --command scripts/update-vendor-hash.sh --check
+      - name: Cross builds (every goreleaser target)
+        working-directory: src
+        run: |
+          for target in linux/amd64 linux/arm64 linux/386 darwin/amd64 darwin/arm64 windows/amd64 windows/arm64 windows/386; do
+            GOOS=${target%/*} GOARCH=${target#*/} CGO_ENABLED=0 nix develop --command go build -o /dev/null .
+          done
+
+  # helmizer-specific: the release planner and image scripts have their own tests.
+  release-tooling:
+    name: release tooling tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31.11.3
+      - run: nix develop --command python3 -m unittest discover -s scripts -p 'test_*.py'
+
+  # helmizer-specific: base image bumps must not break the two release images
+  # (helmizer and helmizer + helm, which action.yml runs).
+  docker:
+    name: docker images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build and smoke-test both images
+        run: |
+          docker build --build-arg VERSION=0.0.0-ci -t helmizer-ci .
+          docker build --build-arg VERSION=0.0.0-ci -f Dockerfile.helm -t helmizer-helm-ci .
+          test "$(docker run --rm helmizer-ci --version)" = "helmizer 0.0.0-ci"
+          docker run --rm --entrypoint helm helmizer-helm-ci version --short
+
+  ci-ok:
+    name: ci-ok
+    if: always()
+    needs:
+      - pre-commit
+      - flake
+      - renovate-config
+      - infra
+      - go
+      - release-tooling
+      - docker
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: All required jobs passed
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "results: $RESULTS"
+          for r in $RESULTS; do
+            if [ "$r" != success ] && [ "$r" != skipped ]; then exit 1; fi
+          done

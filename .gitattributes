@@ -1,0 +1,6 @@
+* text=auto eol=lf
+flake.lock linguist-generated=true -diff
+.footprint.json linguist-generated=true
+*.png binary
+*.jpg binary
+*.ico binary
