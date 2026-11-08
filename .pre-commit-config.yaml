@@ -1,60 +1,111 @@
+# Git hooks. The local hooks run tools from the flake devShell (`direnv allow`,
+# or `nix develop`), so their versions come from flake.lock; only
+# pre-commit-hooks is fetched by pre-commit itself (Renovate bumps it).
+#
+#   pre-commit run --all-files     # what CI's pre-commit job runs
+#
+# The devShell installs the hooks on first entry.
+default_install_hook_types: [pre-commit]
+default_stages: [pre-commit, manual]
 repos:
-  # General pre-commit hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=512"]
       - id: check-case-conflict
-      - id: check-docstring-first
       - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
       - id: check-merge-conflict
+      - id: check-symlinks
       - id: destroyed-symlinks
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: fix-byte-order-marker
       - id: mixed-line-ending
-      - id: check-added-large-files
-        args:
-          - '--maxkb=64'
+        args: ["--fix=lf"]
       - id: trailing-whitespace
-        args:
-          - '--markdown-linebreak-ext=md'
-      - id: check-symlinks
+        args: ["--markdown-linebreak-ext=md"]
+      - id: check-json
+        # VS Code settings and tsconfig are JSONC (comments, trailing commas).
+        exclude: '(^|/)(\.vscode/.*|tsconfig[^/]*|\.devcontainer/.*)\.json$'
+      - id: check-toml
       - id: check-yaml
-        args:
-          - '--allow-multiple-documents'
-      - id: requirements-txt-fixer
-      - id: check-ast
-  # Go specific hooks
-  - repo: https://github.com/tekwizely/pre-commit-golang
-    rev: v1.0.0-rc.4
+        # --unsafe: syntax only, so custom tags (mkdocs, GitLab !reference) pass.
+        args: ["--allow-multiple-documents", "--unsafe"]
+  - repo: local
     hooks:
-      - id: go-build-mod
-      # - id: go-mod-tidy
-      # - id: go-mod-tidy-repo
-      - id: go-test-mod
-      # - id: go-test-repo-mod
-      - id: go-fmt
-      # - id: go-fmt-repo
-  # Python specific hooks
-  - repo: https://github.com/asottile/reorder_python_imports
-    rev: v3.19.0
-    hooks:
-      - id: reorder-python-imports
-        args: [--application-directories, '.:src', --py312-plus]
-  - repo: https://github.com/psf/black
-    rev: 26.10.1
-    hooks:
-      - id: black
-        args:
-          - --line-length
-          - "140"
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.4.1
-    hooks:
-      - id: mypy
-        args:
-          - --check-untyped-defs
-          - --ignore-missing-imports
-          - --install-types
-          - --non-interactive
-        files: docs/diagrams/main.py
+      - id: treefmt
+        name: treefmt (nix fmt)
+        entry: scripts/devshell-run treefmt --fail-on-change --no-cache --quiet
+        language: system
+        types: [text]
+      - id: shellcheck
+        name: shellcheck
+        entry: scripts/devshell-run shellcheck
+        language: system
+        types: [shell]
+      - id: gitleaks
+        name: gitleaks (staged changes)
+        entry: scripts/devshell-run gitleaks git --pre-commit --staged --redact --no-banner
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+      - id: typos
+        name: typos
+        entry: scripts/devshell-run typos --force-exclude
+        language: system
+        types: [text]
+      - id: markdownlint
+        name: markdownlint
+        entry: scripts/devshell-run markdownlint-cli2
+        language: system
+        types: [markdown]
+      - id: editorconfig
+        name: editorconfig-checker
+        entry: scripts/devshell-run editorconfig-checker
+        language: system
+        types: [text]
+        exclude: '(^|/)(LICENSE|vendor/.*|.*\.lock)$'
+      - id: tflint
+        name: tflint
+        entry: scripts/devshell-run bash -c 'tflint --recursive --chdir=infra/tofu --config="$PWD/infra/tofu/.tflint.hcl"'
+        language: system
+        files: ^infra/tofu/.*\.tf$
+        pass_filenames: false
+      - id: actionlint
+        name: actionlint
+        entry: scripts/devshell-run actionlint
+        language: system
+        files: ^\.github/workflows/.*\.ya?ml$
+      - id: zizmor
+        name: zizmor (offline)
+        entry: scripts/devshell-run zizmor --offline --persona regular
+        language: system
+        files: ^\.github/workflows/.*\.ya?ml$
+
+      - id: lychee
+        name: lychee (local links)
+        # --offline: relative links and anchors only; no network in hooks.
+        entry: scripts/devshell-run lychee --offline --no-progress --include-fragments
+        language: system
+        types: [markdown]
+
+      - id: golangci-lint
+        name: golangci-lint
+        entry: scripts/devshell-run bash -c 'cd src && golangci-lint run ./...'
+        language: system
+        files: \.go$|(^|/)go\.(mod|sum)$|^\.golangci\.yml$
+        pass_filenames: false
+      - id: go-mod-tidy
+        name: go mod tidy
+        entry: scripts/devshell-run bash -c 'cd src && go mod tidy -diff'
+        language: system
+        files: (^|/)go\.(mod|sum)$|\.go$
+        pass_filenames: false
+      - id: vendor-hash
+        name: flake.nix vendorHash matches go.sum
+        entry: scripts/devshell-run scripts/update-vendor-hash.sh --check
+        language: system
+        files: (^|/)go\.(mod|sum)$|^flake\.nix$
+        pass_filenames: false

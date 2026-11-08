@@ -1,0 +1,22 @@
+# markdownlint-cli2: https://github.com/DavidAnson/markdownlint-cli2
+config:
+  default: true
+  # Prose is wrapped by humans, tables and links are not.
+  MD013: false
+  # CLAUDE.md imports, templates and snippet includes start without a heading.
+  MD041: false
+  # A bold line as a section label is house style in these docs.
+  MD036: false
+  # Inline HTML is allowed (badges, <details>).
+  MD033: false
+  # Keep a Changelog repeats "Added"/"Fixed" headings under each release.
+  MD024:
+    siblings_only: true
+  # mkdocs-material admonitions and tabs use 4-space indented content.
+  MD046: false
+  MD007:
+    indent: 2
+ignores:
+  - "vendor/**"
+  - "**/node_modules/**"
+  - "result/**"

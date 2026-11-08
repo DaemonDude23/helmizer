@@ -34,7 +34,7 @@ else
 fi
 
 case "${MODE}" in
-  prepare|tag)
+  prepare | tag)
     ;;
   *)
     echo "Error: mode must be 'prepare' or 'tag' (got '${MODE}')"
@@ -43,7 +43,7 @@ case "${MODE}" in
     ;;
 esac
 
-if ! [[ "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+if ! [[ ${VERSION} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   echo "Error: version must be in X.Y.Z format (got '${VERSION}')"
   exit 1
 fi
@@ -85,7 +85,7 @@ verify_changelog() {
 
 update_release_files() {
   echo "--> Updating development version in src/VERSION"
-  printf '%s\n' "${VERSION}" > src/VERSION
+  printf '%s\n' "${VERSION}" >src/VERSION
 
   echo "--> Updating release examples in docs/dev.md"
   sed -i "s/prepare v[0-9]*\.[0-9]*\.[0-9]*/prepare v${VERSION}/" docs/dev.md || true
@@ -122,7 +122,7 @@ verify_builds() {
 
   BUILT_VERSION="$("${NIX_OUT_LINK}/bin/helmizer" --version)"
   echo "${BUILT_VERSION}"
-  if [[ "${BUILT_VERSION}" != "helmizer ${VERSION}" ]]; then
+  if [[ ${BUILT_VERSION} != "helmizer ${VERSION}" ]]; then
     echo "Error: built version mismatch (got '${BUILT_VERSION}', expected 'helmizer ${VERSION}')"
     exit 1
   fi
@@ -159,7 +159,7 @@ tag_release() {
   echo "==> Tagging ${TAG} from branch '${CURRENT_BRANCH}'"
   ensure_clean
 
-  if [[ "${CURRENT_BRANCH}" != "${MAIN_BRANCH}" ]]; then
+  if [[ ${CURRENT_BRANCH} != "${MAIN_BRANCH}" ]]; then
     echo "Error: tag mode must run from '${MAIN_BRANCH}' (current branch: '${CURRENT_BRANCH}')"
     echo "If your default branch has a different name, set MAIN_BRANCH=<branch>."
     exit 1

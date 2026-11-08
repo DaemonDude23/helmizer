@@ -1,0 +1,39 @@
+# `nix fmt` formats the whole tree; pre-commit runs the same config on staged
+# files, and `nix flake check` fails on anything unformatted. The formatter
+# binaries come from flake.nix (formatters).
+[global]
+excludes = [
+  "*.lock",
+  ".footprint.json",
+  "LICENSE",
+  "CHANGELOG.md",
+  "vendor/**",
+  "result/**",
+]
+
+[formatter.nixfmt]
+command = "nixfmt"
+includes = ["*.nix"]
+
+[formatter.shfmt]
+command = "shfmt"
+options = ["--write", "--simplify", "--indent", "2", "--case-indent"]
+includes = ["*.sh", "*.bash"]
+
+[formatter.tofu]
+command = "tofu"
+options = ["fmt"]
+includes = ["*.tf", "*.tfvars", "*.tftest.hcl"]
+
+[formatter.hclfmt]
+# Terragrunt files (root.hcl, terragrunt.hcl, .tflint.hcl).
+command = "hclfmt"
+options = ["-w"]
+includes = ["*.hcl"]
+excludes = ["*.tftest.hcl", "**/.terraform.lock.hcl"]
+
+[formatter.goimports]
+command = "goimports"
+options = ["-w"]
+includes = ["*.go"]
+excludes = ["vendor/**"]

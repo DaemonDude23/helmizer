@@ -129,9 +129,10 @@ func ExecuteCommands(stage string, args CLIArgs, helmizer Helmizer) ([]string, e
 
 	// Determine which command sequence to execute
 	commands := []Commands{}
-	if stage == "pre" {
+	switch stage {
+	case "pre":
 		commands = helmizer.PreCommands
-	} else if stage == "post" {
+	case "post":
 		commands = helmizer.PostCommands
 	}
 
@@ -165,35 +166,33 @@ func ExecuteCommands(stage string, args CLIArgs, helmizer Helmizer) ([]string, e
 			log.Errorf("Failed to execute command: %s\n%s", commandString, stdoutStderr.String())
 			if helmizer.StopOnError {
 				log.Fatal("stopOnError is set to true - exiting")
-				os.Exit(1)
-			} else {
-				log.Debug("Command failed, but continuing on")
-				return outputs, err
 			}
-		} else {
-			// Log the output, trimming command
-			output := strings.TrimSuffix(stdoutStderr.String(), "\n")
-			log.Infof("Successfully executed command: %s\n%s", commandString, output)
-			outputs = append(outputs, output)
+			log.Debug("Command failed, but continuing on")
+			return outputs, err
 		}
+		// Log the output, trimming command
+		output := strings.TrimSuffix(stdoutStderr.String(), "\n")
+		log.Infof("Successfully executed command: %s\n%s", commandString, output)
+		outputs = append(outputs, output)
 	}
 	return outputs, nil
 }
 
 // Retrieves a list of files or URLs based on the provided configuration file path and configuration.
 // It returns a slice of strings containing the absolute or relative paths to the files.
-func GetFilesOrURLs(Type string, ConfigFilePath string, config Config) []string {
+func GetFilesOrURLs(kind string, configFilePath string, config Config) []string {
 	var outputList []string // Contains list of URLs or files
 	// Get absolute path to parent directory containing helmizer.yaml
-	HelmizerConfigAbsDir, _ := filepath.Abs(filepath.Dir(ConfigFilePath))
+	HelmizerConfigAbsDir, _ := filepath.Abs(filepath.Dir(configFilePath))
 
 	typeToIterateOver := []string{}
 
-	if Type == "Crds" {
+	switch kind {
+	case "Crds":
 		typeToIterateOver = config.Kustomize.Crds
-	} else if Type == "PatchesStrategicMerge" {
+	case "PatchesStrategicMerge":
 		typeToIterateOver = config.Kustomize.PatchesStrategicMerge
-	} else if Type == "Resources" {
+	case "Resources":
 		typeToIterateOver = config.Kustomize.Resources
 	}
 
@@ -352,7 +351,7 @@ func ReconcileHelmizerConfig(args CLIArgs, config Config) Config {
 	return config
 }
 
-func WriteKustomizationFile(args CLIArgs, helmizer Config, kustomization Kustomization, kFilePath string) {
+func WriteKustomizationFile(_ CLIArgs, _ Config, kustomization Kustomization, kFilePath string) {
 	// Get the absolute path to the kustomization file
 	kAbsPath, _ := filepath.Abs(kFilePath)
 
@@ -389,9 +388,8 @@ func WriteKustomizationFile(args CLIArgs, helmizer Config, kustomization Kustomi
 		err = os.WriteFile(kAbsPath, fixedNewContent, 0644)
 		if err != nil {
 			log.Fatal(err)
-		} else {
-			log.Printf("Successfully wrote kustomization file: %s", kAbsPath)
 		}
+		log.Printf("Successfully wrote kustomization file: %s", kAbsPath)
 	} else {
 		log.Infof("kustomization file's keys/values have not changed - not writing file: %s", kAbsPath)
 	}

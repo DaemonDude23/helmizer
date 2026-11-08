@@ -1,0 +1,6 @@
+# https://github.com/crate-ci/typos — project words go in [default.extend-words].
+[files]
+extend-exclude = ["*.lock", "vendor/", "go.sum", "*.svg"]
+
+[default.extend-words]
+unparseable = "unparseable"

@@ -127,7 +127,7 @@ func resolveHelmfilePath(baseDir string, rawPath string) (string, error) {
 		path = filepath.Join(baseDir, path)
 	}
 	if _, err := os.Stat(path); err != nil {
-		return "", fmt.Errorf("Helmfile path not found: %s", path)
+		return "", fmt.Errorf("helmfile path not found: %s", path)
 	}
 	return path, nil
 }

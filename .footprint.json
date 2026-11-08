@@ -1,0 +1,14 @@
+{
+  "blueprint": "footprint-public-github-go",
+  "footprint": "05b18158e668",
+  "vars": {
+    "PROJECT": "helmizer",
+    "GO_DIR": "src",
+    "VERSION_FILE": "src/VERSION",
+    "DESCRIPTION": "Generates kustomization.yaml for your locally-rendered YAML manifests, such as with Helm templates"
+  },
+  "unmanaged": [".github/workflows/release.yml"],
+  "notes": {
+    ".github/workflows/release.yml": "helmizer keeps its own release.yaml: monthly planned releases (scripts/release-plan.py), scanned GHCR images for action.yml, draft-then-publish."
+  }
+}

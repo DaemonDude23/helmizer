@@ -1,0 +1,90 @@
+# Security scanning, separate from CI so a slow or noisy scanner never blocks
+# the test signal. The weekly schedule matters: new advisories land against an
+# unchanged tree, and only a scheduled run notices. Scanners come from the
+# flake's nixpkgs, so flake.lock maintenance keeps them current.
+name: Security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gitleaks:
+    name: gitleaks (full history)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31.11.3
+      - run: nix shell --inputs-from . nixpkgs#gitleaks --command gitleaks git --redact --no-banner --verbose .
+
+  trivy:
+    name: trivy fs
+    # Dependency CVEs across every lockfile, committed secrets, and IaC misconfigurations.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31.11.3
+      - run: >-
+          nix shell --inputs-from . nixpkgs#trivy --command
+          trivy fs --scanners vuln,secret,misconfig --severity HIGH,CRITICAL
+          --ignore-unfixed --exit-code 1 --skip-dirs .direnv
+          --ignorefile .trivyignore.yaml .
+
+  zizmor:
+    name: zizmor (workflow security)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31.11.3
+      - run: nix shell --inputs-from . nixpkgs#zizmor --command zizmor --persona regular .github/workflows
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  dependency-review:
+    name: dependency review
+    # New or bumped dependencies in a PR, checked against the advisory database.
+    if: github.event_name == 'pull_request' && github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: high
+
+  go:
+    name: govulncheck + gosec
+    # govulncheck is reachability-aware: it fails only when a vulnerable symbol
+    # is actually called. Suppress a reviewed gosec finding inline with
+    # `// #nosec G### -- reason`.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31.11.3
+      - run: nix develop --command make vuln

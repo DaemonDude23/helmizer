@@ -1,0 +1,29 @@
+# https://editorconfig.org — also enforced by editorconfig-checker in pre-commit.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+[*.{go,mod,sum}]
+indent_style = tab
+indent_size = unset
+
+[Makefile]
+indent_style = tab
+indent_size = unset
+
+[*.py]
+indent_size = 4
+
+[*.md]
+trim_trailing_whitespace = false
+# Markdown lists and code blocks are checked by markdownlint instead.
+indent_size = unset
+
+[{LICENSE,*.lock,.footprint.json}]
+indent_size = unset

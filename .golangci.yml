@@ -1,0 +1,40 @@
+# golangci-lint v2 (from the flake). pre-commit runs `golangci-lint run`.
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  default: standard
+  enable:
+    - bodyclose
+    - copyloopvar
+    - errorlint
+    - gocritic
+    - gosec
+    - misspell
+    - nolintlint
+    - revive
+    - unconvert
+    - usestdlibvars
+  settings:
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+  exclusions:
+    presets:
+      - comments
+      - common-false-positives
+      - std-error-handling
+    rules:
+      - path: _test\.go
+        linters: [gosec, errcheck]
+      # helmizer: ApiVersion / PatchesJson6902 mirror kustomize's YAML keys and are
+      # exported; renaming them is churn without a behavior change.
+      - linters: [revive]
+        text: "var-naming: struct field (ApiVersion|PatchesJson6902)"
+
+formatters:
+  enable:
+    - gofmt
+    - goimports

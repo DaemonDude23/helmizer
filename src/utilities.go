@@ -78,14 +78,12 @@ func ReadYamlFile(args CLIArgs) Config {
 	// Stat Helmizer config file
 	if _, err := os.Stat(args.ConfigFilePath); err != nil {
 		log.Fatalf("Helmizer config file not found: %s", args.ConfigFilePath)
-		os.Exit(1)
 	}
 
 	// Read config file
 	data, err := os.ReadFile(args.ConfigFilePath)
 	if err != nil {
 		log.Fatalf("Error reading YAML file: %s\n", err)
-		os.Exit(1)
 	}
 
 	// Parse the config file's YAML content into a Config struct
@@ -93,14 +91,12 @@ func ReadYamlFile(args CLIArgs) Config {
 	unmarshalErr := yaml.Unmarshal(data, &config)
 	if unmarshalErr != nil {
 		log.Fatalf("Error unmarshaling YAML data: %s\n", unmarshalErr)
-		os.Exit(1)
 	}
 
 	// Marshal the struct into YAML format
 	_, marshallErr := yaml.Marshal(&config)
 	if marshallErr != nil {
 		log.Fatalf("error: %v", marshallErr)
-		os.Exit(1)
 	}
 
 	return config

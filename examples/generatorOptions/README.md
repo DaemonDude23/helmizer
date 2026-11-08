@@ -7,7 +7,7 @@
 
 ---
 
-https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/generatoroptions/
+<https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/generatoroptions/>
 
 # Generating the Helm Template
 
