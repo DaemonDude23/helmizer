@@ -19,11 +19,11 @@ concurrency:
 env:
   # Bumped by Renovate (see the customManagers entry in renovate.json).
   # renovate: datasource=go depName=golang.org/x/vuln
-  GOVULNCHECK_VERSION: v1.9.0
+  GOVULNCHECK_VERSION: v1.10.0
   # renovate: datasource=go depName=github.com/securego/gosec/v2
   GOSEC_VERSION: v2.30.0
   # renovate: datasource=docker depName=docker.io/aquasec/trivy
-  TRIVY_IMAGE: docker.io/aquasec/trivy:0.76.1@sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c
+  TRIVY_IMAGE: docker.io/aquasec/trivy:0.76.2@sha256:8f6bb947dbc528902e11f2f5be52f7b519f6a39d5d148f41166f2040499768fb
 
 jobs:
   govulncheck:
@@ -38,7 +38,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Set up Go
-        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7
         with:
           go-version: '1.27.x'
           check-latest: true
@@ -59,7 +59,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Set up Go
-        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7
         with:
           go-version: '1.27.x'
           check-latest: true
@@ -110,6 +110,6 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Dependency review
-        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        uses: actions/dependency-review-action@bbc44d14a204704ccc493733616cd1e93a0321ec # v5.0.1
         with:
           fail-on-severity: high
